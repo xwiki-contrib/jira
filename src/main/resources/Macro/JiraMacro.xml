@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Macro</web>
+<name>JiraMacro</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1319655013000</creationDate>
+<date>1320161859000</date>
+<contentUpdateDate>1320161859000</contentUpdateDate>
+<version>1.0</version>
+<title>JiraMacro</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.WikiMacroClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>9</number>
+<prettyName>Macro code</prettyName>
+<rows>20</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<contentDescription>
+<disabled>0</disabled>
+<name>contentDescription</name>
+<number>8</number>
+<prettyName>Content description (Not applicable for "No content" type)</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</contentDescription>
+<contentType>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>contentType</name>
+<number>7</number>
+<prettyName>Macro content type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator>|</separator>
+<separators>|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Optional|Mandatory|No content</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</contentType>
+<defaultCategory>
+<disabled>0</disabled>
+<name>defaultCategory</name>
+<number>4</number>
+<prettyName>Default category</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultCategory>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>3</number>
+<prettyName>Macro description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<id>
+<disabled>0</disabled>
+<name>id</name>
+<number>1</number>
+<prettyName>Macro id</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</id>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>2</number>
+<prettyName>Macro name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<supportsInlineMode>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>supportsInlineMode</name>
+<number>5</number>
+<prettyName>Supports inline mode</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</supportsInlineMode>
+<visibility>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>visibility</name>
+<number>6</number>
+<prettyName>Macro visibility</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator>|</separator>
+<separators>|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Current User|Current Wiki|Global</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</visibility>
+</class>
+<name>Macro.JiraMacro</name>
+<number>0</number>
+<className>XWiki.WikiMacroClass</className>
+<guid>173bcd0e-35d0-49fe-864b-6942f403e0c8</guid>
+<property>
+<code>{{groovy}}
+import org.apache.velocity.tools.generic.EscapeTool;
+import java.text.SimpleDateFormat;
+import java.text.ParsePosition;
+// Get the macro parameters and macro content
+
+def jiraURLMacroParameter = xcontext.macro.params.jiraURL.trim();
+def styleMacroParameter = xcontext.macro.params.style.trim();
+def columnsMacroParameter = xcontext.macro.params.columns;
+def columnsNamesMacroParameter = xcontext.macro.params.columnsNames;
+def enableNotesMacroParameter = xcontext.macro.params.notes.trim();
+def enableJqlMacroParameter = xcontext.macro.params.jql.trim();
+def macroContent = xcontext.macro.content.trim();
+
+def escapetool = new EscapeTool();
+
+def displayIssueData(issue, columns, displayType, enableNotesMacroParameter, note) {
+    def sep = "";
+    if(displayType == "table") {
+        sep = "|";
+    }
+    else if (displayType == "list") {
+        sep = " ";
+    }
+    else if (displayType == "enum") {
+        sep = " ";
+    }
+    
+    columns.each {   
+             if (it.equals("key"))  { print "${sep}[[${issue.key}&gt;&gt;${issue.link}]]" }
+             else if (it.equals("type")) { print "${sep}[[image:${issue.type.@iconUrl}]]"}
+             else if (it.equals("status")) { print "${sep}[[image:${issue.status.@iconUrl}]]" }
+             else if (it.equals("created")) { 
+                def sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z")
+                def createdDate = sdf.parse(issue.created.toString(), new ParsePosition(0))
+                sdf = new SimpleDateFormat("dd-MMM-yyyy")
+                print "${sep}${sdf.format(createdDate)}" 
+            }
+            else{    
+            print   "${sep}{{{" + issue."${it}" + "}}}"
+            }
+        }
+        
+        if (enableNotesMacroParameter) { print "${sep}${note}"  }
+        if (displayType != "enum" ) { println "" }
+}
+
+def generateJQLIDs(macroContent, enableNotesMacroParameter, issueNoteList){
+
+    def issueIdList = []
+    // Read and parse macro content
+    macroContent.eachLine { line -&gt;
+        def lineParams = line.split("[|]")
+        // If notes are true, we take the second parameter too
+        if (enableNotesMacroParameter=="true") {
+            issueIdList.add(lineParams[0].trim())
+            if (lineParams.size() &gt; 1) {
+                issueNoteList.add(lineParams[1].trim())
+            }    
+            else {
+                issueNoteList.add("")
+            }
+        }
+        else {
+            issueIdList.add(lineParams[0])
+        }
+    }
+    //Now that we have the id's and required columns, we can create the JQL
+    issueIdList = issueIdList.collect{ "issueKey=" +it}
+    return issueIdList.join("+OR+") + "&amp;"
+}
+
+
+def geneateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames){
+    def columnsParameters = []
+    def columnsNamesParameters = []
+    // We build the Columns ArrayList
+    if (columnsMacroParameter){
+        columnsParameters = columnsMacroParameter.split("[,]").collect{it.trim();}
+        }
+    switch (styleMacroParameter) {
+        case "table": if (columnsParameters.size()== 0) columnsParameters = ["type", "key", "status", "assignee"]; break;
+        case "list":  if (columnsParameters.size()== 0) columnsParameters = ["status", "key", "summary"]; break;
+        case "enum":  if (columnsParameters.size()== 0) columnsParameters = ["status", "key"]; break;
+    }
+    
+    // We build the Columns Names ArrayList
+    if (columnsNamesMacroParameter){
+        columnsNamesParameters = columnsNamesMacroParameter.split("[,]").collect{it.trim();}
+        }
+    else{
+        if (styleMacroParameter.equals("table")) { 
+            if (columnsNamesParameters.size()== 0) columnsNamesParameters = ["Type", "Key", "Status", "Assignee"];
+            }
+        }
+           
+    // We create the JQL portion regarding the columns/fields we want and we also append the link field which is used internally
+
+    columns.addAll(columnsParameters)
+    columnsNames.addAll(columnsNamesParameters)
+    columnsParameters = columnsParameters.collect{"field=" + it.trim()}
+    return columnsParameters.join("&amp;") + "&amp;field=link"
+}
+
+
+// Build the URL
+def URL = jiraURLMacroParameter + "/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery="
+
+
+def columns =[]
+def columnsNames = []
+def issueNoteList = []
+if (enableJqlMacroParameter.equals("true")){
+       URL += URLEncoder.encode(macroContent, "UTF-8")      
+       URL += "&amp;" + geneateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames)
+        }
+else{
+        URL += generateJQLIDs(macroContent, enableNotesMacroParameter, issueNoteList)
+        URL += geneateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames)           
+}
+
+def root = new XmlSlurper().parseText(URL.toURL().text)
+if (styleMacroParameter.equals("table")) {
+    columnsNames.each{ print "|=" + it.capitalize() }
+    if (enableNotesMacroParameter.equals("true")) { print "|=Notes" }
+    println""
+
+    root.channel.item.eachWithIndex { issue, i -&gt;
+        displayIssueData(issue, columns, "table", enableNotesMacroParameter.equals("true"), issueNoteList[i]);
+    }
+}
+else if (styleMacroParameter.equals("list"))
+{
+    root.channel.item.eachWithIndex { issue, i -&gt;
+        displayIssueData(issue, columns, "list", enableNotesMacroParameter.equals("true"),issueNoteList[i]);
+    }
+}
+
+else if (styleMacroParameter.equals("enum"))
+{
+    root.channel.item.eachWithIndex { issue, i -&gt;
+        displayIssueData(issue, columns, "enum", false ,null);
+    }
+}
+
+{{/groovy}}
+</code></property><property><contentDescription>Put each issue on a new line or specify a JQL query.</contentDescription>
+</property>
+<property>
+<contentType>Mandatory</contentType>
+</property>
+<property>
+<defaultCategory>Content</defaultCategory>
+</property>
+<property>
+<description>Displays JIRA issues</description>
+</property>
+<property>
+<id>jira</id>
+</property>
+<property>
+<name>JIRA</name>
+</property>
+<property>
+<supportsInlineMode>0</supportsInlineMode>
+</property>
+<property>
+<visibility>Current Wiki</visibility>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WikiMacroParameterClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultValue>
+<disabled>0</disabled>
+<name>defaultValue</name>
+<number>4</number>
+<prettyName>Parameter default value</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultValue>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>2</number>
+<prettyName>Parameter description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<mandatory>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>mandatory</name>
+<number>3</number>
+<prettyName>Parameter mandatory</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</mandatory>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Parameter name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Macro.JiraMacro</name>
+<number>0</number>
+<className>XWiki.WikiMacroParameterClass</className>
+<guid>7ae88e52-beff-4737-8208-fb2397c6afd4</guid>
+<property>
+<defaultValue></defaultValue>
+</property>
+<property>
+<description>The URL to your JIRA</description>
+</property>
+<property>
+<mandatory>1</mandatory>
+</property>
+<property>
+<name>jiraURL</name>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WikiMacroParameterClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultValue>
+<disabled>0</disabled>
+<name>defaultValue</name>
+<number>4</number>
+<prettyName>Parameter default value</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultValue>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>2</number>
+<prettyName>Parameter description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<mandatory>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>mandatory</name>
+<number>3</number>
+<prettyName>Parameter mandatory</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</mandatory>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Parameter name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Macro.JiraMacro</name>
+<number>1</number>
+<className>XWiki.WikiMacroParameterClass</className>
+<guid>45d9ed6a-383a-4a05-9ed8-08771cf7f41a</guid>
+<property>
+<defaultValue></defaultValue>
+</property>
+<property>
+<description>Parameter which describes the way the macro should display the results:
+available options: table, list, enumeration</description>
+</property>
+<property>
+<mandatory>0</mandatory>
+</property>
+<property>
+<name>style</name>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WikiMacroParameterClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultValue>
+<disabled>0</disabled>
+<name>defaultValue</name>
+<number>4</number>
+<prettyName>Parameter default value</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultValue>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>2</number>
+<prettyName>Parameter description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<mandatory>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>mandatory</name>
+<number>3</number>
+<prettyName>Parameter mandatory</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</mandatory>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Parameter name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Macro.JiraMacro</name>
+<number>2</number>
+<className>XWiki.WikiMacroParameterClass</className>
+<guid>858c5f7a-00bf-4fa8-b425-38eca7022074</guid>
+<property>
+<defaultValue></defaultValue>
+</property>
+<property>
+<description>Parameter which describes the columns that will be displayed when using the table option. These values represent fields from JIRA like type, id, assignee, status</description>
+</property>
+<property>
+<mandatory>0</mandatory>
+</property>
+<property>
+<name>columns</name>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WikiMacroParameterClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultValue>
+<disabled>0</disabled>
+<name>defaultValue</name>
+<number>4</number>
+<prettyName>Parameter default value</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultValue>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>2</number>
+<prettyName>Parameter description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<mandatory>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>mandatory</name>
+<number>3</number>
+<prettyName>Parameter mandatory</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</mandatory>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Parameter name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Macro.JiraMacro</name>
+<number>3</number>
+<className>XWiki.WikiMacroParameterClass</className>
+<guid>3f6a7480-4042-47ac-a7c5-3f144f57b55f</guid>
+<property>
+<defaultValue></defaultValue>
+</property>
+<property>
+<description>The name of the columns you want to be used in the table header. They must have the same order as in columns parameter</description>
+</property>
+<property>
+<mandatory>0</mandatory>
+</property>
+<property>
+<name>columnsNames</name>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WikiMacroParameterClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultValue>
+<disabled>0</disabled>
+<name>defaultValue</name>
+<number>4</number>
+<prettyName>Parameter default value</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultValue>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>2</number>
+<prettyName>Parameter description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<mandatory>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>mandatory</name>
+<number>3</number>
+<prettyName>Parameter mandatory</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</mandatory>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Parameter name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Macro.JiraMacro</name>
+<number>4</number>
+<className>XWiki.WikiMacroParameterClass</className>
+<guid>6aa85b45-f4b0-4f04-89d2-0b67ebdc598c</guid>
+<property>
+<defaultValue>false</defaultValue>
+</property>
+<property>
+<description>Parameter which takes additional notes and puts them in a separate column. This information must be specified near the issue. This information is not taken from JIRA</description>
+</property>
+<property>
+<mandatory>0</mandatory>
+</property>
+<property>
+<name>notes</name>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.WikiMacroParameterClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultValue>
+<disabled>0</disabled>
+<name>defaultValue</name>
+<number>4</number>
+<prettyName>Parameter default value</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultValue>
+<description>
+<disabled>0</disabled>
+<name>description</name>
+<number>2</number>
+<prettyName>Parameter description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<mandatory>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>mandatory</name>
+<number>3</number>
+<prettyName>Parameter mandatory</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</mandatory>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Parameter name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Macro.JiraMacro</name>
+<number>5</number>
+<className>XWiki.WikiMacroParameterClass</className>
+<guid>4ef708ec-2def-49ba-a02a-c3faf40e0614</guid>
+<property>
+<defaultValue>false</defaultValue>
+</property>
+<property>
+<description>If true, it will interpret the macro content as a JQL Query</description>
+</property>
+<property>
+<mandatory>0</mandatory>
+</property>
+<property>
+<name>jql</name>
+</property>
+</object>
+<content>
+==== JIRA Macro as Table with no columns defined, using the default hardcoded ones ====
+
+{{jira style="table" notes="true" jiraURL="http://jira.xwiki.org"}}
+XWIKI-1000| HARD TO FIX
+XWIKI-4356|EASY TO FIX
+XWIKI-3677|This issue takes too long. Please find a solution ASAP
+{{/jira}}
+
+==== JIRA Macro as Table using custom columns ====
+{{jira style="table" columns="type,key, summary,status, assignee, created" columnsNames="Le Type,Za Key, Short description,Issue Status, Person to Fix this, kreator" notes="true" jiraURL="http://jira.xwiki.org"}}
+XWIKI-1000| HARD TO FIX
+XWIKI-4356|EASY TO FIX
+XWIKI-3677|This issue takes too long. Please find a solution ASAP
+{{/jira}}
+
+==== JIRA Macro as List with no columns defined, using the default hardcoded ones ====
+{{jira style="list" notes="true" jiraURL="http://jira.xwiki.org"}}
+XWIKI-1000| Stefan
+XWIKI-4356|Mircea
+XWIKI-3677
+{{/jira}}
+
+==== JIRA Macro as List using custom columns ====
+{{jira style="list" columns="key, summary,type,status, assignee, created" columnsNames="Za key, Description, Le type, Issue status, Who will fix it ?, Kreation Date" notes="true" jiraURL="http://jira.xwiki.org"}}
+XWIKI-1000| Stefan
+XWIKI-4356|Mircea
+XWIKI-3677
+{{/jira}}
+
+==== JIRA Macro as Enum with no columns defined, using the default hardcoded ones ====
+{{jira style="enum" notes="false" jiraURL="http://jira.xwiki.org"}}
+XWIKI-1000| Stefan
+XWIKI-4356|Mircea
+XWIKI-3677|Argat
+{{/jira}}
+
+==== JIRA Macro as Enum, using custom columns ====
+{{jira style="enum" columns="key, status, type" columnsNames="Za key, Issue Status or whatever, What Type is this?" jiraURL="http://jira.xwiki.org"}}
+XWIKI-1000| Stefan
+XWIKI-4356|Mircea
+XWIKI-3677|Argat
+{{/jira}}
+
+==== JIRA Macro as Table using JQL with no columns defined, using the default hardcoded ones (uses a complex query from Vincent) ====
+{{jira style="table" jql="true" jiraURL="http://jira.xwiki.org"}}
+(project in (XWIKI) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XE) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XRENDERING) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XCOMMONS) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XEM) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2"))
+{{/jira}}
+
+==== JIRA Macro as Table using JQL with custom columns defined (uses a complex query from Vincent) ====
+{{jira style="table" columns="key, status, type, summary, key, key" columnsNames="Za key master, What is the status ? , Le type, The summary, key ONE, key TWO" jql="true" jiraURL="http://jira.xwiki.org"}}
+(project in (XWIKI) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XE) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XRENDERING) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XCOMMONS) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XEM) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2"))
+{{/jira}}
+</content></xwikidoc>
