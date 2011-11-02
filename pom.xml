@@ -31,7 +31,7 @@
   </parent>
   <groupId>org.xwiki.contrib</groupId>
   <artifactId>macro-jira</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <name>JIRA Macro</name>
   <packaging>xar</packaging>
   <description>Extracts information from JIRA and presents it to the user in a nice and customizable way</description>
