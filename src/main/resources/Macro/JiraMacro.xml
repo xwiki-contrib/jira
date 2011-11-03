@@ -229,7 +229,7 @@ def geneateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, style
         }
     else{
         if (styleMacroParameter.equals("table")) { 
-            if (columnsNamesParameters.size()== 0) columnsNamesParameters = ["Type", "Key", "Status", "Assignee"];
+            if (columnsNamesParameters.size()== 0) columnsNamesParameters = ["Type", "Key", "Status", "Summary", "Assignee"];
             }
         }
            
@@ -748,12 +748,12 @@ XWIKI-4356|Note 2
 XWIKI-3677|Note 3
 {{/jira}}
 
-==== JIRA Macro as Table using JQL with no columns defined, using the default hardcoded ones (uses a complex query from Vincent) ====
+==== JIRA Macro as Table using JQL with no columns defined, using the default hardcoded ones ====
 {{jira style="table" jql="true" url="http://jira.xwiki.org"}}
 (project in (XWIKI) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XE) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XRENDERING) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XCOMMONS) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XEM) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2"))
 {{/jira}}
 
-==== JIRA Macro as Table using JQL with custom columns defined (uses a complex query from Vincent) ====
+==== JIRA Macro as Table using JQL with custom columns defined ====
 {{jira style="table" columns="key, status, type, summary, key, key" columnsNames="Issue Id, What is the status ? , Issue type, The summary, key ONE, Same key again" jql="true" url="http://jira.xwiki.org"}}
 (project in (XWIKI) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XE) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XRENDERING) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XCOMMONS) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XEM) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2"))
 {{/jira}}
