@@ -14,7 +14,7 @@
 <date>1320161859000</date>
 <contentUpdateDate>1320161859000</contentUpdateDate>
 <version>1.0</version>
-<title>JiraMacro</title>
+<title>JIRA Macro</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -713,7 +713,7 @@ available options: table, list, enumeration</description>
 </property>
 </object>
 <content>
-==== JIRA Macro as Table with no columns defined, using the default hardcoded ones ====
+= JIRA Macro as Table with no columns defined, using the default hardcoded ones =
 
 {{jira style="table" notes="true" url="http://jira.xwiki.org"}}
 XWIKI-1000| HARD TO FIX
@@ -721,47 +721,54 @@ XWIKI-4356|EASY TO FIX
 XWIKI-3677|This issue takes too long. Please find a solution ASAP
 {{/jira}}
 
-==== JIRA Macro as Table using custom columns ====
+= JIRA Macro as Table using custom columns =
+
 {{jira style="table" columns="type,key, summary,status, assignee, created" columnsNames="Issue type,Issue Id, Short description,Issue Status, Person to Fix this, Creation Date" notes="true" url="http://jira.xwiki.org"}}
 XWIKI-1000|HARD TO FIX
 XWIKI-4356|EASY TO FIX
 XWIKI-3677|This issue takes too long. Please find a solution ASAP
 {{/jira}}
 
-==== JIRA Macro as List with no columns defined, using the default hardcoded ones ====
+= JIRA Macro as List with no columns defined, using the default hardcoded ones =
+
 {{jira style="list" notes="true" url="http://jira.xwiki.org"}}
 XWIKI-1000|Note 1
 XWIKI-4356|Note 2
 XWIKI-3677|Note 3
 {{/jira}}
 
-==== JIRA Macro as List using custom columns ====
+= JIRA Macro as List using custom columns =
+
 {{jira style="list" columns="key, summary,type,status, assignee, created" columnsNames="Issue Id, Description, Issue type, Issue status, Who will fix it ?, Creation Date" notes="true" url="http://jira.xwiki.org"}}
 XWIKI-1000|Note 1
 XWIKI-4356|Note 2
 XWIKI-3677|Note 3
 {{/jira}}
 
-==== JIRA Macro as Enum with no columns defined, using the default hardcoded ones ====
+= JIRA Macro as Enum with no columns defined, using the default hardcoded ones =
+
 {{jira style="enum" notes="false" url="http://jira.xwiki.org"}}
 XWIKI-1000|Note 1
 XWIKI-4356|Note 2
 XWIKI-3677|Note 3
 {{/jira}}
 
-==== JIRA Macro as Enum, using custom columns ====
+= JIRA Macro as Enum, using custom columns =
+
 {{jira style="enum" columns="key, status, type" columnsNames="Issue Id, Issue Status, What Type is this?" url="http://jira.xwiki.org"}}
 XWIKI-1000|Note 1
 XWIKI-4356|Note 2
 XWIKI-3677|Note 3
 {{/jira}}
 
-==== JIRA Macro as Table using JQL with no columns defined, using the default hardcoded ones ====
+= JIRA Macro as Table using JQL with no columns defined, using the default hardcoded ones =
+
 {{jira style="table" jql="true" url="http://jira.xwiki.org"}}
 (project in (XWIKI) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XE) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XRENDERING) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XCOMMONS) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XEM) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2"))
 {{/jira}}
 
-==== JIRA Macro as Table using JQL with custom columns defined ====
+= JIRA Macro as Table using JQL with custom columns defined =
+
 {{jira style="table" columns="key, status, type, summary, key, key" columnsNames="Issue Id, What is the status ? , Issue type, The summary, key ONE, Same key again" jql="true" url="http://jira.xwiki.org"}}
 (project in (XWIKI) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XE) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XRENDERING) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XCOMMONS) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2") and resolution in ("Fixed")) or (project in (XEM) and fixVersion in ("3.2 M1", "3.2 M2", "3.2 M3", "3.2 RC1", "3.2"))
 {{/jira}}
