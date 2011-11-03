@@ -141,6 +141,8 @@
 import org.apache.velocity.tools.generic.EscapeTool;
 import java.text.SimpleDateFormat;
 import java.text.ParsePosition;
+import org.xwiki.rendering.macro.MacroExecutionException
+
 // Get the macro parameters and macro content
 
 def jiraURLMacroParameter = xcontext.macro.params.url.trim();
@@ -153,6 +155,12 @@ def macroContent = xcontext.macro.content.trim();
 
 def escapetool = new EscapeTool();
 
+
+if (xcontext.macro.context.isInline()){
+    if (styleMacroParameter.equals("table") || styleMacroParameter.equals("list")){
+        throw new MacroExecutionException("Using this style is not allowed in inline mode");
+    }
+}
 def displayIssueData(issue, columns, displayType, enableNotesMacroParameter, note) {
     def sep = "";
     if(displayType == "table") {
@@ -251,7 +259,7 @@ def columnsNames = []
 def issueNoteList = []
 if (enableJqlMacroParameter.equals("true")){
        URL += URLEncoder.encode(macroContent, "UTF-8")      
-       URL += "&amp;" + geneateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames)
+       URL += "&amp;" + generateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames)
         }
 else{
         URL += generateJQLIDs(macroContent, enableNotesMacroParameter, issueNoteList)
@@ -301,7 +309,7 @@ else if (styleMacroParameter.equals("enum"))
 <name>JIRA</name>
 </property>
 <property>
-<supportsInlineMode>0</supportsInlineMode>
+<supportsInlineMode>1</supportsInlineMode>
 </property>
 <property>
 <visibility>Current Wiki</visibility>
