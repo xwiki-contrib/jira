@@ -210,7 +210,7 @@ def generateJQLIDs(macroContent, enableNotesMacroParameter, issueNoteList){
 }
 
 
-def geneateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames){
+def generateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames){
     def columnsParameters = []
     def columnsNamesParameters = []
     // We build the Columns ArrayList
@@ -255,7 +255,7 @@ if (enableJqlMacroParameter.equals("true")){
         }
 else{
         URL += generateJQLIDs(macroContent, enableNotesMacroParameter, issueNoteList)
-        URL += geneateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames)           
+        URL += generateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, styleMacroParameter, columns, columnsNames)           
 }
 
 def root = new XmlSlurper().parseText(URL.toURL().text)
