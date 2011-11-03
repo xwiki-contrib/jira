@@ -218,7 +218,7 @@ def geneateColumnsArray(columnsMacroParameter, columnsNamesMacroParameter, style
         columnsParameters = columnsMacroParameter.split("[,]").collect{it.trim();}
         }
     switch (styleMacroParameter) {
-        case "table": if (columnsParameters.size()== 0) columnsParameters = ["type", "key", "status", "assignee"]; break;
+        case "table": if (columnsParameters.size()== 0) columnsParameters = ["type", "key", "status", "summary", "assignee"]; break;
         case "list":  if (columnsParameters.size()== 0) columnsParameters = ["status", "key", "summary"]; break;
         case "enum":  if (columnsParameters.size()== 0) columnsParameters = ["status", "key"]; break;
     }
