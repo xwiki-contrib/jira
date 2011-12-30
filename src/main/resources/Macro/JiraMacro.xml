@@ -146,7 +146,7 @@ import org.xwiki.rendering.macro.MacroExecutionException
 // Get the macro parameters and macro content
 
 def jiraURLMacroParameter = xcontext.macro.params.url.trim();
-def styleMacroParameter = xcontext.macro.params.style.trim();
+def styleMacroParameter = (xcontext.macro.params.style==null||xcontext.macro.params.style=="") ? "table" : xcontext.macro.params.style.trim();
 def columnsMacroParameter = xcontext.macro.params.columns;
 def columnsNamesMacroParameter = xcontext.macro.params.columnsNames;
 def enableNotesMacroParameter = xcontext.macro.params.notes.trim();
