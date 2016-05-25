@@ -1,8 +1,0 @@
-An XWiki Groovy Macro. It extracts information from JIRA and presents it to the user in a nice and customizable way.
-
-Note that this JIRA Macro has been superseeded by a new JIRA Macro which is part of the XWiki Rendering module and
-thus supported by the XWiki Dev Team:
-http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Macro
-
-This contribured macro is documented at 
-http://extensions.xwiki.org/xwiki/bin/view/Extension/Contrib+JIRA+Macro
