@@ -86,9 +86,13 @@ public class JIRAMacroParameters
     private List<String> fieldNames;
 
     /**
+     * @see #getId()
+     */
+    private String id;
+
+    /**
      * @param url see {@link #getURL()}
      */
-    @PropertyMandatory
     @PropertyDescription("the JIRA Server URL")
     public void setURL(String url)
     {
@@ -96,11 +100,30 @@ public class JIRAMacroParameters
     }
 
     /**
-     * @return the JIRA Server URL (eg "http://jira.xwiki.org")
+     * @return the JIRA Server URL (e.g. {@code http://jira.xwiki.org})
      */
     public String getURL()
     {
         return this.url;
+    }
+
+    /**
+     * @param id see {@link #getId()}
+     */
+    @PropertyDescription("the configuration id of the JIRA Server URL to use")
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    /**
+     * @return the configuration id of the JIRA Server URL to use (defined in the Macro configuration settings). Note
+     *         that if a URL is specified it'll take precedence over this parameter. If no URL and no id is specified
+     *         then the default id from the configuration will be used (if any)
+     */
+    public String getId()
+    {
+        return this.id;
     }
 
     /**

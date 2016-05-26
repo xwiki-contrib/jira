@@ -67,12 +67,14 @@ public class ListJIRADataSource extends AbstractJIRADataSource
     public Collection<Element> getData(String macroContent, JIRAMacroParameters parameters)
         throws MacroExecutionException
     {
+        String url = computeURLPrefix(parameters);
+
         List<Pair<String, String>> ids = parseIds(macroContent);
         if (ids.isEmpty()) {
             throw new MacroExecutionException("Empty list of JIRA ids!");
         }
 
-        Document document = getXMLDocument(parameters.getURL(), constructJQLQuery(ids));
+        Document document = getXMLDocument(url, constructJQLQuery(ids));
         return buildIssues(document, ids);
     }
 

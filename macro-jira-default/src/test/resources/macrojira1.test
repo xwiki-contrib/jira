@@ -2,6 +2,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .# Test jira macro called without a url parameter
+.# and no URL mapping defined
 .#-----------------------------------------------------
 {{jira/}}
 .#-----------------------------------------------------
@@ -10,10 +11,10 @@
 beginDocument
 beginMacroMarkerStandalone [jira] []
 beginGroup [[class]=[xwikirenderingerror]]
-onWord [Invalid macro parameters used for the "jira" macro. Click on this message for details.]
+onWord [Failed to execute the [jira] macro. Click on this message for details.]
 endGroup [[class]=[xwikirenderingerror]]
 beginGroup [[class]=[xwikirenderingerrordescription hidden]]
-onVerbatim [org.xwiki.properties.PropertyMandatoryException: Property [url] mandatory${{{regex:.*}}}] [false]
+onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: No JIRA URL found. You must specify a URL as a macro parameter or an URL id in as a macro parameter, or define a default URL id in the macro's configuration${{{regex:.*}}}] [false]
 endGroup [[class]=[xwikirenderingerrordescription hidden]]
 endMacroMarkerStandalone [jira] []
 endDocument

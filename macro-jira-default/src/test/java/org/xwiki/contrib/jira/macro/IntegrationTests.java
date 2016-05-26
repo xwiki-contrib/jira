@@ -30,9 +30,6 @@ import org.jmock.lib.concurrent.Synchroniser;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.runner.RunWith;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.contrib.jira.macro.JIRADataSource;
-import org.xwiki.contrib.jira.macro.internal.source.JQLJIRADataSource;
-import org.xwiki.contrib.jira.macro.internal.source.ListJIRADataSource;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 
 /**
@@ -71,24 +68,12 @@ public class IntegrationTests
             will(returnValue(document));
         }});
 
-        ListJIRADataSource testableListJIRADataSource = new ListJIRADataSource()
-        {
-            @Override protected SAXBuilder createSAXBuilder()
-            {
-                return saxBuilder;
-            }
-        };
-        componentManager.registerComponent(componentManager.getComponentDescriptor(JIRADataSource.class, "list"),
-            testableListJIRADataSource);
+        TestableListJIRADataSource testableListJIRADataSource =
+            componentManager.getInstance(JIRADataSource.class, "list");
+        testableListJIRADataSource.setSAXBuilder(saxBuilder);
 
-        JQLJIRADataSource testableJQLJIRADataSource = new JQLJIRADataSource()
-        {
-            @Override protected SAXBuilder createSAXBuilder()
-            {
-                return saxBuilder;
-            }
-        };
-        componentManager.registerComponent(componentManager.getComponentDescriptor(JIRADataSource.class, "jql"),
-            testableJQLJIRADataSource);
+        TestableJQLJIRADataSource testableJQLJIRADataSource =
+            componentManager.getInstance(JIRADataSource.class, "jql");
+        testableJQLJIRADataSource.setSAXBuilder(saxBuilder);
     }
 }

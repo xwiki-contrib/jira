@@ -76,6 +76,8 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
+            <!-- Ensure that we don't add any dependency on XWiki Platform since we want to allow pure
+                 XWiki Rendering users to be able to use the jira macro. -->
             <id>enforce-platform-isolation</id>
             <goals>
               <goal>enforce</goal>
@@ -84,23 +86,15 @@
               <rules>
                 <bannedDependencies>
                   <excludes>
-                    <!-- Ensure that we don't add any dependency on XWiki Platform since we want to allow pure
-                         XWiki Rendering users to be able to use the jira macro. -->
                     <exclude>org.xwiki.platform:*</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>
             </configuration>
           </execution>
-        </executions>
-      </plugin>
-      <!-- Ensure that this macro doesn't uses the HTML macro. We want to ensure this since we want to let users be
-           able to disable the HTML macro (for security reasons) and the rest of XWiki should continue to work fine
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
+          <!-- Ensure that this macro doesn't uses the HTML macro. We want to ensure this since we want to let users be
+               able to disable the HTML macro (for security reasons) and the rest of XWiki should continue to work fine
+          -->
           <execution>
             <id>enforce-banned-dependencies</id>
             <goals>

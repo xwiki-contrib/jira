@@ -1,4 +1,5 @@
 org.xwiki.contrib.jira.macro.internal.JIRAMacro
+org.xwiki.contrib.jira.macro.internal.DefaultJIRAConfiguration
 org.xwiki.contrib.jira.macro.internal.source.ListJIRADataSource
 org.xwiki.contrib.jira.macro.internal.source.JQLJIRADataSource
 org.xwiki.contrib.jira.macro.internal.displayer.TableJIRADisplayer

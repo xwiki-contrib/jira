@@ -17,42 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.macro.internal.source;
-
-import java.util.Collection;
+package org.xwiki.contrib.jira.macro;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jdom2.Document;
-import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.internal.source.ListJIRADataSource;
 
-/**
- * Takes a JQL query from the Macro content and return matching JIRA issues.
- *
- * @version $Id$
- * @since 4.2M1
- */
 @Component
-@Named("jql")
+@Named("list")
 @Singleton
-public class JQLJIRADataSource extends AbstractJIRADataSource
+public class TestableListJIRADataSource extends ListJIRADataSource
 {
-    @Override
-    public Collection<Element> getData(String macroContent, JIRAMacroParameters parameters)
-        throws MacroExecutionException
+    private SAXBuilder saxBuilder;
+
+    public void setSAXBuilder(SAXBuilder saxBuilder)
     {
-        String url = computeURLPrefix(parameters);
+        this.saxBuilder = saxBuilder;
+    }
 
-        if (StringUtils.isBlank(macroContent)) {
-            throw new MacroExecutionException("Missing JQL query!");
-        }
-
-        Document document = getXMLDocument(url, macroContent);
-        return buildIssues(document).values();
+    @Override
+    protected SAXBuilder createSAXBuilder()
+    {
+        return this.saxBuilder;
     }
 }
