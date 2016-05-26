@@ -31,6 +31,8 @@
   <name>Macro - JIRA - Default Implementation</name>
   <version>8.2-SNAPSHOT</version>
   <packaging>jar</packaging>
+  <!-- Additional information: The reason we don't put any platform-related depdendencies in this module is to allow
+       pure XWiki Rendering users to use it. -->
   <description>Fetches information from a JIRA server and displays them as a table, list or enumeration</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.95</xwiki.jacoco.instructionRatio>
