@@ -33,6 +33,26 @@
   <name>Macro - JIRA - Parent POM</name>
   <version>8.2-SNAPSHOT</version>
   <description>Macro - JIRA - Parent POM</description>
+  <scm>
+    <connection>scm:git:git://github.com/xwiki-contrib/macro-jira.git</connection>
+    <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-jira.git</developerConnection>
+    <url>https://github.com/xwiki-contrib/macro-jira</url>
+    <tag>HEAD</tag>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/browse/MJIRA</url>
+  </issueManagement>
+  <developers>
+    <developer>
+      <id>vmassol</id>
+      <name>Vincent Massol</name>
+    </developer>
+    <developer>
+      <id>xwikidev</id>
+      <name>XWiki Development Team</name>
+    </developer>
+  </developers>
   <properties>
     <rendering.version>${commons.version}</rendering.version>
   </properties>
