@@ -23,28 +23,102 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.rendering</groupId>
-    <artifactId>xwiki-rendering-macros</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <groupId>org.xwiki.commons</groupId>
+    <artifactId>xwiki-commons-pom</artifactId>
+    <version>6.4</version>
   </parent>
-  <artifactId>xwiki-rendering-macro-jira</artifactId>
-  <name>XWiki Rendering - Macro - JIRA</name>
+  <groupId>org.xwiki.contrib.jira</groupId>
+  <artifactId>macro-jira</artifactId>
+  <name>Macro - JIRA</name>
+  <version>8.2-SNAPSHOT</version>
   <description>Fetches information from a JIRA server and displays them as a table, list or enumeration</description>
   <properties>
+    <rendering.version>${commons.version}</rendering.version>
     <xwiki.jacoco.instructionRatio>0.95</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JIRA Macro</xwiki.extension.name>
-  </properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.rendering:xwiki-rendering-macro-jira</xwiki.extension.features>  </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-transformation-macro</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>jdom2</artifactId>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-event</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-test</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*IntegrationTests.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+      <!-- Ensure that this macro doesn't uses the HTML macro. We want to ensure this since we want to let users be
+           able to disable the HTML macro (for security reasons) and the rest of XWiki should continue to work fine
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.xwiki.rendering:xwiki-rendering-macro-html:*:jar:*</exclude>
+                  </excludes>
+                  <message>
+                    We need to be able to turn off the HTML Macro and still have a working system.
+                    Thus it is forbidden to depend on the HTML Macro.
+                  </message>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
