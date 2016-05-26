@@ -29,56 +29,16 @@
   </parent>
   <groupId>org.xwiki.contrib.jira</groupId>
   <artifactId>macro-jira</artifactId>
-  <name>Macro - JIRA</name>
+  <packaging>pom</packaging>
+  <name>Macro - JIRA - Parent POM</name>
   <version>8.2-SNAPSHOT</version>
-  <description>Fetches information from a JIRA server and displays them as a table, list or enumeration</description>
+  <description>Macro - JIRA - Parent POM</description>
   <properties>
     <rendering.version>${commons.version}</rendering.version>
-    <xwiki.jacoco.instructionRatio>0.95</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>JIRA Macro</xwiki.extension.name>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.rendering:xwiki-rendering-macro-jira</xwiki.extension.features>  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-api</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-transformation-macro</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom2</artifactId>
-    </dependency>
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-event</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-test</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  </properties>
+  <modules>
+    <module>macro-jira-default</module>
+  </modules>
   <build>
     <plugins>
       <plugin>
