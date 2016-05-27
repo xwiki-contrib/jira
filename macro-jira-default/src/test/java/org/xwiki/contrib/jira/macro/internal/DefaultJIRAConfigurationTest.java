@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.contrib.jira.macro.JIRAServer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.*;
@@ -45,21 +46,15 @@ public class DefaultJIRAConfigurationTest
         DefaultJIRAConfiguration configuration = this.mocker.getComponentUnderTest();
 
         assertNull(configuration.getDefaultURLId());
-        assertNull(configuration.getPassword());
-        assertNull(configuration.getUsername());
-        assertTrue(configuration.getURLMappings().isEmpty());
+        assertTrue(configuration.getJIRAServers().isEmpty());
 
         configuration.setDefaultURLId("defaultid");
         assertEquals("defaultid", configuration.getDefaultURLId());
 
-        configuration.setUsername("username");
-        assertEquals("username", configuration.getUsername());
-
-        configuration.setPassword("password");
-        assertEquals("password", configuration.getPassword());
-
-        configuration.setURLMappings(Collections.singletonMap("key", "value"));
-        assertEquals(1, configuration.getURLMappings().size());
-        assertTrue(configuration.getURLMappings().containsKey("key"));
+        configuration.setJIRAServers(Collections.singletonMap("key", new JIRAServer("url", "username", "password")));
+        assertEquals(1, configuration.getJIRAServers().size());
+        assertEquals("url", configuration.getJIRAServers().get("key").getURL());
+        assertEquals("username", configuration.getJIRAServers().get("key").getUsername());
+        assertEquals("password", configuration.getJIRAServers().get("key").getPassword());
     }
 }

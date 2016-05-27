@@ -34,6 +34,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.macro.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
@@ -67,14 +68,14 @@ public class ListJIRADataSource extends AbstractJIRADataSource
     public Collection<Element> getData(String macroContent, JIRAMacroParameters parameters)
         throws MacroExecutionException
     {
-        String url = computeURLPrefix(parameters);
+        JIRAServer jiraServer = getJIRAServer(parameters);
 
         List<Pair<String, String>> ids = parseIds(macroContent);
         if (ids.isEmpty()) {
             throw new MacroExecutionException("Empty list of JIRA ids!");
         }
 
-        Document document = getXMLDocument(url, constructJQLQuery(ids));
+        Document document = getXMLDocument(jiraServer, constructJQLQuery(ids));
         return buildIssues(document, ids);
     }
 

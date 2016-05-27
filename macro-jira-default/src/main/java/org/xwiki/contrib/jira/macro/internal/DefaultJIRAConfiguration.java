@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.contrib.jira.macro.JIRAConfiguration;
+import org.xwiki.contrib.jira.macro.JIRAServer;
 
 /**
  * Default in-memory implementation for the JIRA Configuration.
@@ -33,26 +34,22 @@ import org.xwiki.contrib.jira.macro.JIRAConfiguration;
  */
 public class DefaultJIRAConfiguration implements JIRAConfiguration
 {
-    private Map<String, String> urlMappings = Collections.EMPTY_MAP;
+    private Map<String, JIRAServer> jiraServers = Collections.EMPTY_MAP;
 
     private String defaultURLId;
 
-    private String username;
-
-    private String password;
-
     @Override
-    public Map<String, String> getURLMappings()
+    public Map<String, JIRAServer> getJIRAServers()
     {
-        return this.urlMappings;
+        return this.jiraServers;
     }
 
     /**
-     * @param urlMappings see {@link #getURLMappings()}
+     * @param jiraServers see {@link #getJIRAServers()} ()}
      */
-    public void setURLMappings(Map<String, String> urlMappings)
+    public void setJIRAServers(Map<String, JIRAServer> jiraServers)
     {
-        this.urlMappings = new HashMap<>(urlMappings);
+        this.jiraServers = new HashMap<>(jiraServers);
     }
 
     @Override
@@ -67,27 +64,5 @@ public class DefaultJIRAConfiguration implements JIRAConfiguration
     public void setDefaultURLId(String defaultURLId)
     {
         this.defaultURLId = defaultURLId;
-    }
-
-    @Override
-    public String getUsername()
-    {
-        return this.username;
-    }
-
-    public void setUsername(String username)
-    {
-        this.username = username;
-    }
-
-    @Override
-    public String getPassword()
-    {
-        return this.password;
-    }
-
-    public void setPassword(String password)
-    {
-        this.password = password;
     }
 }

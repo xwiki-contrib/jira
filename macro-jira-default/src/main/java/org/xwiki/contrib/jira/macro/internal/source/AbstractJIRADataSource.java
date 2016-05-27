@@ -33,6 +33,7 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.contrib.jira.macro.JIRAConfiguration;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAFields;
@@ -69,38 +70,38 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
     }
 
     /**
-     * @param jiraURL the JIRA URL prefix (eg "http://jira.xwiki.org")
+     * @param jiraServer the JIRA Server definition to use
      * @param jqlQuery the JQL query to execute
      * @return the XML document containing the matching JIRA issues
      * @throws MacroExecutionException if the JIRA issues cannot be retrieved
      */
-    public Document getXMLDocument(String jiraURL, String jqlQuery) throws MacroExecutionException
+    public Document getXMLDocument(JIRAServer jiraServer, String jqlQuery) throws MacroExecutionException
     {
         Document document;
 
         try {
             // Note: we encode using UTF8 since it's the W3C recommendation.
             // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-            document = createSAXBuilder().build(new URL(computeFullURL(jiraURL, jqlQuery)));
+            document = createSAXBuilder().build(new URL(computeFullURL(jiraServer, jqlQuery)));
         } catch (Exception e) {
             throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]",
-                jiraURL, jqlQuery), e);
+                jiraServer.getURL(), jqlQuery), e);
         }
         return document;
     }
 
-    protected String computeFullURL(String jiraURL, String jqlQuery)
+    protected String computeFullURL(JIRAServer jiraServer, String jqlQuery)
     {
         String additionalQueryString;
-        if (!StringUtils.isBlank(this.configuration.getUsername())
-            && !StringUtils.isBlank(this.configuration.getPassword()))
+        if (!StringUtils.isBlank(jiraServer.getUsername())
+            && !StringUtils.isBlank(jiraServer.getPassword()))
         {
             additionalQueryString = String.format("&os_username=%s&os_password=%s&os_authType=basic",
-                encode(this.configuration.getUsername()), encode(this.configuration.getPassword()));
+                encode(jiraServer.getUsername()), encode(jiraServer.getPassword()));
         } else {
             additionalQueryString = "";
         }
-        return String.format("%s%s%s%s", jiraURL, JQL_URL_PREFIX, encode(jqlQuery), additionalQueryString);
+        return String.format("%s%s%s%s", jiraServer.getURL(), JQL_URL_PREFIX, encode(jqlQuery), additionalQueryString);
     }
 
     /**
@@ -117,12 +118,14 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
      * @return the url to the JIRA instance (eg "http://jira.xwiki.org")
      * @throws MacroExecutionException if no URL has been specified (either in the macro parameter or configuration)
      */
-    protected String computeURLPrefix(JIRAMacroParameters parameters) throws MacroExecutionException
+    protected JIRAServer getJIRAServer(JIRAMacroParameters parameters) throws MacroExecutionException
     {
-        String url;
+        JIRAServer jiraServer;
 
-        // Check if the user has provided an explicit url in the macro
-        url = parameters.getURL();
+        // Check if the user has provided an explicit url in the macro. If so, try to find a matching URL in the
+        // configured JIRA Server list in order to find if there are any credentials. If not found, return a public
+        // JIRA instance.
+        String url = parameters.getURL();
         if (StringUtils.isBlank(url)) {
             // If not, then check if the user has provided a url id in the macro
             String id = parameters.getId();
@@ -130,19 +133,31 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
                 // If not, then check if there's a default id specified in the configuration
                 id = this.configuration.getDefaultURLId();
                 if (StringUtils.isBlank(id)) {
-                    throw new MacroExecutionException("No JIRA URL found. You must specify a URL as a macro "
-                        + "parameter or an URL id in as a macro parameter, or define a default URL id in the macro's "
-                        + "configuration");
+                    throw new MacroExecutionException("No JIRA Server found. You must specify a JIRA server: using the "
+                        + "\"url\" macro parameter, using the \"id\" macro parameter to reference a server defined in "
+                        + "the JIRA Macro configuration or by defining a default server id in the JIRA Macro "
+                        + "configuration.");
                 }
             }
-            url = this.configuration.getURLMappings().get(id);
-            if (url == null) {
-                throw new MacroExecutionException(String.format("The JIRA URL id [%s] is not defined in the macro's "
-                    + "configuration. Please fix the id or add a new URL mapping in the configuration", id));
+            jiraServer = this.configuration.getJIRAServers().get(id);
+            if (jiraServer == null) {
+                throw new MacroExecutionException(String.format("The JIRA Server id [%s] is not defined in the macro's "
+                    + "configuration. Please fix the id or add a new server in the JIRA Macro configuration.", id));
+            }
+        } else {
+            jiraServer = null;
+            for (JIRAServer server : this.configuration.getJIRAServers().values()) {
+                if (server.getURL().equals(url)) {
+                    jiraServer = server;
+                    break;
+                }
+            }
+            if (jiraServer == null) {
+                jiraServer = new JIRAServer(url);
             }
         }
 
-        return url;
+        return jiraServer;
     }
 
     private String encode(String content)

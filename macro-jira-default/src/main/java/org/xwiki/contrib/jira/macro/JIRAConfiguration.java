@@ -33,24 +33,14 @@ import org.xwiki.component.annotation.Role;
 public interface JIRAConfiguration
 {
     /**
-     * @return the map of JIRA server URLs (e.g. {@code http://jira.xwiki.org}), indexed by some id representing each
-     *         of them. This id can then be used as a parameter of the Macro to point to a given JIRA instance
+     * @return the map of JIRA server definitions, indexed by some id representing each of them. This id can then be
+     *         used as a parameter of the Macro to point to a given JIRA server
      */
-    Map<String, String> getURLMappings();
+    Map<String, JIRAServer> getJIRAServers();
 
     /**
-     * @return the id for the URL in {@link #getURLMappings()} for the default jira server. This id will be used when
+     * @return the id for the URL in {@link #getJIRAServers()} for the default jira server. This id will be used when
      *         no URL or no URL id is specified in the macro call
      */
     String getDefaultURLId();
-
-    /**
-     * @return the username to log onto the JIRA instance (if null then log in anonymously)
-     */
-    String getUsername();
-
-    /**
-     * @return the password to log onto the JIRA instance (if null then log in anonymously)
-     */
-    String getPassword();
 }

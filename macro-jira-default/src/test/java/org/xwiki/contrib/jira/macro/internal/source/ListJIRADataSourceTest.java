@@ -22,7 +22,6 @@ package org.xwiki.contrib.jira.macro.internal.source;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -34,6 +33,7 @@ import org.junit.Test;
 import org.xwiki.contrib.jira.macro.JIRAConfiguration;
 import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -108,87 +108,105 @@ public class ListJIRADataSourceTest implements JIRAFields
     }
 
     @Test
-    public void computeURLPrefixWhenNoneDefined() throws Exception
+    public void getJIRAServerWhenNoneDefined() throws Exception
     {
         try {
-            this.mocker.getComponentUnderTest().computeURLPrefix(new JIRAMacroParameters());
+            this.mocker.getComponentUnderTest().getJIRAServer(new JIRAMacroParameters());
             fail("should have thrown an exception");
         } catch (MacroExecutionException expected) {
-            assertEquals("No JIRA URL found. You must specify a URL as a macro parameter or an URL id in as a macro "
-                + "parameter, or define a default URL id in the macro's configuration", expected.getMessage());
+            assertEquals("No JIRA Server found. You must specify a JIRA server: using the \"url\" macro parameter, "
+                + "using the \"id\" macro parameter to reference a server defined in the JIRA Macro configuration or "
+                + "by defining a default server id in the JIRA Macro configuration.", expected.getMessage());
         }
     }
 
     @Test
-    public void computeURLPrefixWhenIdUsedButNoneDefined() throws Exception
+    public void getJIRAServerWhenIdUsedButNoneDefined() throws Exception
     {
         JIRAMacroParameters parameters = new JIRAMacroParameters();
         parameters.setId("unknownid");
         try {
-            this.mocker.getComponentUnderTest().computeURLPrefix(parameters);
+            this.mocker.getComponentUnderTest().getJIRAServer(parameters);
             fail("should have thrown an exception");
         } catch (MacroExecutionException expected) {
-            assertEquals("The JIRA URL id [unknownid] is not defined in the macro's configuration. Please fix the id "
-                + "or add a new URL mapping in the configuration", expected.getMessage());
+            assertEquals("The JIRA Server id [unknownid] is not defined in the macro's configuration. Please fix the "
+                + "id or add a new server in the JIRA Macro configuration.", expected.getMessage());
         }
     }
 
     @Test
-    public void computeURLPrefixWhenIdUsedAndDefined() throws Exception
+    public void getJIRAServerWhenIdUsedAndDefined() throws Exception
     {
         JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
-        Map<String, String> mappings = Collections.singletonMap("someid", "http://localhost");
-        when(configuration.getURLMappings()).thenReturn(mappings);
+        when(configuration.getJIRAServers()).thenReturn(Collections.singletonMap("someid",
+            new JIRAServer("http://localhost")));
 
         JIRAMacroParameters parameters = new JIRAMacroParameters();
         parameters.setId("someid");
-        assertEquals("http://localhost", this.mocker.getComponentUnderTest().computeURLPrefix(parameters));
+        assertEquals("http://localhost", this.mocker.getComponentUnderTest().getJIRAServer(parameters).getURL());
     }
 
     @Test
-    public void computeURLPrefixWhenUsingDefaultId() throws Exception
+    public void getJIRAServerWhenUsingDefaultId() throws Exception
     {
         JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
-        Map<String, String> mappings = Collections.singletonMap("someid", "http://localhost");
         when(configuration.getDefaultURLId()).thenReturn("someid");
-        when(configuration.getURLMappings()).thenReturn(mappings);
+        when(configuration.getJIRAServers()).thenReturn(Collections.singletonMap("someid",
+            new JIRAServer("http://localhost")));
 
-        assertEquals("http://localhost", this.mocker.getComponentUnderTest().computeURLPrefix(new JIRAMacroParameters()));
+        assertEquals("http://localhost",
+            this.mocker.getComponentUnderTest().getJIRAServer(new JIRAMacroParameters()).getURL());
     }
 
     @Test
-    public void computeURLPrefixWhenDefaultIdInvalid() throws Exception
+    public void getJIRAServerWhenDefaultIdInvalid() throws Exception
     {
         JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
-        Map<String, String> mappings = Collections.singletonMap("someid", "http://localhost");
         when(configuration.getDefaultURLId()).thenReturn("unknownid");
-        when(configuration.getURLMappings()).thenReturn(mappings);
+        when(configuration.getJIRAServers()).thenReturn(Collections.singletonMap("someid",
+            new JIRAServer("http://localhost")));
 
         try {
-            this.mocker.getComponentUnderTest().computeURLPrefix(new JIRAMacroParameters());
+            this.mocker.getComponentUnderTest().getJIRAServer(new JIRAMacroParameters());
             fail("should have thrown an exception");
         } catch (MacroExecutionException expected) {
-            assertEquals("The JIRA URL id [unknownid] is not defined in the macro's configuration. Please fix the id "
-                + "or add a new URL mapping in the configuration", expected.getMessage());
+            assertEquals("The JIRA Server id [unknownid] is not defined in the macro's configuration. Please fix the "
+                + "id or add a new server in the JIRA Macro configuration.", expected.getMessage());
         }
+    }
+
+    @Test
+    public void getJIRAServerWhenURLSpecifiedAndMatchingConfigurationExist() throws Exception
+    {
+        JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
+        when(configuration.getJIRAServers()).thenReturn(Collections.singletonMap("whatever",
+            new JIRAServer("http://localhost", "username", "password")));
+
+        JIRAMacroParameters parameters = new JIRAMacroParameters();
+        parameters.setURL("http://localhost");
+
+        assertEquals("http://localhost", this.mocker.getComponentUnderTest().getJIRAServer(parameters).getURL());
+        assertEquals("username", this.mocker.getComponentUnderTest().getJIRAServer(parameters).getUsername());
     }
 
     @Test
     public void computeFullURL() throws Exception
     {
+        // No credentials passed
+        JIRAServer jiraServer = new JIRAServer("http://localhost/jira");
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
-            this.mocker.getComponentUnderTest().computeFullURL("http://localhost/jira", "query"));
+            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query"));
 
-        JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
-        when(configuration.getUsername()).thenReturn("user");
-
+        // Just username defined but no password (or empty password)
+        jiraServer = new JIRAServer("http://localhost/jira", "username", "");
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
-            this.mocker.getComponentUnderTest().computeFullURL("http://localhost/jira", "query"));
+            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query"));
 
-        when(configuration.getPassword()).thenReturn("pass");
+        // With credentials
+        jiraServer = new JIRAServer("http://localhost/jira", "username", "password");
 
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
-            + "jqlQuery=query&os_username=user&os_password=pass&os_authType=basic",
-            this.mocker.getComponentUnderTest().computeFullURL("http://localhost/jira", "query"));
+            + "jqlQuery=query&os_username=username&os_password=password&os_authType=basic",
+            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query"));
     }
 }

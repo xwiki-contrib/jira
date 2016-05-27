@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.macro.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 
@@ -46,13 +47,13 @@ public class JQLJIRADataSource extends AbstractJIRADataSource
     public Collection<Element> getData(String macroContent, JIRAMacroParameters parameters)
         throws MacroExecutionException
     {
-        String url = computeURLPrefix(parameters);
+        JIRAServer jiraServer = getJIRAServer(parameters);
 
         if (StringUtils.isBlank(macroContent)) {
             throw new MacroExecutionException("Missing JQL query!");
         }
 
-        Document document = getXMLDocument(url, macroContent);
+        Document document = getXMLDocument(jiraServer, macroContent);
         return buildIssues(document).values();
     }
 }
