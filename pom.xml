@@ -60,6 +60,8 @@
   <modules>
     <!-- Sorted alphabetically -->
     <module>macro-jira-default</module>
+    <module>macro-jira-platform</module>
+    <module>macro-jira-ui</module>
   </modules>
   <build>
     <plugins>
@@ -72,34 +74,6 @@
             <include>**/*IntegrationTests.java</include>
           </includes>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <!-- Ensure that this macro doesn't uses the HTML macro. We want to ensure this since we want to let users be
-               able to disable the HTML macro (for security reasons) and the rest of XWiki should continue to work fine
-          -->
-          <execution>
-            <id>enforce-banned-dependencies</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <bannedDependencies>
-                  <excludes>
-                    <exclude>org.xwiki.rendering:xwiki-rendering-macro-html:*:jar:*</exclude>
-                  </excludes>
-                  <message>
-                    We need to be able to turn off the HTML Macro and still have a working system.
-                    Thus it is forbidden to depend on the HTML Macro.
-                  </message>
-                </bannedDependencies>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -134,4 +108,12 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>macro-jira-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

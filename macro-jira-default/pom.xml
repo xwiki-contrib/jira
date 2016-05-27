@@ -29,7 +29,6 @@
   </parent>
   <artifactId>macro-jira-default</artifactId>
   <name>Macro - JIRA - Default Implementation</name>
-  <version>8.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <!-- Additional information: The reason we don't put any platform-related depdendencies in this module is to allow
        pure XWiki Rendering users to use it. -->
@@ -102,6 +101,28 @@
                   <excludes>
                     <exclude>org.xwiki.platform:*</exclude>
                   </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Ensure that this macro doesn't uses the HTML macro. We want to ensure this since we want to let users be
+               able to disable the HTML macro (for security reasons) and the rest of XWiki should continue to work fine
+          -->
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.xwiki.rendering:xwiki-rendering-macro-html:*:jar:*</exclude>
+                  </excludes>
+                  <message>
+                    We need to be able to turn off the HTML Macro and still have a working system.
+                    Thus it is forbidden to depend on the HTML Macro.
+                  </message>
                 </bannedDependencies>
               </rules>
             </configuration>
