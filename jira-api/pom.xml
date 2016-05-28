@@ -23,19 +23,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <groupId>org.xwiki.contrib.jira</groupId>
+    <artifactId>jira</artifactId>
     <version>8.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-jira</artifactId>
-  <name>XWiki Platform - JIRA</name>
+  <artifactId>jira-api</artifactId>
+  <name>JIRA - API</name>
   <packaging>jar</packaging>
   <description>Provides scripting access to JIRA using JIRA's Client API (JRJC)</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JIRA Scripting API</xwiki.extension.name>
+    <!-- The extension's category -->
+    <xwiki.extension.category>api</xwiki.extension.category>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-jira</xwiki.extension.features>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.contrib.jira</groupId>
+      <artifactId>jira-config-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-script</artifactId>

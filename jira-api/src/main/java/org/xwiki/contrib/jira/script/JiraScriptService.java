@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.jira;
+package org.xwiki.contrib.jira.script;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,8 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.script.service.ScriptService;
 
 import com.atlassian.jira.rest.client.AuthenticationHandler;
@@ -56,28 +58,16 @@ public class JiraScriptService implements ScriptService
     private Logger logger;
 
     /**
-     * Note that the password will be passed in clear over the network to the remote JIRA instance. Thus, only use this
-     * method when connecting over HTTPS.
+     * Note that when connecting with credentials the password will be passed in clear over the network to the remote
+     * JIRA instance. Thus, only use this method when connecting over HTTPS.
      *
-     * @param jiraURL the URL to the remote JIRA instance to connect to
-     * @param username the username to connect to JIRA
-     * @param password the password to connect to JIRA
+     * @param jiraServer the JIRA server definition for the instance to use (url, credentials)
      * @return the client to interact with the remote JIRA instance
+     * @since 8.2
      */
-    public JiraRestClient getJiraRestClient(String jiraURL, String username, String password)
+    public JiraRestClient getJiraRestClient(JIRAServer jiraServer)
     {
-        return getJiraRestClient(jiraURL, new BasicHttpAuthenticationHandler(username, password));
-    }
-
-    /**
-     * Connect anonymously to the remote JIRA instance.
-     *
-     * @param jiraURL the URL to the remote JIRA instance to connect to
-     * @return the client to interact with the remote JIRA instance
-     */
-    public JiraRestClient getJiraRestClient(String jiraURL)
-    {
-        return getJiraRestClient(jiraURL, new AnonymousAuthenticationHandler());
+        return getJiraRestClient(jiraServer.getURL(), getAuthenticationHandler(jiraServer));
     }
 
     /**
@@ -89,6 +79,17 @@ public class JiraScriptService implements ScriptService
     public ProgressMonitor getNullProgressMonitor()
     {
         return new NullProgressMonitor();
+    }
+
+    private AuthenticationHandler getAuthenticationHandler(JIRAServer jiraServer)
+    {
+        AuthenticationHandler handler;
+        if (StringUtils.isBlank(jiraServer.getUsername()) || StringUtils.isBlank(jiraServer.getPassword())) {
+            handler = new AnonymousAuthenticationHandler();
+        } else {
+            handler = new BasicHttpAuthenticationHandler(jiraServer.getUsername(), jiraServer.getPassword());
+        }
+        return handler;
     }
 
     /**

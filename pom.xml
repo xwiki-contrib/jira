@@ -59,6 +59,7 @@
   </properties>
   <modules>
     <!-- Sorted alphabetically -->
+    <module>jira-api</module>
     <module>jira-config</module>
     <module>jira-macro</module>
   </modules>
