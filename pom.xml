@@ -28,20 +28,20 @@
     <version>6.4</version>
   </parent>
   <groupId>org.xwiki.contrib.jira</groupId>
-  <artifactId>macro-jira</artifactId>
+  <artifactId>jira</artifactId>
   <packaging>pom</packaging>
-  <name>Macro - JIRA - Parent POM</name>
+  <name>JIRA - Parent POM</name>
   <version>8.2-SNAPSHOT</version>
-  <description>Macro - JIRA - Parent POM</description>
+  <description>Parent POM for JIRA-related modules</description>
   <scm>
-    <connection>scm:git:git://github.com/xwiki-contrib/macro-jira.git</connection>
-    <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-jira.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/macro-jira</url>
+    <connection>scm:git:git://github.com/xwiki-contrib/jira.git</connection>
+    <developerConnection>scm:git:git@github.com:xwiki-contrib/jira.git</developerConnection>
+    <url>https://github.com/xwiki-contrib/jira</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
-    <url>http://jira.xwiki.org/browse/MJIRA</url>
+    <url>http://jira.xwiki.org/browse/JIRA</url>
   </issueManagement>
   <developers>
     <developer>
@@ -59,9 +59,8 @@
   </properties>
   <modules>
     <!-- Sorted alphabetically -->
-    <module>macro-jira-default</module>
-    <module>macro-jira-platform</module>
-    <module>macro-jira-ui</module>
+    <module>jira-config</module>
+    <module>jira-macro</module>
   </modules>
   <build>
     <plugins>
@@ -112,7 +111,7 @@
     <profile>
       <id>integration-tests</id>
       <modules>
-        <module>macro-jira-test</module>
+        <module>jira-test</module>
       </modules>
     </profile>
   </profiles>
