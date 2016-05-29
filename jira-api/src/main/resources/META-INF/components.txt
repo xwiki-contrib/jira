@@ -1,1 +1,2 @@
 org.xwiki.contrib.jira.script.JiraScriptService
+org.xwiki.contrib.jira.internal.script.JIRAServerConverter

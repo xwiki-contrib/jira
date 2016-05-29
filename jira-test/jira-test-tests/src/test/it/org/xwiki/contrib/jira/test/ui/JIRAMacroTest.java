@@ -55,15 +55,20 @@ public class JIRAMacroTest extends AbstractTest
         jiraPage.setURL(0, "http://localhost");
         jiraPage.clickSave();
 
-        // Now create a new page and try using the jira macro in it
+        // Now create a new page and try using the jira macro in it + verify that the scripting jira api works too
         String velocity = "{{jira id=\"local\"}}\n"
             + "XWIKI-1000\n"
             + "XWIKI-1001\n"
-            + "{{/jira}}";
+            + "{{/jira}}\n\n"
+            + "{{velocity}}\n"
+            + "$services.jira.getJiraRestClient('local').class.name\n"
+            + "{{/velocity}}";
+
         ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), velocity, "");
 
         assertEquals("Type Key Summary Status Created Date\n"
             + "XWIKI-1000 Improve PDF Output 19-Mar-2007\n"
-            + "XWIKI-1001 On jetty, non-default skins are not usable 19-Mar-2007", vp.getContent());
+            + "XWIKI-1001 On jetty, non-default skins are not usable 19-Mar-2007\n"
+            + "com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClient", vp.getContent());
     }
 }
