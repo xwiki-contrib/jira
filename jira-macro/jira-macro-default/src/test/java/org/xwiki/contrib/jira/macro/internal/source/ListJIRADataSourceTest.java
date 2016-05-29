@@ -114,9 +114,9 @@ public class ListJIRADataSourceTest implements JIRAFields
             this.mocker.getComponentUnderTest().getJIRAServer(new JIRAMacroParameters());
             fail("should have thrown an exception");
         } catch (MacroExecutionException expected) {
-            assertEquals("No JIRA Server found. You must specify a JIRA server: using the \"url\" macro parameter, "
-                + "using the \"id\" macro parameter to reference a server defined in the JIRA Macro configuration or "
-                + "by defining a default server id in the JIRA Macro configuration.", expected.getMessage());
+            assertEquals("No JIRA Server found. You must specify a JIRA server, using the \"url\" macro parameter or "
+                + "using the \"id\" macro parameter to reference a server defined in the JIRA Macro configuration.",
+                expected.getMessage());
         }
     }
 
@@ -144,35 +144,6 @@ public class ListJIRADataSourceTest implements JIRAFields
         JIRAMacroParameters parameters = new JIRAMacroParameters();
         parameters.setId("someid");
         assertEquals("http://localhost", this.mocker.getComponentUnderTest().getJIRAServer(parameters).getURL());
-    }
-
-    @Test
-    public void getJIRAServerWhenUsingDefaultId() throws Exception
-    {
-        JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
-        when(configuration.getDefaultURLId()).thenReturn("someid");
-        when(configuration.getJIRAServers()).thenReturn(Collections.singletonMap("someid",
-            new JIRAServer("http://localhost")));
-
-        assertEquals("http://localhost",
-            this.mocker.getComponentUnderTest().getJIRAServer(new JIRAMacroParameters()).getURL());
-    }
-
-    @Test
-    public void getJIRAServerWhenDefaultIdInvalid() throws Exception
-    {
-        JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
-        when(configuration.getDefaultURLId()).thenReturn("unknownid");
-        when(configuration.getJIRAServers()).thenReturn(Collections.singletonMap("someid",
-            new JIRAServer("http://localhost")));
-
-        try {
-            this.mocker.getComponentUnderTest().getJIRAServer(new JIRAMacroParameters());
-            fail("should have thrown an exception");
-        } catch (MacroExecutionException expected) {
-            assertEquals("The JIRA Server id [unknownid] is not defined in the macro's configuration. Please fix the "
-                + "id or add a new server in the JIRA Macro configuration.", expected.getMessage());
-        }
     }
 
     @Test

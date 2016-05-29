@@ -127,17 +127,15 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         // JIRA instance.
         String url = parameters.getURL();
         if (StringUtils.isBlank(url)) {
-            // If not, then check if the user has provided a url id in the macro
+            // If not, then check if the user has provided a server id in the macro
             String id = parameters.getId();
             if (StringUtils.isBlank(id)) {
-                // If not, then check if there's a default id specified in the configuration
-                id = this.configuration.getDefaultURLId();
-                if (StringUtils.isBlank(id)) {
-                    throw new MacroExecutionException("No JIRA Server found. You must specify a JIRA server: using the "
-                        + "\"url\" macro parameter, using the \"id\" macro parameter to reference a server defined in "
-                        + "the JIRA Macro configuration or by defining a default server id in the JIRA Macro "
-                        + "configuration.");
-                }
+                // Note: we could have decided that if there's a single JIRA server definition we would use that id by
+                // default. However doing so would break all Macro calls not specifying an id as soon as a second jira
+                // server definiton is added later on...
+                throw new MacroExecutionException("No JIRA Server found. You must specify a JIRA server, using the "
+                    + "\"url\" macro parameter or using the \"id\" macro parameter to reference a server defined in "
+                    + "the JIRA Macro configuration.");
             }
             jiraServer = this.configuration.getJIRAServers().get(id);
             if (jiraServer == null) {

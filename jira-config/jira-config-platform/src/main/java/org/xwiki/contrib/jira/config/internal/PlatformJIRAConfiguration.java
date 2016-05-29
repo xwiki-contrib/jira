@@ -43,10 +43,4 @@ public class PlatformJIRAConfiguration implements JIRAConfiguration
     {
         return this.jiraConfiguration.getProperty("serverMappings");
     }
-
-    @Override
-    public String getDefaultURLId()
-    {
-        return this.jiraConfiguration.getProperty("defaultUrlId");
-    }
 }

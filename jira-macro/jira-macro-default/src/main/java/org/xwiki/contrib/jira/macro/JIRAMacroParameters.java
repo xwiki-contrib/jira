@@ -118,8 +118,7 @@ public class JIRAMacroParameters
 
     /**
      * @return the configuration id of the JIRA Server URL to use (defined in the Macro configuration settings). Note
-     *         that if a URL is specified it'll take precedence over this parameter. If no URL and no id is specified
-     *         then the default id from the configuration will be used (if any)
+     *         that if a URL is specified it'll take precedence over this parameter.
      */
     public String getId()
     {

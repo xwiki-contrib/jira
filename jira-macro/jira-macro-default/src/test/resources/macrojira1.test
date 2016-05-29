@@ -14,7 +14,7 @@ beginGroup [[class]=[xwikirenderingerror]]
 onWord [Failed to execute the [jira] macro. Click on this message for details.]
 endGroup [[class]=[xwikirenderingerror]]
 beginGroup [[class]=[xwikirenderingerrordescription hidden]]
-onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: No JIRA Server found. You must specify a JIRA server: using the "url" macro parameter, using the "id" macro parameter to reference a server defined in the JIRA Macro configuration or by defining a default server id in the JIRA Macro configuration.${{{regex:.*}}}] [false]
+onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: No JIRA Server found. You must specify a JIRA server, using the "url" macro parameter or using the "id" macro parameter to reference a server defined in the JIRA Macro configuration.${{{regex:.*}}}] [false]
 endGroup [[class]=[xwikirenderingerrordescription hidden]]
 endMacroMarkerStandalone [jira] []
 endDocument

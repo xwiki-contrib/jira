@@ -36,8 +36,6 @@ public class DefaultJIRAConfiguration implements JIRAConfiguration
 {
     private Map<String, JIRAServer> jiraServers = Collections.EMPTY_MAP;
 
-    private String defaultURLId;
-
     @Override
     public Map<String, JIRAServer> getJIRAServers()
     {
@@ -50,19 +48,5 @@ public class DefaultJIRAConfiguration implements JIRAConfiguration
     public void setJIRAServers(Map<String, JIRAServer> jiraServers)
     {
         this.jiraServers = new HashMap<>(jiraServers);
-    }
-
-    @Override
-    public String getDefaultURLId()
-    {
-        return this.defaultURLId;
-    }
-
-    /**
-     * @param defaultURLId see {@link #getDefaultURLId()}
-     */
-    public void setDefaultURLId(String defaultURLId)
-    {
-        this.defaultURLId = defaultURLId;
     }
 }

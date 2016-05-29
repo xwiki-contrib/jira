@@ -37,10 +37,4 @@ public interface JIRAConfiguration
      *         used as a parameter of the Macro to point to a given JIRA server
      */
     Map<String, JIRAServer> getJIRAServers();
-
-    /**
-     * @return the id for the URL in {@link #getJIRAServers()} for the default jira server. This id will be used when
-     *         no URL or no URL id is specified in the macro call
-     */
-    String getDefaultURLId();
 }

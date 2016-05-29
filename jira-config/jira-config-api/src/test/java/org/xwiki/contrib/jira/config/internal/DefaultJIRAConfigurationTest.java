@@ -45,11 +45,7 @@ public class DefaultJIRAConfigurationTest
     {
         DefaultJIRAConfiguration configuration = this.mocker.getComponentUnderTest();
 
-        assertNull(configuration.getDefaultURLId());
         assertTrue(configuration.getJIRAServers().isEmpty());
-
-        configuration.setDefaultURLId("defaultid");
-        assertEquals("defaultid", configuration.getDefaultURLId());
 
         configuration.setJIRAServers(Collections.singletonMap("key", new JIRAServer("url", "username", "password")));
         assertEquals(1, configuration.getJIRAServers().size());

@@ -19,38 +19,29 @@
  */
 package org.xwiki.contrib.jira.config.internal;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.model.reference.RegexEntityReference;
-import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XObjectAddedEvent;
-import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 
 /**
  * Provides configuration from the {@code JIRA.JIRAConfig} document in the current wiki, extracting the data from the
- * {@code JIRA.JIRAConfigClass} and {@code JIRA.JIRAServerConfigClass} xobjects.
+ * {@code JIRA.JIRAConfigClass} xobjects.
  *
  * @version $Id$
  * @since 8.2
@@ -62,11 +53,7 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
 {
     private static final String SPACE = "JIRA";
 
-    private static final LocalDocumentReference CLASS_REFERENCE_GENERAL =
-        new LocalDocumentReference(SPACE, "JIRAConfigClass");
-
-    private static final LocalDocumentReference CLASS_REFERENCE_SERVER =
-        new LocalDocumentReference(SPACE, "JIRAServerConfigClass");
+    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE, "JIRAConfigClass");
 
     /**
      * The local reference of the {@code JIRA.JIRAConfig} document.
@@ -81,26 +68,6 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     }
 
     @Override
-    protected List<Event> getCacheCleanupEvents()
-    {
-        RegexEntityReference generalClassMatcher = new RegexEntityReference(
-            Pattern.compile(".*:" + this.referenceSerializer.serialize(CLASS_REFERENCE_GENERAL,
-                new Object[0]) + "\\[\\d*\\]"), EntityType.OBJECT);
-        RegexEntityReference jiraServerClassMatcher = new RegexEntityReference(
-            Pattern.compile(".*:" + this.referenceSerializer.serialize(CLASS_REFERENCE_SERVER,
-                new Object[0]) + "\\[\\d*\\]"), EntityType.OBJECT);
-        return Arrays.asList(new Event[] {
-            new XObjectAddedEvent(generalClassMatcher),
-            new XObjectDeletedEvent(generalClassMatcher),
-            new XObjectUpdatedEvent(generalClassMatcher),
-            new XObjectAddedEvent(jiraServerClassMatcher),
-            new XObjectDeletedEvent(jiraServerClassMatcher),
-            new XObjectUpdatedEvent(jiraServerClassMatcher),
-            new WikiDeletedEvent()
-        });
-    }
-
-    @Override
     protected DocumentReference getDocumentReference()
     {
         return new DocumentReference(DOC_REFERENCE, getCurrentWikiReference());
@@ -109,7 +76,7 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     @Override
     protected LocalDocumentReference getClassReference()
     {
-        return CLASS_REFERENCE_GENERAL;
+        return CLASS_REFERENCE;
     }
 
     @Override
@@ -155,7 +122,7 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     private List<BaseObject> getJIRAServerBaseObjects() throws XWikiException
     {
         DocumentReference documentReference = getFailsafeDocumentReference();
-        LocalDocumentReference classReference = CLASS_REFERENCE_SERVER;
+        LocalDocumentReference classReference = getClassReference();
         if(documentReference != null && classReference != null) {
             XWikiContext xcontext = this.xcontextProvider.get();
             XWikiDocument document = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
