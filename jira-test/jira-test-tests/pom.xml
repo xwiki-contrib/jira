@@ -71,23 +71,6 @@
       <version>${platform.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
-         systems go through SLF4J -->
-    <!--dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency-->
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
@@ -104,6 +87,26 @@
             <goals>
               <goal>package</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- In XWiki 6.4, there are various versions of antlr dependencies used and without this we end up with 2
+           antlr JARs in the the generated XWiki instance, preventing XWiki from starting correctly
+           TODO: Remove this when we upgrade the commons version -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <delete file="${project.build.directory}/xwiki/webapps/xwiki/WEB-INF/lib/antlr-2.7.2.jar"/>
+              </tasks>
+            </configuration>
           </execution>
         </executions>
       </plugin>
