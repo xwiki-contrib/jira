@@ -17,30 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.macro;
+package org.xwiki.contrib.jira.macro.internal.source;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.jira.macro.internal.source.JQLJIRADataSource;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 
 @Component
-@Named("jql")
+@Named("list")
 @Singleton
-public class TestableJQLJIRADataSource extends JQLJIRADataSource
+public class TestableListJIRADataSource extends ListJIRADataSource implements Initializable
 {
     private SAXBuilder saxBuilder;
 
-    public void setSAXBuilder(SAXBuilder saxBuilder)
+    @Override
+    public void initialize() throws InitializationException
     {
-        this.saxBuilder = saxBuilder;
+        try {
+            setSAXBuilder(MockSAXBuilder.getSAXBuilder());
+        } catch (Exception e) {
+            throw new InitializationException("Init failure", e);
+        }
     }
 
     @Override
     protected SAXBuilder createSAXBuilder()
     {
         return this.saxBuilder;
+    }
+
+    public void setSAXBuilder(SAXBuilder saxBuilder)
+    {
+        this.saxBuilder = saxBuilder;
     }
 }

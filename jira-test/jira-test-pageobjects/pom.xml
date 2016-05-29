@@ -24,20 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib.jira</groupId>
-    <artifactId>jira</artifactId>
+    <artifactId>jira-test</artifactId>
     <version>8.2-SNAPSHOT</version>
   </parent>
-  <artifactId>jira-test</artifactId>
-  <name>JIRA - Tests - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>JIRA - Tests - Parent POM</description>
-  <properties>
-    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>jira-test-pageobjects</module>
-    <module>jira-test-tests</module>
-  </modules>
+  <artifactId>jira-test-pageobjects</artifactId>
+  <name>JIRA - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>JIRA - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+  </dependencies>
 </project>

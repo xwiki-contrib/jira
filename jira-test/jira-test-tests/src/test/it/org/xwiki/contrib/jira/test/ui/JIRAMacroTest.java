@@ -20,6 +20,8 @@
 package org.xwiki.contrib.jira.test.ui;
 
 import org.junit.*;
+import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.contrib.jira.test.po.JIRAAdministrationSectionPage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
@@ -42,6 +44,26 @@ public class JIRAMacroTest extends AbstractTest
     {
         // Navigate to the JIRA Admin UI and set up a JIRA instance pointing to localhost
 
-        // Test using the JIRA Macro
+        // Verify that there is a jira section
+        AdministrationPage wikiAdministrationPage = AdministrationPage.gotoPage();
+        assertTrue(wikiAdministrationPage.hasSection("Applications", "JIRA"));
+
+        // Setup a jira instance
+        wikiAdministrationPage.clickSection("Applications", "JIRA");
+        JIRAAdministrationSectionPage jiraPage = new JIRAAdministrationSectionPage();
+        jiraPage.setId(0, "local");
+        jiraPage.setURL(0, "http://localhost");
+        jiraPage.clickSave();
+
+        // Now create a new page and try using the jira macro in it
+        String velocity = "{{jira id=\"local\"}}\n"
+            + "XWIKI-1000\n"
+            + "XWIKI-1001\n"
+            + "{{/jira}}";
+        ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), velocity, "");
+
+        assertEquals("Type Key Summary Status Created Date\n"
+            + "XWIKI-1000 Improve PDF Output 19-Mar-2007\n"
+            + "XWIKI-1001 On jetty, non-default skins are not usable 19-Mar-2007", vp.getContent());
     }
 }

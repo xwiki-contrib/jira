@@ -17,36 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.config.internal;
+package org.xwiki.contrib.jira.macro.internal.source;
 
-import java.util.Collections;
-import java.util.Map;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.contrib.jira.config.JIRAConfiguration;
-import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.contrib.jira.macro.internal.source.JQLJIRADataSource;
 
 @Component
+@Named("jql")
 @Singleton
-public class PlatformJIRAConfiguration implements JIRAConfiguration
+public class TestableJQLJIRADataSource extends JQLJIRADataSource implements Initializable
 {
-    @Inject
-    @Named("jira")
-    private ConfigurationSource jiraConfiguration;
+    private SAXBuilder saxBuilder;
 
     @Override
-    public Map<String, JIRAServer> getJIRAServers()
+    public void initialize() throws InitializationException
     {
-        Map<String, JIRAServer> jiraServers = this.jiraConfiguration.getProperty("serverMappings");
-        // The returned value can be null if no xobject has been defined on the wiki config page.
-        if (jiraServers == null) {
-            jiraServers = Collections.emptyMap();
+        try {
+            setSAXBuilder(MockSAXBuilder.getSAXBuilder());
+        } catch (Exception e) {
+            throw new InitializationException("Init failure", e);
         }
-        return jiraServers;
+    }
+
+    @Override
+    protected SAXBuilder createSAXBuilder()
+    {
+        return this.saxBuilder;
+    }
+
+    public void setSAXBuilder(SAXBuilder saxBuilder)
+    {
+        this.saxBuilder = saxBuilder;
     }
 }

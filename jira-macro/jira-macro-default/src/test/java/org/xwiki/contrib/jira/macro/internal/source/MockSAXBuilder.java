@@ -17,30 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.macro;
+package org.xwiki.contrib.jira.macro.internal.source;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.net.URL;
 
+import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.jira.macro.internal.source.ListJIRADataSource;
 
-@Component
-@Named("list")
-@Singleton
-public class TestableListJIRADataSource extends ListJIRADataSource
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class MockSAXBuilder
 {
-    private SAXBuilder saxBuilder;
-
-    public void setSAXBuilder(SAXBuilder saxBuilder)
+    public static SAXBuilder getSAXBuilder() throws Exception
     {
-        this.saxBuilder = saxBuilder;
-    }
+        SAXBuilder localSaxBuilder = new SAXBuilder();
+        Document document = localSaxBuilder.build(MockSAXBuilder.class.getResourceAsStream("/input.xml"));
 
-    @Override
-    protected SAXBuilder createSAXBuilder()
-    {
-        return this.saxBuilder;
+        SAXBuilder saxBuilder = mock(SAXBuilder.class);
+        when(saxBuilder.build(new URL("http://localhost/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml"
+            + "?jqlQuery=issueKey+in+%28XWIKI-1000%2CXWIKI-1001%29"))).thenReturn(document);
+
+        return saxBuilder;
     }
 }

@@ -1,2 +1,2 @@
-500:org.xwiki.contrib.jira.macro.TestableListJIRADataSource
-500:org.xwiki.contrib.jira.macro.TestableJQLJIRADataSource
+500:org.xwiki.contrib.jira.macro.internal.source.TestableListJIRADataSource
+500:org.xwiki.contrib.jira.macro.internal.source.TestableJQLJIRADataSource

@@ -19,18 +19,9 @@
  */
 package org.xwiki.contrib.jira.macro;
 
-import java.net.URL;
-
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.lib.concurrent.Synchroniser;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.runner.RunWith;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.test.annotation.AllComponents;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -40,40 +31,7 @@ import org.xwiki.rendering.test.integration.RenderingTestSuite;
  * @since 4.2M1
  */
 @RunWith(RenderingTestSuite.class)
+@AllComponents
 public class IntegrationTests
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(ComponentManager componentManager) throws Exception
-    {
-        Mockery mockery = new JUnit4Mockery();
-
-        // The SAXBuilder we mock below somehow executes in different threads (apparently in a Finalizer thread) and
-        // thus we must make it thread safe.
-        mockery.setThreadingPolicy(new Synchroniser());
-
-        // SAXBuilder is a class and not an interface which is why we need to set up the Class Imposteriser
-        mockery.setImposteriser(ClassImposteriser.INSTANCE);
-
-        // Replace the SAXBuilder used in the Source implementations for hint "list" by a mock so that we don't
-        // go out on the internet and thus control our test environment.
-
-        SAXBuilder localSaxBuilder = new SAXBuilder();
-        final Document document = localSaxBuilder.build(getClass().getResourceAsStream("/input.xml"));
-
-        final SAXBuilder saxBuilder = mockery.mock(SAXBuilder.class);
-        mockery.checking(new Expectations() {{
-            allowing(saxBuilder).build(new URL(
-                "http://localhost/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery="
-                + "issueKey+in+%28XWIKI-1000%2CXWIKI-1001%29"));
-            will(returnValue(document));
-        }});
-
-        TestableListJIRADataSource testableListJIRADataSource =
-            componentManager.getInstance(JIRADataSource.class, "list");
-        testableListJIRADataSource.setSAXBuilder(saxBuilder);
-
-        TestableJQLJIRADataSource testableJQLJIRADataSource =
-            componentManager.getInstance(JIRADataSource.class, "jql");
-        testableJQLJIRADataSource.setSAXBuilder(saxBuilder);
-    }
 }
