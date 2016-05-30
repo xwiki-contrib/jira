@@ -69,6 +69,6 @@ public class JIRAMacroTest extends AbstractTest
         assertEquals("Type Key Summary Status Created Date\n"
             + "XWIKI-1000 Improve PDF Output 19-Mar-2007\n"
             + "XWIKI-1001 On jetty, non-default skins are not usable 19-Mar-2007\n"
-            + "com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClient", vp.getContent());
+            + "com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClient", vp.getContent());
     }
 }
