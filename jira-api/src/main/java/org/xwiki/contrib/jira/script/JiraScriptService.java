@@ -19,6 +19,7 @@
  */
 package org.xwiki.contrib.jira.script;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -26,19 +27,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.script.service.ScriptService;
 
-import com.atlassian.jira.rest.client.AuthenticationHandler;
-import com.atlassian.jira.rest.client.JiraRestClient;
-import com.atlassian.jira.rest.client.NullProgressMonitor;
-import com.atlassian.jira.rest.client.ProgressMonitor;
+import com.atlassian.jira.rest.client.api.AuthenticationHandler;
+import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.auth.AnonymousAuthenticationHandler;
 import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
-import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
+import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 
 /**
  * Expose Atlassian's JIRA REST service to XWiki scripts.
@@ -71,14 +71,18 @@ public class JiraScriptService implements ScriptService
     }
 
     /**
-     * Since all JRJC APIs require to be passed a {@link ProgressMonitor} this method makes it easy to get one
-     * (especially useful from Velocity scripts since they can't do any new).
+     * Releases and clean the JIRA Rest client. Must be called to release resources.
      *
-     * @return a {@link ProgressMonitor} that doesn't do anything
+     * @param restClient the client obtained through {@link #getJiraRestClient(JIRAServer)}
+     * @since 8.2.2
      */
-    public ProgressMonitor getNullProgressMonitor()
+    public void closeJiraRestClient(JiraRestClient restClient)
     {
-        return new NullProgressMonitor();
+        try {
+            restClient.close();
+        } catch (IOException e) {
+            this.logger.warn("Failed to clean JIRA Rest Client [{}]", ExceptionUtils.getRootCause(e));
+        }
     }
 
     private AuthenticationHandler getAuthenticationHandler(JIRAServer jiraServer)
@@ -101,11 +105,11 @@ public class JiraScriptService implements ScriptService
     {
         JiraRestClient restClient;
         try {
-            JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
+            AsynchronousJiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
             URI jiraServerUri = new URI(jiraURL);
             restClient = factory.create(jiraServerUri, authenticationHandler);
         } catch (URISyntaxException e) {
-            this.logger.warn("Invalid JIRA URL [{}]", jiraURL);
+            this.logger.warn("Invalid JIRA URL [{}]. Root cause [{}]", jiraURL, ExceptionUtils.getRootCause(e));
             restClient = null;
         }
         return restClient;
