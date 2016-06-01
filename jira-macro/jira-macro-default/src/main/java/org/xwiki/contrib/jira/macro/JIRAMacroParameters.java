@@ -19,12 +19,9 @@
  */
 package org.xwiki.contrib.jira.macro;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.contrib.jira.macro.internal.JIRAMacro} Macro.
@@ -34,32 +31,6 @@ import org.xwiki.properties.annotation.PropertyMandatory;
  */
 public class JIRAMacroParameters
 {
-    /**
-     * @see #getDefaultFieldNames()
-     */
-    private static final Map<String, String> FIELD_NAMES = new HashMap<String, String>();
-
-    /**
-     * @see #getDefaultFieldNames()
-     */
-    static {
-        FIELD_NAMES.put(JIRAFields.SUMMARY, "Summary");
-        FIELD_NAMES.put(JIRAFields.KEY, "Key");
-        FIELD_NAMES.put(JIRAFields.TYPE, "Type");
-        FIELD_NAMES.put(JIRAFields.STATUS, "Status");
-        FIELD_NAMES.put(JIRAFields.ASSIGNEE, "Assignee");
-        FIELD_NAMES.put(JIRAFields.REPORTER, "Reporter");
-        FIELD_NAMES.put(JIRAFields.CREATED, "Created Date");
-        FIELD_NAMES.put(JIRAFields.UPDATED, "Updated Date");
-        FIELD_NAMES.put(JIRAFields.RESOLVED, "Resolved Date");
-        FIELD_NAMES.put(JIRAFields.FIXVERSION, "Fixed In");
-        FIELD_NAMES.put(JIRAFields.COMPONENT, "Component");
-        FIELD_NAMES.put(JIRAFields.VOTES, "Votes");
-        FIELD_NAMES.put(JIRAFields.RESOLUTION, "Resolution");
-        FIELD_NAMES.put(JIRAFields.LINK, "Link");
-        FIELD_NAMES.put(JIRAFields.VERSION, "Affected Versions");
-    }
-
     /**
      * @see #getURL()
      */
@@ -78,12 +49,17 @@ public class JIRAMacroParameters
     /**
      * @see #getFields()
      */
-    private List<String> fields;
+    private String fields;
 
     /**
      * @see #getFieldNames()
      */
     private List<String> fieldNames;
+
+    /**
+     * @see #getFieldNames()
+     */
+    private List<String> fieldTypes;
 
     /**
      * @see #getId()
@@ -160,36 +136,31 @@ public class JIRAMacroParameters
     }
 
     /**
-     * @return the default field names (used for example by the Table displayer as table headers)
-     */
-    public Map<String, String> getDefaultFieldNames()
-    {
-        return FIELD_NAMES;
-    }
-
-    /**
      * @param fields see {@link #getFields()}
      */
-    @PropertyDescription(
-        "the fields to be displayed (default field list depends on the style used)")
-    public void setFields(List<String> fields)
+    @PropertyDescription("the fields to be displayed with optional labels and types (default field list depends "
+        + "on the style used). Format is {@code id1:label1!type1,id2:label2!type2}")
+    public void setFields(String fields)
     {
         this.fields = fields;
     }
 
     /**
-     * @return the list of JIRA fields to display (if not defined, a default list of fields defined by the chosen
-     *         Displayer will be used)
+     * @return the list of JIRA fields to display along with optional labels and types (if not defined, a default list
+     *         of fields defined by the chosen Displayer will be used).
+     *         Format is {@code id1:label1!type1,id2:label2!type2}
      */
-    public List<String> getFields()
+    public String getFields()
     {
         return this.fields;
     }
 
     /**
      * @param fieldNames see {@link #getFieldNames()}
+     * @deprecated starting with 8.3 use {@link #setFields(String)} using the format {@code id:label!type}
      */
     @PropertyDescription("the pretty names of the fields in the order in which they are displayed")
+    @Deprecated
     public void setFieldNames(List<String> fieldNames)
     {
         this.fieldNames = fieldNames;
@@ -198,7 +169,9 @@ public class JIRAMacroParameters
     /**
      * @return the names to use for JIRA issue fields for Displayers displaying the field names (eg the Table
      *         Data Source)
+     * @deprecated starting with 8.3 use {@link #setFields(String)} using the format {@code id:label!type}
      */
+    @Deprecated
     public List<String> getFieldNames()
     {
         return this.fieldNames;

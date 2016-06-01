@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.contrib.jira.macro.JIRAFields;
@@ -49,18 +50,20 @@ public class EnumJIRADisplayer extends AbstractJIRADisplayer
     /**
      * Default list of JIRA fields to display.
      */
-    private static final List<String> FIELDS = Arrays.asList(JIRAFields.STATUS, JIRAFields.KEY);
+    private static final List<JIRAField> FIELDS = Arrays.asList(JIRAFields.STATUS, JIRAFields.KEY);
 
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
         List<Block> blocks = new ArrayList<Block>();
+
+        List<JIRAField> fields = parseFields(parameters);
         Iterator<Element> issueIt = issues.iterator();
         while (issueIt.hasNext()) {
             Element issue = issueIt.next();
-            Iterator<String> it = getFields(parameters).iterator();
+            Iterator<JIRAField> it = fields.iterator();
             while (it.hasNext()) {
-                String field = it.next();
+                JIRAField field = it.next();
                 // Use the displayer for the field
                 blocks.addAll(getFieldDisplayer(field).displayField(field, issue));
                 // Add space to separate fields, unless we're on the last field
@@ -77,7 +80,7 @@ public class EnumJIRADisplayer extends AbstractJIRADisplayer
     }
 
     @Override
-    protected List<String> getDefaultFields()
+    protected List<JIRAField> getDefaultFields()
     {
         return FIELDS;
     }

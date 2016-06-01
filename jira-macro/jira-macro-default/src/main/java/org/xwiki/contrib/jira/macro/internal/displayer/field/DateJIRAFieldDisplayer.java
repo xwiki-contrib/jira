@@ -19,38 +19,20 @@
  */
 package org.xwiki.contrib.jira.macro.internal.displayer.field;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.jira.macro.JIRAField;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.VerbatimBlock;
 
 /**
- * Default displayer that simply displays the field as text.
+ * Generic displayer for date-type fields.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 8.3
  */
 @Component
+@Named("type/date")
 @Singleton
-public class DefaultJIRAFieldDisplayer extends AbstractJIRAFieldDisplayer
+public class DateJIRAFieldDisplayer extends AbstractDateJIRAFieldDisplayer
 {
-    @Override
-    public List<Block> displayField(JIRAField field, Element issue)
-    {
-        List<Block> result = Collections.emptyList();
-
-        String value = getValue(field, issue);
-        if (value != null) {
-            result = Arrays.<Block>asList(new VerbatimBlock(value, true));
-        }
-
-        return result;
-    }
 }

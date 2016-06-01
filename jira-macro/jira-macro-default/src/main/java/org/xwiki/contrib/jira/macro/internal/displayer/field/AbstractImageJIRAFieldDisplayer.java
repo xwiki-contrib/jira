@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jdom2.Element;
+import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -41,7 +42,7 @@ import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
 public abstract class AbstractImageJIRAFieldDisplayer implements JIRAFieldDisplayer
 {
     @Override
-    public List<Block> displayField(String fieldName, Element issue)
+    public List<Block> displayField(JIRAField field, Element issue)
     {
         List<Block> result = Collections.emptyList();
         Element fieldElement = getElement(issue);

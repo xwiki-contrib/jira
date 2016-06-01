@@ -22,15 +22,15 @@ package org.xwiki.contrib.jira.macro.internal.displayer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.TableCellBlock;
@@ -54,7 +54,7 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
     /**
      * Default list of JIRA fields to display.
      */
-    private static final List<String> FIELDS =
+    private static final List<JIRAField> FIELDS =
         Arrays.asList(JIRAFields.TYPE, JIRAFields.KEY, JIRAFields.SUMMARY, JIRAFields.STATUS, JIRAFields.CREATED);
 
     @Override
@@ -62,20 +62,20 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
     {
         List<Block> rowBlocks = new ArrayList<Block>();
 
-        Map<String, String> fieldNames = getFieldNames(parameters);
+        List<JIRAField> fields = parseFields(parameters);
 
         // Create the table headers for the specified fields
         List<Block> headerCellBlocks = new ArrayList<Block>();
-        for (String field : getFields(parameters)) {
+        for (JIRAField field : fields) {
             headerCellBlocks.add(new TableHeadCellBlock(Arrays.<Block>asList(
-                new VerbatimBlock(getFieldName(field, fieldNames), true))));
+                new VerbatimBlock(computeFieldName(field), true))));
         }
         rowBlocks.add(new TableRowBlock(headerCellBlocks));
 
         // Construct the data rows, one row per issue
         for (Element issue : issues) {
             List<Block> dataCellBlocks = new ArrayList<Block>();
-            for (String field : getFields(parameters)) {
+            for (JIRAField field : fields) {
                 // Use the displayer for the field
                 dataCellBlocks.add(new TableCellBlock(getFieldDisplayer(field).displayField(field, issue)));
             }
@@ -86,42 +86,21 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
     }
 
     @Override
-    protected List<String> getDefaultFields()
+    protected List<JIRAField> getDefaultFields()
     {
         return FIELDS;
     }
 
     /**
-     * @param field the field id for which to find the name to display
-     * @param fieldNames the map of all field names
+     * @param field the field for which to find the name to display
      * @return the field name to display as table header for the passed field
      */
-    private String getFieldName(String field, Map<String, String> fieldNames)
+    private String computeFieldName(JIRAField field)
     {
-        String result = fieldNames.get(field);
-        if (result == null) {
-            result = field;
+        String result = field.getLabel();
+        if (StringUtils.isBlank(result)) {
+            result = field.getId();
         }
         return result;
-    }
-
-    /**
-     * @param parameters the macro parameters containing optional field names defined by the user
-     * @return the map of all field names combining default field names and field names defined by the user in the macro
-     *         parameters
-     */
-    private Map<String, String> getFieldNames(JIRAMacroParameters parameters)
-    {
-        Map<String, String> fieldNames = new HashMap<String, String>();
-        fieldNames.putAll(parameters.getDefaultFieldNames());
-
-        if (parameters.getFieldNames() != null) {
-            List<String> fields = getFields(parameters);
-            for (int i = 0; i < fields.size(); i++) {
-                fieldNames.put(fields.get(i), parameters.getFieldNames().get(i));
-            }
-        }
-
-        return fieldNames;
     }
 }

@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -50,16 +51,16 @@ import org.xwiki.contrib.jira.macro.JIRAFields;
 public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
 {
     @Override
-    public List<Block> displayField(String fieldName, Element issue)
+    public List<Block> displayField(JIRAField field, Element issue)
     {
         List<Block> result = Collections.emptyList();
-        String key = issue.getChildText(JIRAFields.KEY);
+        String key = issue.getChildText(JIRAFields.KEY.getId());
         if (key != null) {
-            String link = issue.getChildText(JIRAFields.LINK);
+            String link = issue.getChildText(JIRAFields.LINK.getId());
             List<Block> labelBlocks = Arrays.<Block>asList(new VerbatimBlock(key, true));
 
             // If the Issue is closed then display it striked-out
-            String resolutionId = issue.getChild(JIRAFields.RESOLUTION).getAttributeValue("id");
+            String resolutionId = issue.getChild(JIRAFields.RESOLUTION.getId()).getAttributeValue("id");
             if (!"-1".equals(resolutionId)) {
                 // The issue is resolved
                 labelBlocks = Arrays.<Block>asList(new FormatBlock(labelBlocks, Format.STRIKEDOUT));

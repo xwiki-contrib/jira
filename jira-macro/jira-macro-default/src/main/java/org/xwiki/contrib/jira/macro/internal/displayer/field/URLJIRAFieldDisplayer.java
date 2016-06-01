@@ -19,53 +19,45 @@
  */
 package org.xwiki.contrib.jira.macro.internal.displayer.field;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jdom2.Element;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
- * Common Field Displayer for Dates. Parses field in the JIRA date format and generates date the format
- * {@code dd-MMM-yyyy}.
+ * Generic displayer for URL-type fields.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 8.3
  */
-public abstract class AbstractDateJIRAFieldDisplayer extends AbstractJIRAFieldDisplayer
+@Component
+@Named("type/url")
+@Singleton
+public class URLJIRAFieldDisplayer extends AbstractJIRAFieldDisplayer
 {
-    /**
-     * JIRA Date format.
-     */
-    private DateFormat jiraDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
-
-    /**
-     * Date format for displaying.
-     */
-    private DateFormat displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-
     @Override
     public List<Block> displayField(JIRAField field, Element issue)
     {
-        List<Block> result;
-        String date = getValue(field, issue);
-        if (date != null) {
-            try {
-                Date parsedDate = this.jiraDateFormat.parse(date);
-                result = Arrays.<Block>asList(new VerbatimBlock(this.displayDateFormat.format(parsedDate), true));
-            } catch (ParseException e) {
-                result = Arrays.<Block>asList(new VerbatimBlock(date, true));
-            }
-        } else {
-            result = Collections.emptyList();
+        List<Block> result = Collections.emptyList();
+
+        String value = getValue(field, issue);
+        if (value != null) {
+            List<Block> labelBlocks = Arrays.<Block>asList(new VerbatimBlock(value, true));
+            ResourceReference reference = new ResourceReference(value, ResourceType.URL);
+            result = Arrays.<Block>asList(new LinkBlock(labelBlocks, reference, true));
         }
+
         return result;
     }
 }

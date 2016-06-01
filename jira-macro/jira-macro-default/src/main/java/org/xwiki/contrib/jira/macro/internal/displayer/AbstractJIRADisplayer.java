@@ -23,11 +23,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.macro.JIRADisplayer;
 import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
+import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.contrib.jira.macro.internal.FieldParser;
 
 /**
  * Common issue Displayer that Displayers can extend and that provides common methods.
@@ -49,18 +53,27 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
     @Inject
     protected JIRAFieldDisplayer defaultDisplayer;
 
+    private FieldParser fieldParser = new FieldParser();
+
     /**
-     * @param fieldName the field to display
-     * @return the field displayer to use to display the passed field name
+     * @param field the field to display
+     * @return the field displayer to use to display the passed field
      */
-    protected JIRAFieldDisplayer getFieldDisplayer(String fieldName)
+    protected JIRAFieldDisplayer getFieldDisplayer(JIRAField field)
     {
         JIRAFieldDisplayer displayer;
         try {
-            displayer = this.componentManager.getInstance(JIRAFieldDisplayer.class, fieldName);
+            // Look for a field displayer for the field id
+            displayer = this.componentManager.getInstance(JIRAFieldDisplayer.class, field.getId());
         } catch (ComponentLookupException e) {
-            // Use the default displayer
-            displayer = this.defaultDisplayer;
+            // Look for a field displayer for the field type
+            try {
+                displayer = this.componentManager.getInstance(JIRAFieldDisplayer.class,
+                    String.format("type/%s", field.getType()));
+            } catch (ComponentLookupException ee) {
+                // Use the default displayer
+                displayer = this.defaultDisplayer;
+            }
         }
         return displayer;
     }
@@ -70,17 +83,50 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
      *            defined by the user then use default field names)
      * @return the list of JIRA field names to be displayed
      */
-    protected List<String> getFields(JIRAMacroParameters parameters)
+    protected List<JIRAField> parseFields(JIRAMacroParameters parameters)
     {
-        List<String> fields = parameters.getFields();
-        if (fields == null) {
+        List<JIRAField> fields = this.fieldParser.parse(parameters.getFields());
+        if (fields.isEmpty()) {
             fields = getDefaultFields();
+        } else {
+            // Normalize field data, i.e. fill up any blank by using default field data
+
+            // Step 1: For backward-compatiblity reasons, use the field names defined in the macro parameters if defined
+            if (parameters.getFieldNames() != null) {
+                List<String> fieldNames = parameters.getFieldNames();
+                for (int i = 0; i < fields.size(); i++) {
+                    if (StringUtils.isBlank(fields.get(i).getLabel()) && fieldNames.size() > i) {
+                        fields.get(i).setLabel(fieldNames.get(i));
+                    }
+                }
+            }
+
+            // Step 2: Normalize using default fields definitions
+            for (JIRAField field : fields) {
+                normalizeField(field);
+            }
         }
+
         return fields;
+    }
+
+    private void normalizeField(JIRAField field)
+    {
+        if (StringUtils.isBlank(field.getLabel()) || StringUtils.isBlank(field.getType())) {
+            JIRAField defautField = JIRAFields.DEFAULT_FIELDS.get(field.getId());
+            if (defautField != null) {
+                if (StringUtils.isBlank(field.getLabel())) {
+                    field.setLabel(defautField.getLabel());
+                }
+                if (StringUtils.isBlank(field.getType())) {
+                    field.setType(defautField.getType());
+                }
+            }
+        }
     }
 
     /**
      * @return the default list of fields to display if not overriden by the user
      */
-    protected abstract List<String> getDefaultFields();
+    protected abstract List<JIRAField> getDefaultFields();
 }

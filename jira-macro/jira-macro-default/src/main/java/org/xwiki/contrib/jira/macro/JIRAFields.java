@@ -19,6 +19,9 @@
  */
 package org.xwiki.contrib.jira.macro;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Definition of JIRA field ids.
  *
@@ -30,80 +33,98 @@ public interface JIRAFields
     /**
      * JIRA Summary field.
      */
-    String SUMMARY = "summary";
+    JIRAField SUMMARY = new JIRAField("summary", "Summary", "text");
 
     /**
      * JIRA Key field (eg "XWIKI-1000").
      */
-    String KEY = "key";
+    JIRAField KEY = new JIRAField("key", "Key", "text");
 
     /**
      * JIRA Type field (eg Bug, Improvement, etc).
      */
-    String TYPE = "type";
+    JIRAField TYPE = new JIRAField("type", "Type", "text");
 
     /**
      * JIRA Status field (eg Closed, Open, etc).
      */
-    String STATUS = "status";
+    JIRAField STATUS = new JIRAField("status", "Status", "text");
 
     /**
      * JIRA Assignee field (the person assigned to fix the issue).
      */
-    String ASSIGNEE = "assignee";
+    JIRAField ASSIGNEE = new JIRAField("assignee", "Assignee", "text");
 
     /**
      * JIRA Reporter field (the person who reported the issue).
      */
-    String REPORTER = "reporter";
+    JIRAField REPORTER = new JIRAField("reporter", "Reporter", "text");
 
     /**
      * JIRA Created date field (the date the issue was created).
      */
-    String CREATED = "created";
+    JIRAField CREATED = new JIRAField("created", "Created Date", "date");
 
     /**
      * JIRA Updated date field (the date the issue was last modified).
      */
-    String UPDATED = "updated";
+    JIRAField UPDATED = new JIRAField("updated", "Updated Date", "date");
 
     /**
      * JIRA Resolved date field (the date the issue was resolved).
      */
-    String RESOLVED = "resolved";
+    JIRAField RESOLVED = new JIRAField("updated", "Resolved Date", "date");
 
     /**
      * JIRA Fix Version field (the version in which the issue was resolved or closed).
      */
-    String FIXVERSION = "fixVersion";
+    JIRAField FIXVERSION = new JIRAField("fixVersion", "Fixed in", "text");
 
     /**
      * JIRA Affected Versions field (the list of Versions for which the issue was reported).
      */
-    String VERSION = "version";
+    JIRAField VERSION = new JIRAField("version", "Affected Versions", "text");
 
     /**
      * JIRA Component field (the list of domains/categories for the issue).
      */
-    String COMPONENT = "component";
+    JIRAField COMPONENT = new JIRAField("component", "Component", "text");
 
     /**
      * JIRA Vote field (the number of votes for the issue).
      */
-    String VOTES = "votes";
+    JIRAField VOTES = new JIRAField("votes", "Votes", "number");
 
     /**
      * JIRA Resolution field (eg Closed, Won't Fix, Duplicate; etc).
      */
-    String RESOLUTION = "resolution";
+    JIRAField RESOLUTION = new JIRAField("resolution", "Resolution", "text");
 
     /**
      * JIRA link field (the URL to the issue on the JIRA instance).
      */
-    String LINK = "link";
+    JIRAField LINK = new JIRAField("link", "Link", "url");
 
     /**
      * Special field used by the List Data Source which allows the user to define notes for a given issue.
      */
     String NOTE = "note";
+
+    Map<String, JIRAField> DEFAULT_FIELDS = new HashMap<String, JIRAField>() {{
+        put(SUMMARY.getId(), SUMMARY);
+        put(KEY.getId(), KEY);
+        put(TYPE.getId(), TYPE);
+        put(STATUS.getId(), STATUS);
+        put(ASSIGNEE.getId(), ASSIGNEE);
+        put(REPORTER.getId(), REPORTER);
+        put(CREATED.getId(), CREATED);
+        put(UPDATED.getId(), UPDATED);
+        put(RESOLVED.getId(), RESOLVED);
+        put(FIXVERSION.getId(), FIXVERSION);
+        put(VERSION.getId(), VERSION);
+        put(COMPONENT.getId(), COMPONENT);
+        put(VOTES.getId(), VOTES);
+        put(RESOLUTION.getId(), RESOLUTION);
+        put(LINK.getId(), LINK);
+    }};
 }

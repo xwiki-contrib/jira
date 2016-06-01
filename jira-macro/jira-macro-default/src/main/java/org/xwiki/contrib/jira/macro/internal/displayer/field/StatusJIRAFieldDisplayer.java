@@ -40,7 +40,7 @@ public class StatusJIRAFieldDisplayer extends AbstractImageJIRAFieldDisplayer
     @Override
     protected Element getElement(Element issue)
     {
-        return issue.getChild(JIRAFields.STATUS);
+        return issue.getChild(JIRAFields.STATUS.getId());
     }
 
     @Override

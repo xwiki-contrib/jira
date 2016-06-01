@@ -39,9 +39,9 @@ public interface JIRAFieldDisplayer
     /**
      * Generate Blocks to display the passed field.
      *
-     * @param fieldName the name of the field to display
+     * @param field the field to display
      * @param issue the JIRA issue as an XML element, can be used to extract information useful to generate the display
      * @return the list of Blocks to display the passed field
      */
-    List<Block> displayField(String fieldName, Element issue);
+    List<Block> displayField(JIRAField field, Element issue);
 }

@@ -99,11 +99,11 @@ public class ListJIRADataSourceTest implements JIRAFields
 
         assertEquals(2, issues.size());
         Element issue1 = issues.get(0);
-        assertEquals("XWIKI-1000", issue1.getChildTextTrim(KEY));
-        assertEquals("Improve PDF Output", issue1.getChildTextTrim(SUMMARY));
+        assertEquals("XWIKI-1000", issue1.getChildTextTrim(KEY.getId()));
+        assertEquals("Improve PDF Output", issue1.getChildTextTrim(SUMMARY.getId()));
         Element issue2 = issues.get(1);
-        assertEquals("XWIKI-1001", issue2.getChildTextTrim(KEY));
-        assertEquals("On jetty, non-default skins are not usable", issue2.getChildTextTrim(SUMMARY));
+        assertEquals("XWIKI-1001", issue2.getChildTextTrim(KEY.getId()));
+        assertEquals("On jetty, non-default skins are not usable", issue2.getChildTextTrim(SUMMARY.getId()));
         assertEquals("Note", issue2.getChildTextTrim(NOTE));
     }
 

@@ -64,7 +64,7 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
     {
         Map<String, Element> issues = new LinkedHashMap<String, Element>();
         for (Element item : document.getRootElement().getChild("channel").getChildren("item")) {
-            issues.put(item.getChildText(JIRAFields.KEY), item);
+            issues.put(item.getChildText(JIRAFields.KEY.getId()), item);
         }
         return issues;
     }

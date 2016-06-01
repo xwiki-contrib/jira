@@ -40,7 +40,7 @@ public class TypeJIRAFieldDisplayer extends AbstractImageJIRAFieldDisplayer
     @Override
     protected Element getElement(Element issue)
     {
-        return issue.getChild(JIRAFields.TYPE);
+        return issue.getChild(JIRAFields.TYPE.getId());
     }
 
     @Override
