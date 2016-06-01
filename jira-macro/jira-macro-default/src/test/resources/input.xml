@@ -181,9 +181,10 @@
             </customfieldvalue>
           </customfieldvalues>
         </customfield>
-        <customfield id="customfield_10022" key="com.atlassian.jira.ext.charting:timeinstatus">
-          <customfieldname>Time in Status</customfieldname>
+        <customfield id="customfield_10022" key="somekey">
+          <customfieldname>Custom HTML</customfieldname>
           <customfieldvalues>
+            <![CDATA[ <p>Some <strong>paragrpah</strong></p> ]]>
           </customfieldvalues>
         </customfield>
       </customfields>
