@@ -31,13 +31,13 @@
   <artifactId>jira</artifactId>
   <packaging>pom</packaging>
   <name>JIRA - Parent POM</name>
-  <version>8.3</version>
+  <version>8.4-SNAPSHOT</version>
   <description>Parent POM for JIRA-related modules</description>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/jira.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/jira.git</developerConnection>
     <url>https://github.com/xwiki-contrib/jira</url>
-    <tag>jira-8.3</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
