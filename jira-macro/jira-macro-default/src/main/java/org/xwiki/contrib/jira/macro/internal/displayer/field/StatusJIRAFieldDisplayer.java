@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.jira.macro.JIRAFields;
+import org.xwiki.contrib.jira.macro.JIRAField;
 
 /**
  * Displayer for the "status" JIRA field (displayed as an image).
@@ -40,7 +40,7 @@ public class StatusJIRAFieldDisplayer extends AbstractImageJIRAFieldDisplayer
     @Override
     protected Element getElement(Element issue)
     {
-        return issue.getChild(JIRAFields.STATUS.getId());
+        return issue.getChild(JIRAField.STATUS.getId());
     }
 
     @Override

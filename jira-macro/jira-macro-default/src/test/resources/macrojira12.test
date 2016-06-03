@@ -1,0 +1,36 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test passing a parameter to a field fisplayer
+.#-----------------------------------------------------
+{{jira url="http://localhost" fields="'Custom Link'!url" parameters="field.url.label='custom label'"}}
+XWIKI-1000
+XWIKI-1001
+{{/jira}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [jira] [url=http://localhost|fields='Custom Link'!url|parameters=field.url.label='custom label'] [XWIKI-1000
+XWIKI-1001]
+beginTable
+beginTableRow
+beginTableHeadCell
+onVerbatim [Custom Link] [true]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+beginLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org]] [true]
+onVerbatim [custom label] [true]
+endLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org]] [true]
+endTableCell
+endTableRow
+beginTableRow
+beginTableCell
+endTableCell
+endTableRow
+endTable
+endMacroMarkerStandalone [jira] [url=http://localhost|fields='Custom Link'!url|parameters=field.url.label='custom label'] [XWIKI-1000
+XWIKI-1001]
+endDocument

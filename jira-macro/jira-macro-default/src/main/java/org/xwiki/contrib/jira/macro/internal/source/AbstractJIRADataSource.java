@@ -32,11 +32,11 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
+import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
-import org.xwiki.contrib.jira.macro.JIRAFields;
 
 /**
  * Common implementation for JIRA Data Source that knowns how to execute a JQL query on a JIRA instance and retrieve the
@@ -64,7 +64,7 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
     {
         Map<String, Element> issues = new LinkedHashMap<String, Element>();
         for (Element item : document.getRootElement().getChild("channel").getChildren("item")) {
-            issues.put(item.getChildText(JIRAFields.KEY.getId()), item);
+            issues.put(item.getChildText(JIRAField.KEY.getId()), item);
         }
         return issues;
     }

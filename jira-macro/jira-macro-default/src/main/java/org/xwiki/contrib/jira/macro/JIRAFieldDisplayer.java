@@ -41,7 +41,8 @@ public interface JIRAFieldDisplayer
      *
      * @param field the field to display
      * @param issue the JIRA issue as an XML element, can be used to extract information useful to generate the display
+     * @param parameters the macro parameters which can contain field displayer-specific configuration information
      * @return the list of Blocks to display the passed field
      */
-    List<Block> displayField(JIRAField field, Element issue);
+    List<Block> displayField(JIRAField field, Element issue, JIRAMacroParameters parameters);
 }

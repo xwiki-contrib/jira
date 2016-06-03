@@ -26,9 +26,11 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
@@ -47,13 +49,17 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class URLJIRAFieldDisplayer extends AbstractJIRAFieldDisplayer
 {
     @Override
-    public List<Block> displayField(JIRAField field, Element issue)
+    public List<Block> displayField(JIRAField field, Element issue, JIRAMacroParameters parameters)
     {
         List<Block> result = Collections.emptyList();
 
         String value = getValue(field, issue);
         if (value != null) {
-            List<Block> labelBlocks = Arrays.<Block>asList(new VerbatimBlock(value, true));
+            String label = parameters.getParameters().getProperty("field.url.label");
+            if (StringUtils.isBlank(label)) {
+                label = value;
+            }
+            List<Block> labelBlocks = Arrays.<Block>asList(new VerbatimBlock(label, true));
             ResourceReference reference = new ResourceReference(value, ResourceType.URL);
             result = Arrays.<Block>asList(new LinkBlock(labelBlocks, reference, true));
         }

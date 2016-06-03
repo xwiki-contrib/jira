@@ -31,12 +31,12 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
-import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.xwiki.contrib.jira.macro.JIRAField.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 4.2M1
  */
-public class ListJIRADataSourceTest implements JIRAFields
+public class ListJIRADataSourceTest
 {
     @Rule
     public MockitoComponentMockingRule<ListJIRADataSource> mocker =

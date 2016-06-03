@@ -28,10 +28,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.macro.JIRADisplayer;
 import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
-import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.macro.JIRAField;
-import org.xwiki.contrib.jira.macro.internal.FieldParser;
 
 /**
  * Common issue Displayer that Displayers can extend and that provides common methods.
@@ -52,8 +50,6 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
      */
     @Inject
     protected JIRAFieldDisplayer defaultDisplayer;
-
-    private FieldParser fieldParser = new FieldParser();
 
     /**
      * @param field the field to display
@@ -81,11 +77,11 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
     /**
      * @param parameters the macro parameters from which to get an optional list of JIRA field names to display (if not
      *            defined by the user then use default field names)
-     * @return the list of JIRA field names to be displayed
+     * @return the list of JIRA fields to be displayed
      */
-    protected List<JIRAField> parseFields(JIRAMacroParameters parameters)
+    protected List<JIRAField> normalizeFields(JIRAMacroParameters parameters)
     {
-        List<JIRAField> fields = this.fieldParser.parse(parameters.getFields());
+        List<JIRAField> fields = parameters.getFields().getFields();
         if (fields.isEmpty()) {
             fields = getDefaultFields();
         } else {
@@ -113,7 +109,7 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
     private void normalizeField(JIRAField field)
     {
         if (StringUtils.isBlank(field.getLabel()) || StringUtils.isBlank(field.getType())) {
-            JIRAField defautField = JIRAFields.DEFAULT_FIELDS.get(field.getId());
+            JIRAField defautField = JIRAField.DEFAULT_FIELDS.get(field.getId());
             if (defautField != null) {
                 if (StringUtils.isBlank(field.getLabel())) {
                     field.setLabel(defautField.getLabel());

@@ -19,7 +19,9 @@
  */
 package org.xwiki.contrib.jira.macro;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import org.xwiki.properties.annotation.PropertyDescription;
 
@@ -49,7 +51,7 @@ public class JIRAMacroParameters
     /**
      * @see #getFields()
      */
-    private String fields;
+    private JIRAFields fields = new JIRAFields(Collections.<JIRAField>emptyList());
 
     /**
      * @see #getFieldNames()
@@ -65,6 +67,8 @@ public class JIRAMacroParameters
      * @see #getId()
      */
     private String id;
+
+    private Properties extraParameters = new Properties();
 
     /**
      * @param url see {@link #getURL()}
@@ -140,7 +144,7 @@ public class JIRAMacroParameters
      */
     @PropertyDescription("the fields to be displayed with optional labels and types (default field list depends "
         + "on the style used). Format is {@code id1:label1!type1,id2:label2!type2}")
-    public void setFields(String fields)
+    public void setFields(JIRAFields fields)
     {
         this.fields = fields;
     }
@@ -148,16 +152,16 @@ public class JIRAMacroParameters
     /**
      * @return the list of JIRA fields to display along with optional labels and types (if not defined, a default list
      *         of fields defined by the chosen Displayer will be used).
-     *         Format is {@code id1:label1!type1,id2:label2!type2}
+     *         String format is {@code id1:label1!type1,id2:label2!type2}
      */
-    public String getFields()
+    public JIRAFields getFields()
     {
         return this.fields;
     }
 
     /**
      * @param fieldNames see {@link #getFieldNames()}
-     * @deprecated starting with 8.3 use {@link #setFields(String)} using the format {@code id:label!type}
+     * @deprecated starting with 8.3 use {@link #setFields(JIRAFields)} using the format {@code id:label!type}
      */
     @PropertyDescription("the pretty names of the fields in the order in which they are displayed")
     @Deprecated
@@ -169,11 +173,22 @@ public class JIRAMacroParameters
     /**
      * @return the names to use for JIRA issue fields for Displayers displaying the field names (eg the Table
      *         Data Source)
-     * @deprecated starting with 8.3 use {@link #setFields(String)} using the format {@code id:label!type}
+     * @deprecated starting with 8.3 use {@link #setFields(JIRAFields)} using the format {@code id:label!type}
      */
     @Deprecated
     public List<String> getFieldNames()
     {
         return this.fieldNames;
+    }
+
+    @PropertyDescription("extra parameters for sources, displayers and field displayers")
+    public void setParameters(Properties extraParameters)
+    {
+        this.extraParameters = extraParameters;
+    }
+
+    public Properties getParameters()
+    {
+        return this.extraParameters;
     }
 }

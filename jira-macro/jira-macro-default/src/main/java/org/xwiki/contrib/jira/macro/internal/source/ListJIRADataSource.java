@@ -35,8 +35,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 
 /**
@@ -98,7 +98,7 @@ public class ListJIRADataSource extends AbstractJIRADataSource
                 // Add the Note field if there's one specified by the user
                 String note = id.getRight();
                 if (!StringUtils.isBlank(note)) {
-                    Element noteElement = new Element(JIRAFields.NOTE);
+                    Element noteElement = new Element(JIRAField.NOTE);
                     noteElement.addContent(note);
                     issue.addContent(noteElement);
                 }

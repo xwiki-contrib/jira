@@ -33,7 +33,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 
 /**
@@ -50,14 +49,14 @@ public class EnumJIRADisplayer extends AbstractJIRADisplayer
     /**
      * Default list of JIRA fields to display.
      */
-    private static final List<JIRAField> FIELDS = Arrays.asList(JIRAFields.STATUS, JIRAFields.KEY);
+    private static final List<JIRAField> FIELDS = Arrays.asList(JIRAField.STATUS, JIRAField.KEY);
 
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
         List<Block> blocks = new ArrayList<Block>();
 
-        List<JIRAField> fields = parseFields(parameters);
+        List<JIRAField> fields = normalizeFields(parameters);
         Iterator<Element> issueIt = issues.iterator();
         while (issueIt.hasNext()) {
             Element issue = issueIt.next();
@@ -65,7 +64,7 @@ public class EnumJIRADisplayer extends AbstractJIRADisplayer
             while (it.hasNext()) {
                 JIRAField field = it.next();
                 // Use the displayer for the field
-                blocks.addAll(getFieldDisplayer(field).displayField(field, issue));
+                blocks.addAll(getFieldDisplayer(field).displayField(field, issue, parameters));
                 // Add space to separate fields, unless we're on the last field
                 if (it.hasNext()) {
                     blocks.add(new SpaceBlock());

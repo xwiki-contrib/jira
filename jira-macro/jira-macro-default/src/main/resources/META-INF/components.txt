@@ -14,3 +14,5 @@ org.xwiki.contrib.jira.macro.internal.displayer.field.ResolvedJIRAFieldDisplayer
 org.xwiki.contrib.jira.macro.internal.displayer.field.DateJIRAFieldDisplayer
 org.xwiki.contrib.jira.macro.internal.displayer.field.URLJIRAFieldDisplayer
 org.xwiki.contrib.jira.macro.internal.displayer.field.HTMLJIRAFieldDisplayer
+org.xwiki.contrib.jira.macro.internal.PropertiesConverter
+org.xwiki.contrib.jira.macro.internal.FieldConverter

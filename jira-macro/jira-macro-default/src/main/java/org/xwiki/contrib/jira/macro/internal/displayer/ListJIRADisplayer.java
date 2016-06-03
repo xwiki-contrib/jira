@@ -35,7 +35,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 
 /**
@@ -53,21 +52,21 @@ public class ListJIRADisplayer extends AbstractJIRADisplayer
      * Default list of JIRA fields to display.
      */
     private static final List<JIRAField> FIELDS =
-        Arrays.asList(JIRAFields.STATUS, JIRAFields.KEY, JIRAFields.SUMMARY);
+        Arrays.asList(JIRAField.STATUS, JIRAField.KEY, JIRAField.SUMMARY);
 
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
         List<Block> listItemBlocks = new ArrayList<Block>();
 
-        List<JIRAField> fields = parseFields(parameters);
+        List<JIRAField> fields = normalizeFields(parameters);
         for (Element issue : issues) {
             List<Block> itemBlocks = new ArrayList<Block>();
             Iterator<JIRAField> it = fields.iterator();
             while (it.hasNext()) {
                 JIRAField field = it.next();
                 // Use the displayer for the field
-                itemBlocks.addAll(getFieldDisplayer(field).displayField(field, issue));
+                itemBlocks.addAll(getFieldDisplayer(field).displayField(field, issue, parameters));
                 // Add space to separate fields, unless we're on the last field
                 if (it.hasNext()) {
                     itemBlocks.add(new SpaceBlock());

@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.jdom2.Element;
 import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.VerbatimBlock;
 
@@ -52,7 +53,7 @@ public abstract class AbstractDateJIRAFieldDisplayer extends AbstractJIRAFieldDi
     private DateFormat displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 
     @Override
-    public List<Block> displayField(JIRAField field, Element issue)
+    public List<Block> displayField(JIRAField field, Element issue, JIRAMacroParameters parameters)
     {
         List<Block> result;
         String date = getValue(field, issue);

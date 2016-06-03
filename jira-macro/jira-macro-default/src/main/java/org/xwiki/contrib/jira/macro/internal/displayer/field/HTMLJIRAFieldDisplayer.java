@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -49,7 +50,7 @@ import org.xwiki.rendering.syntax.Syntax;
 public class HTMLJIRAFieldDisplayer extends AbstractJIRAFieldDisplayer
 {
     @Override
-    public List<Block> displayField(JIRAField field, Element issue)
+    public List<Block> displayField(JIRAField field, Element issue, JIRAMacroParameters parameters)
     {
         List<Block> result = Collections.emptyList();
 

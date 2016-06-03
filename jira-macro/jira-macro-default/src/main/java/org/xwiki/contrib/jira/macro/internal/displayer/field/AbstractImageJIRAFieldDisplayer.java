@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.jdom2.Element;
 import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -42,7 +43,7 @@ import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
 public abstract class AbstractImageJIRAFieldDisplayer implements JIRAFieldDisplayer
 {
     @Override
-    public List<Block> displayField(JIRAField field, Element issue)
+    public List<Block> displayField(JIRAField field, Element issue, JIRAMacroParameters parameters)
     {
         List<Block> result = Collections.emptyList();
         Element fieldElement = getElement(issue);
@@ -50,10 +51,10 @@ public abstract class AbstractImageJIRAFieldDisplayer implements JIRAFieldDispla
             String iconURL = getURL(issue);
             if (iconURL != null) {
                 ResourceReference reference = new ResourceReference(iconURL, ResourceType.URL);
-                Map<String, String> parameters = new HashMap<String, String>();
-                parameters.put("alt", fieldElement.getText());
-                parameters.put("title", fieldElement.getText());
-                result = Arrays.<Block>asList(new ImageBlock(reference, false, parameters));
+                Map<String, String> resourceParameters = new HashMap<String, String>();
+                resourceParameters.put("alt", fieldElement.getText());
+                resourceParameters.put("title", fieldElement.getText());
+                result = Arrays.<Block>asList(new ImageBlock(reference, false, resourceParameters));
             }
         }
         return result;

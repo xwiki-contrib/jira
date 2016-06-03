@@ -37,7 +37,6 @@ import org.xwiki.rendering.block.TableCellBlock;
 import org.xwiki.rendering.block.TableHeadCellBlock;
 import org.xwiki.rendering.block.TableRowBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
-import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 
 /**
@@ -55,14 +54,14 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
      * Default list of JIRA fields to display.
      */
     private static final List<JIRAField> FIELDS =
-        Arrays.asList(JIRAFields.TYPE, JIRAFields.KEY, JIRAFields.SUMMARY, JIRAFields.STATUS, JIRAFields.CREATED);
+        Arrays.asList(JIRAField.TYPE, JIRAField.KEY, JIRAField.SUMMARY, JIRAField.STATUS, JIRAField.CREATED);
 
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
         List<Block> rowBlocks = new ArrayList<Block>();
 
-        List<JIRAField> fields = parseFields(parameters);
+        List<JIRAField> fields = normalizeFields(parameters);
 
         // Create the table headers for the specified fields
         List<Block> headerCellBlocks = new ArrayList<Block>();
@@ -77,7 +76,7 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
             List<Block> dataCellBlocks = new ArrayList<Block>();
             for (JIRAField field : fields) {
                 // Use the displayer for the field
-                dataCellBlocks.add(new TableCellBlock(getFieldDisplayer(field).displayField(field, issue)));
+                dataCellBlocks.add(new TableCellBlock(getFieldDisplayer(field).displayField(field, issue, parameters)));
             }
             rowBlocks.add(new TableRowBlock(dataCellBlocks));
         }
