@@ -50,43 +50,43 @@ public class FieldConverterTest
 
         // Test: empty
         JIRAFields fields = this.mocker.getComponentUnderTest().convertToType(type, "");
-        assertEquals(0, fields.getFields().size());
+        assertEquals(0, fields.size());
 
         // Test: only one field and one id
         fields = this.mocker.getComponentUnderTest().convertToType(type, "fieldid1");
         JIRAField parameter1 = new JIRAField("fieldid1");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: only one field with id and label
         fields = this.mocker.getComponentUnderTest().convertToType(type, "fieldid1:fieldlabel1");
         parameter1 = new JIRAField("fieldid1");
         parameter1.setLabel("fieldlabel1");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: only one field with id and type
         fields = this.mocker.getComponentUnderTest().convertToType(type, "fieldid1!fieldtype1");
         parameter1 = new JIRAField("fieldid1");
         parameter1.setType("fieldtype1");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: only one field with id and label and type
         fields = this.mocker.getComponentUnderTest().convertToType(type, "fieldid1:fieldlabel1!fieldtype1");
         parameter1 = new JIRAField("fieldid1");
         parameter1.setLabel("fieldlabel1");
         parameter1.setType("fieldtype1");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: two fields and one id
         fields = this.mocker.getComponentUnderTest().convertToType(type, "fieldid1,fieldid2");
         parameter1 = new JIRAField("fieldid1");
-        assertEquals(2, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(2, fields.size());
+        assertEquals(parameter1, fields.get(0));
         JIRAField parameter2 = new JIRAField("fieldid2");
-        assertEquals(parameter2, fields.getFields().get(1));
+        assertEquals(parameter2, fields.get(1));
 
         // Test: two fields with id and label and type
         fields = this.mocker.getComponentUnderTest().convertToType(type,
@@ -94,42 +94,42 @@ public class FieldConverterTest
         parameter1 = new JIRAField("fieldid1");
         parameter1.setLabel("fieldlabel1");
         parameter1.setType("fieldtype1");
-        assertEquals(2, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(2, fields.size());
+        assertEquals(parameter1, fields.get(0));
         parameter2 = new JIRAField("fieldid2");
         parameter2.setLabel("fieldlabel2");
         parameter2.setType("fieldtype2");
-        assertEquals(parameter2, fields.getFields().get(1));
+        assertEquals(parameter2, fields.get(1));
 
         // Test: id containing a sub-quote
         fields = this.mocker.getComponentUnderTest().convertToType(type, "fieldid1'some content'");
         parameter1 = new JIRAField("fieldid1some content");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: id containing a quote
         fields = this.mocker.getComponentUnderTest().convertToType(type, "'some \"content\"'");
         parameter1 = new JIRAField("some \"content\"");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: id containing a double quote
         fields = this.mocker.getComponentUnderTest().convertToType(type, "\"some 'content'\"");
         parameter1 = new JIRAField("some 'content'");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: id containing a non-terminated quote
         fields = this.mocker.getComponentUnderTest().convertToType(type, "'some content");
         parameter1 = new JIRAField("some content");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: id containing a quote and other known separator characters
         fields = this.mocker.getComponentUnderTest().convertToType(type, "'some:content!whatever'");
         parameter1 = new JIRAField("some:content!whatever");
-        assertEquals(1, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(1, fields.size());
+        assertEquals(parameter1, fields.get(0));
 
         // Test: 2 ids with quotes
         fields = this.mocker.getComponentUnderTest().convertToType(type,
@@ -137,11 +137,11 @@ public class FieldConverterTest
         parameter1 = new JIRAField("fieldid1");
         parameter1.setLabel("fieldlabel1");
         parameter1.setType("fieldtype1");
-        assertEquals(2, fields.getFields().size());
-        assertEquals(parameter1, fields.getFields().get(0));
+        assertEquals(2, fields.size());
+        assertEquals(parameter1, fields.get(0));
         parameter2 = new JIRAField("fieldid2");
         parameter2.setLabel("fieldlabel2");
         parameter2.setType("fieldtype2");
-        assertEquals(parameter2, fields.getFields().get(1));
+        assertEquals(parameter2, fields.get(1));
     }
 }

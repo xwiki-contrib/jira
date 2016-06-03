@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.TableCellBlock;
@@ -53,15 +54,15 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
     /**
      * Default list of JIRA fields to display.
      */
-    private static final List<JIRAField> FIELDS =
-        Arrays.asList(JIRAField.TYPE, JIRAField.KEY, JIRAField.SUMMARY, JIRAField.STATUS, JIRAField.CREATED);
+    private static final JIRAFields FIELDS = new JIRAFields(
+        Arrays.asList(JIRAField.TYPE, JIRAField.KEY, JIRAField.SUMMARY, JIRAField.STATUS, JIRAField.CREATED));
 
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
         List<Block> rowBlocks = new ArrayList<Block>();
 
-        List<JIRAField> fields = normalizeFields(parameters);
+        JIRAFields fields = normalizeFields(parameters);
 
         // Create the table headers for the specified fields
         List<Block> headerCellBlocks = new ArrayList<Block>();
@@ -85,7 +86,7 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
     }
 
     @Override
-    protected List<JIRAField> getDefaultFields()
+    protected JIRAFields getDefaultFields()
     {
         return FIELDS;
     }

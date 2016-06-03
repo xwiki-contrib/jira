@@ -20,8 +20,6 @@
 package org.xwiki.contrib.jira.macro.internal;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Singleton;
 
@@ -42,14 +40,14 @@ public class FieldConverter extends AbstractConverter<JIRAFields>
     {
         public JIRAFields parse(String content)
         {
-            List<JIRAField> fields = new ArrayList<>();
+            JIRAFields fields = new JIRAFields();
             for (String[] tokens : parseGeneric(content)) {
                 JIRAField field = new JIRAField(tokens[0]);
                 field.setLabel(tokens[1]);
                 field.setType(tokens[2]);
                 fields.add(field);
             }
-            return new JIRAFields(fields);
+            return fields;
         }
 
         @Override

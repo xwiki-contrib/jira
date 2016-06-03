@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
 import org.xwiki.rendering.block.ListItemBlock;
@@ -51,15 +52,15 @@ public class ListJIRADisplayer extends AbstractJIRADisplayer
     /**
      * Default list of JIRA fields to display.
      */
-    private static final List<JIRAField> FIELDS =
-        Arrays.asList(JIRAField.STATUS, JIRAField.KEY, JIRAField.SUMMARY);
+    private static final JIRAFields FIELDS = new JIRAFields(
+        Arrays.asList(JIRAField.STATUS, JIRAField.KEY, JIRAField.SUMMARY));
 
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
         List<Block> listItemBlocks = new ArrayList<Block>();
 
-        List<JIRAField> fields = normalizeFields(parameters);
+        JIRAFields fields = normalizeFields(parameters);
         for (Element issue : issues) {
             List<Block> itemBlocks = new ArrayList<Block>();
             Iterator<JIRAField> it = fields.iterator();
@@ -78,7 +79,7 @@ public class ListJIRADisplayer extends AbstractJIRADisplayer
     }
 
     @Override
-    protected List<JIRAField> getDefaultFields()
+    protected JIRAFields getDefaultFields()
     {
         return FIELDS;
     }

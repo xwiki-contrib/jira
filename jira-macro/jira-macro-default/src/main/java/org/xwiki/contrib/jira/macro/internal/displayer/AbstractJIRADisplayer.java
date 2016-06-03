@@ -28,6 +28,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.macro.JIRADisplayer;
 import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
+import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.macro.JIRAField;
 
@@ -79,9 +80,9 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
      *            defined by the user then use default field names)
      * @return the list of JIRA fields to be displayed
      */
-    protected List<JIRAField> normalizeFields(JIRAMacroParameters parameters)
+    protected JIRAFields normalizeFields(JIRAMacroParameters parameters)
     {
-        List<JIRAField> fields = parameters.getFields().getFields();
+        JIRAFields fields = parameters.getFields();
         if (fields.isEmpty()) {
             fields = getDefaultFields();
         } else {
@@ -124,5 +125,5 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
     /**
      * @return the default list of fields to display if not overriden by the user
      */
-    protected abstract List<JIRAField> getDefaultFields();
+    protected abstract JIRAFields getDefaultFields();
 }

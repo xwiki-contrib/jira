@@ -51,7 +51,7 @@ public class JIRAMacroParameters
     /**
      * @see #getFields()
      */
-    private JIRAFields fields = new JIRAFields(Collections.<JIRAField>emptyList());
+    private JIRAFields fields = new JIRAFields();
 
     /**
      * @see #getFieldNames()

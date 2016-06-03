@@ -19,7 +19,8 @@
  */
 package org.xwiki.contrib.jira.macro;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * List of {@link JIRAField}. Note that this class is required only because of a limitation, see
@@ -28,17 +29,20 @@ import java.util.List;
  * @version $Id$
  * @since 8.3
  */
-public class JIRAFields
+public class JIRAFields extends ArrayList<JIRAField>
 {
-    private List<JIRAField> fields;
-
-    public JIRAFields(List<JIRAField> fields)
+    public JIRAFields(int initialCapacity)
     {
-        this.fields = fields;
+        super(initialCapacity);
     }
 
-    public List<JIRAField> getFields()
+    public JIRAFields()
     {
-        return this.fields;
+        super();
+    }
+
+    public JIRAFields(Collection<? extends JIRAField> collection)
+    {
+        super(collection);
     }
 }
