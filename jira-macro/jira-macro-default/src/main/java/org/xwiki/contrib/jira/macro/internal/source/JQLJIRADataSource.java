@@ -53,7 +53,7 @@ public class JQLJIRADataSource extends AbstractJIRADataSource
             throw new MacroExecutionException("Missing JQL query!");
         }
 
-        Document document = getXMLDocument(jiraServer, macroContent);
+        Document document = getXMLDocument(jiraServer, macroContent, parameters.getMaxCount());
         return buildIssues(document).values();
     }
 }

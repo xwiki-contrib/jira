@@ -75,7 +75,7 @@ public class ListJIRADataSource extends AbstractJIRADataSource
             throw new MacroExecutionException("Empty list of JIRA ids!");
         }
 
-        Document document = getXMLDocument(jiraServer, constructJQLQuery(ids));
+        Document document = getXMLDocument(jiraServer, constructJQLQuery(ids), parameters.getMaxCount());
         return buildIssues(document, ids);
     }
 

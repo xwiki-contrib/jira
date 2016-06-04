@@ -70,6 +70,8 @@ public class JIRAMacroParameters
 
     private Properties extraParameters = new Properties();
 
+    private int maxCount = -1;
+
     /**
      * @param url see {@link #getURL()}
      */
@@ -181,14 +183,39 @@ public class JIRAMacroParameters
         return this.fieldNames;
     }
 
+    /**
+     * @param extraParameters see {@link #getParameters()}
+     */
     @PropertyDescription("extra parameters for sources, displayers and field displayers")
     public void setParameters(Properties extraParameters)
     {
         this.extraParameters = extraParameters;
     }
 
+    /**
+     * @return the list of extra configuration parameters that can be used by sources, displayers and field displayers
+     */
     public Properties getParameters()
     {
         return this.extraParameters;
+    }
+
+    /**
+     * @param maxCount see {@link #getMaxCount()}
+     */
+    @PropertyDescription("the max number of JIRA issues to display")
+    @Deprecated
+    public void setMaxCount(int maxCount)
+    {
+        this.maxCount = maxCount;
+    }
+
+    /**
+     * @return the maximum number of JIRA issues to display (if not specified defaults to the value configured in your
+     *         JIRA instance)
+     */
+    public int getMaxCount()
+    {
+        return this.maxCount;
     }
 }

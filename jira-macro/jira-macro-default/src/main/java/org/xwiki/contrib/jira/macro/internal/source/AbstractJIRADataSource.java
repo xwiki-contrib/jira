@@ -72,17 +72,19 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
     /**
      * @param jiraServer the JIRA Server definition to use
      * @param jqlQuery the JQL query to execute
+     * @param maxCount the max number of issues to get
      * @return the XML document containing the matching JIRA issues
      * @throws MacroExecutionException if the JIRA issues cannot be retrieved
      */
-    public Document getXMLDocument(JIRAServer jiraServer, String jqlQuery) throws MacroExecutionException
+    public Document getXMLDocument(JIRAServer jiraServer, String jqlQuery, int maxCount)
+        throws MacroExecutionException
     {
         Document document;
 
         try {
             // Note: we encode using UTF8 since it's the W3C recommendation.
             // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-            document = createSAXBuilder().build(new URL(computeFullURL(jiraServer, jqlQuery)));
+            document = createSAXBuilder().build(new URL(computeFullURL(jiraServer, jqlQuery, maxCount)));
         } catch (Exception e) {
             throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]",
                 jiraServer.getURL(), jqlQuery), e);
@@ -90,9 +92,11 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         return document;
     }
 
-    protected String computeFullURL(JIRAServer jiraServer, String jqlQuery)
+    protected String computeFullURL(JIRAServer jiraServer, String jqlQuery, int maxCount)
     {
         String additionalQueryString;
+
+        // Add username/password if need be
         if (!StringUtils.isBlank(jiraServer.getUsername())
             && !StringUtils.isBlank(jiraServer.getPassword()))
         {
@@ -101,6 +105,13 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         } else {
             additionalQueryString = "";
         }
+
+        // Restrict number of issues returned if need be
+        if (maxCount > -1) {
+            additionalQueryString = String.format("%s%s", additionalQueryString,
+                "&tempMax=" + maxCount);
+        }
+
         return String.format("%s%s%s%s", jiraServer.getURL(), JQL_URL_PREFIX, encode(jqlQuery), additionalQueryString);
     }
 
