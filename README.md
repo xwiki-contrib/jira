@@ -14,4 +14,4 @@ JIRA-related components (Macro, API, Configuration).
 * License: LGPL 2.1
 * Translations: N/A
 * Sonar Dashboard: N/A
-* Continuous Integration Status: [![Build Status](http://ci.xwiki.org/buildStatus/icon?job=Contrib%20-%20JIRA)](http://ci.xwiki.org/job/Contrib%20-%20JIRA/)
+* Continuous Integration Status: [![Build Status](http://ci.xwiki.org/buildStatus/icon?job=XWiki Contrib/jira/master)](http://ci.xwiki.org/view/Contrib/job/XWiki%20Contrib/job/jira/job/master/)
