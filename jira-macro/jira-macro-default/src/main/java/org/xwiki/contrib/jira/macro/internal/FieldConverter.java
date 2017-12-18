@@ -28,6 +28,11 @@ import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.properties.converter.AbstractConverter;
 
+/**
+ * Converts a String in the format {@code id:label!type,...} into a {@link JIRAFields}.
+ *
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class FieldConverter extends AbstractConverter<JIRAFields>

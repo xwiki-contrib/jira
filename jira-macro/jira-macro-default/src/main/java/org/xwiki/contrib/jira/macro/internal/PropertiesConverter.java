@@ -27,6 +27,11 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.properties.converter.AbstractConverter;
 
+/**
+ * Converts a String of the format {@code a=b,c=d, ...} into a {@link Properties} object.
+ *
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class PropertiesConverter extends AbstractConverter<Properties>

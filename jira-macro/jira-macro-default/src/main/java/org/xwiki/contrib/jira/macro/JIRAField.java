@@ -39,101 +39,140 @@ public class JIRAField
     /**
      * JIRA Summary field.
      */
-    public static final JIRAField SUMMARY = new JIRAField("summary", "Summary", "text");
+    public static final JIRAField SUMMARY;
 
     /**
      * JIRA Key field (eg "XWIKI-1000").
      */
-    public static final JIRAField KEY = new JIRAField("key", "Key", "text");
+    public static final JIRAField KEY;
 
     /**
      * JIRA Type field (eg Bug, Improvement, etc).
      */
-    public static final JIRAField TYPE = new JIRAField("type", "Type", "text");
+    public static final JIRAField TYPE;
 
     /**
      * JIRA Status field (eg Closed, Open, etc).
      */
-    public static final JIRAField STATUS = new JIRAField("status", "Status", "text");
+    public static final JIRAField STATUS;
 
     /**
      * JIRA Assignee field (the person assigned to fix the issue).
      */
-    public static final JIRAField ASSIGNEE = new JIRAField("assignee", "Assignee", "text");
+    public static final JIRAField ASSIGNEE;
 
     /**
      * JIRA Reporter field (the person who reported the issue).
      */
-    public static final JIRAField REPORTER = new JIRAField("reporter", "Reporter", "text");
+    public static final JIRAField REPORTER;
 
     /**
      * JIRA Created date field (the date the issue was created).
      */
-    public static final JIRAField CREATED = new JIRAField("created", "Created Date", "date");
+    public static final JIRAField CREATED;
 
     /**
      * JIRA Updated date field (the date the issue was last modified).
      */
-    public static final JIRAField UPDATED = new JIRAField("updated", "Updated Date", "date");
+    public static final JIRAField UPDATED;
 
     /**
      * JIRA Resolved date field (the date the issue was resolved).
      */
-    public static final JIRAField RESOLVED = new JIRAField("updated", "Resolved Date", "date");
+    public static final JIRAField RESOLVED;
 
     /**
      * JIRA Fix Version field (the version in which the issue was resolved or closed).
      */
-    public static final JIRAField FIXVERSION = new JIRAField("fixVersion", "Fixed in", "text");
+    public static final JIRAField FIXVERSION;
 
     /**
      * JIRA Affected Versions field (the list of Versions for which the issue was reported).
      */
-    public static final JIRAField VERSION = new JIRAField("version", "Affected Versions", "text");
+    public static final JIRAField VERSION;
 
     /**
      * JIRA Component field (the list of domains/categories for the issue).
      */
-    public static final JIRAField COMPONENT = new JIRAField("component", "Component", "text");
+    public static final JIRAField COMPONENT;
 
     /**
      * JIRA Vote field (the number of votes for the issue).
      */
-    public static final JIRAField VOTES = new JIRAField("votes", "Votes", "number");
+    public static final JIRAField VOTES;
 
     /**
      * JIRA Resolution field (eg Closed, Won't Fix, Duplicate; etc).
      */
-    public static final JIRAField RESOLUTION = new JIRAField("resolution", "Resolution", "text");
+    public static final JIRAField RESOLUTION;
 
     /**
      * JIRA link field (the URL to the issue on the JIRA instance).
      */
-    public static final JIRAField LINK = new JIRAField("link", "Link", "url");
+    public static final JIRAField LINK;
 
     /**
      * Special field used by the List Data Source which allows the user to define notes for a given issue.
      */
     public static final String NOTE = "note";
 
-    public static final Map<String, JIRAField> DEFAULT_FIELDS = new HashMap<String, JIRAField>() {{
-        put(SUMMARY.getId(), SUMMARY);
-        put(KEY.getId(), KEY);
-        put(TYPE.getId(), TYPE);
-        put(STATUS.getId(), STATUS);
-        put(ASSIGNEE.getId(), ASSIGNEE);
-        put(REPORTER.getId(), REPORTER);
-        put(CREATED.getId(), CREATED);
-        put(UPDATED.getId(), UPDATED);
-        put(RESOLVED.getId(), RESOLVED);
-        put(FIXVERSION.getId(), FIXVERSION);
-        put(VERSION.getId(), VERSION);
-        put(COMPONENT.getId(), COMPONENT);
-        put(VOTES.getId(), VOTES);
-        put(RESOLUTION.getId(), RESOLUTION);
-        put(LINK.getId(), LINK);
-    }};
+    /**
+     * Map of all known JIRA fields (with their id, label and type).
+     */
+    public static final Map<String, JIRAField> DEFAULT_FIELDS = new HashMap<>();
 
+    private static final String TEXT_TYPE = "text";
+
+    private static final String DATE_TYPE = "date";
+
+    private static final String TYPE_ID = "type";
+
+    static {
+        SUMMARY = new JIRAField("summary", "Summary", TEXT_TYPE);
+        DEFAULT_FIELDS.put(SUMMARY.getId(), SUMMARY);
+
+        KEY = new JIRAField("key", "Key", TEXT_TYPE);
+        DEFAULT_FIELDS.put(KEY.getId(), KEY);
+
+        TYPE = new JIRAField(TYPE_ID, "Type", TEXT_TYPE);
+        DEFAULT_FIELDS.put(TYPE.getId(), TYPE);
+
+        STATUS = new JIRAField("status", "Status", TEXT_TYPE);
+        DEFAULT_FIELDS.put(STATUS.getId(), STATUS);
+
+        ASSIGNEE = new JIRAField("assignee", "Assignee", TEXT_TYPE);
+        DEFAULT_FIELDS.put(ASSIGNEE.getId(), ASSIGNEE);
+
+        REPORTER = new JIRAField("reporter", "Reporter", TEXT_TYPE);
+        DEFAULT_FIELDS.put(REPORTER.getId(), REPORTER);
+
+        CREATED = new JIRAField("created", "Created Date", DATE_TYPE);
+        DEFAULT_FIELDS.put(CREATED.getId(), CREATED);
+
+        UPDATED = new JIRAField("updated", "Updated Date", DATE_TYPE);
+        DEFAULT_FIELDS.put(UPDATED.getId(), UPDATED);
+
+        RESOLVED = new JIRAField("resolved", "Resolved Date", DATE_TYPE);
+        DEFAULT_FIELDS.put(RESOLVED.getId(), RESOLVED);
+
+        FIXVERSION = new JIRAField("fixVersion", "Fixed in", TEXT_TYPE);
+        DEFAULT_FIELDS.put(FIXVERSION.getId(), FIXVERSION);
+
+        VERSION = new JIRAField("version", "Affected Versions", TEXT_TYPE);
+        DEFAULT_FIELDS.put(VERSION.getId(), VERSION);
+
+        COMPONENT = new JIRAField("component", "Component", TEXT_TYPE);
+        DEFAULT_FIELDS.put(COMPONENT.getId(), COMPONENT);
+
+        VOTES = new JIRAField("votes", "Votes", "number");
+        DEFAULT_FIELDS.put(VOTES.getId(), VOTES);
+
+        RESOLUTION = new JIRAField("resolution", "Resolution", TEXT_TYPE);
+        DEFAULT_FIELDS.put(RESOLUTION.getId(), RESOLUTION);
+
+        LINK = new JIRAField("link", "Link", "url");
+        DEFAULT_FIELDS.put(LINK.getId(), LINK);
+    }
     private String id;
 
     private String label;
@@ -238,7 +277,7 @@ public class JIRAField
         ToStringBuilder builder = new XWikiToStringBuilder(this);
         builder.append("id", getId());
         builder.append("label", getLabel());
-        builder.append("type", getType());
+        builder.append(TYPE_ID, getType());
         return builder.toString();
     }
 }

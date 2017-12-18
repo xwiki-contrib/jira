@@ -19,7 +19,6 @@
  */
 package org.xwiki.contrib.jira.macro;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 

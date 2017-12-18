@@ -84,34 +84,34 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     {
         // Only handle the "serverMappings" property and when we get asked for it, we get all XObjects in the document
         // and transform them into a Map
-        if (propertyName.equals("serverMappings")) {
-            Map<String, JIRAServer> jiraServers = new HashMap<>();
-            List<BaseObject> baseObjects = getJIRAServerBaseObjects();
-            if (baseObjects != null && !baseObjects.isEmpty()) {
-                for (BaseObject baseObject : baseObjects) {
-                    JIRAServer jiraServer;
-                    StringProperty idProperty = (StringProperty) baseObject.getField("id");
-                    StringProperty urlProperty = (StringProperty) baseObject.getField("url");
-                    if (!isPropertyEmpty(idProperty) && !isPropertyEmpty(urlProperty)) {
-                        StringProperty usernameProperty = (StringProperty) baseObject.getField("username");
-                        StringProperty passswordProperty = (StringProperty) baseObject.getField("password");
-                        if (!isPropertyEmpty(usernameProperty) && !isPropertyEmpty(passswordProperty)) {
-                            jiraServer = new JIRAServer(urlProperty.getValue(),
-                                usernameProperty.getValue(), passswordProperty.getValue());
-                        } else {
-                            jiraServer = new JIRAServer(urlProperty.getValue());
-                        }
-                        jiraServers.put(idProperty.getValue(), jiraServer);
-                    }
-                }
-            }
-            if (jiraServers.isEmpty()) {
-                jiraServers = null;
-            }
-            return jiraServers;
-        } else {
+        if (!propertyName.equals("serverMappings")) {
             return super.getBaseProperty(propertyName, text);
         }
+
+        Map<String, JIRAServer> jiraServers = new HashMap<>();
+        List<BaseObject> baseObjects = getJIRAServerBaseObjects();
+        if (baseObjects != null && !baseObjects.isEmpty()) {
+            for (BaseObject baseObject : baseObjects) {
+                JIRAServer jiraServer;
+                StringProperty idProperty = (StringProperty) baseObject.getField("id");
+                StringProperty urlProperty = (StringProperty) baseObject.getField("url");
+                if (!isPropertyEmpty(idProperty) && !isPropertyEmpty(urlProperty)) {
+                    StringProperty usernameProperty = (StringProperty) baseObject.getField("username");
+                    StringProperty passswordProperty = (StringProperty) baseObject.getField("password");
+                    if (!isPropertyEmpty(usernameProperty) && !isPropertyEmpty(passswordProperty)) {
+                        jiraServer = new JIRAServer(urlProperty.getValue(),
+                            usernameProperty.getValue(), passswordProperty.getValue());
+                    } else {
+                        jiraServer = new JIRAServer(urlProperty.getValue());
+                    }
+                    jiraServers.put(idProperty.getValue(), jiraServer);
+                }
+            }
+        }
+        if (jiraServers.isEmpty()) {
+            jiraServers = null;
+        }
+        return jiraServers;
     }
 
     private boolean isPropertyEmpty(BaseProperty property)
@@ -123,7 +123,7 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     {
         DocumentReference documentReference = getFailsafeDocumentReference();
         LocalDocumentReference classReference = getClassReference();
-        if(documentReference != null && classReference != null) {
+        if (documentReference != null && classReference != null) {
             XWikiContext xcontext = this.xcontextProvider.get();
             XWikiDocument document = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
             return document.getXObjects(classReference);

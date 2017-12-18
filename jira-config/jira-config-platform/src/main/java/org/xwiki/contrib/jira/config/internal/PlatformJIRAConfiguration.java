@@ -31,6 +31,11 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
 
+/**
+ * Platform implementation of the JIRA configuration.
+ *
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class PlatformJIRAConfiguration implements JIRAConfiguration

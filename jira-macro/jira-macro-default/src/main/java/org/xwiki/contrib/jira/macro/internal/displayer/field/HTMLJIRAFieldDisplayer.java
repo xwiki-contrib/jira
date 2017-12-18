@@ -31,11 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.RawBlock;
-import org.xwiki.rendering.block.VerbatimBlock;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**

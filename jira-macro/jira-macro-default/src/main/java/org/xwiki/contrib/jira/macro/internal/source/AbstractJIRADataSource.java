@@ -47,14 +47,14 @@ import org.xwiki.contrib.jira.macro.JIRADataSource;
  */
 public abstract class AbstractJIRADataSource implements JIRADataSource
 {
-    @Inject
-    protected JIRAConfiguration configuration;
-
     /**
      * URL Prefix to use to build the full JQL URL (doesn't contain the JQL query itself which needs to be appended).
      */
     private static final String JQL_URL_PREFIX =
         "/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=";
+
+    @Inject
+    protected JIRAConfiguration configuration;
 
     /**
      * @param document the XML document from which to extract JIRA issues

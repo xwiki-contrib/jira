@@ -31,16 +31,32 @@ import java.util.Collection;
  */
 public class JIRAFields extends ArrayList<JIRAField>
 {
+    /**
+     * Constructs an empty list with the specified initial capacity.
+     *
+     * @param  initialCapacity  the initial capacity of the list
+     * @throws IllegalArgumentException if the specified initial capacity is negative
+     */
     public JIRAFields(int initialCapacity)
     {
         super(initialCapacity);
     }
 
+    /**
+     * Constructs an empty list with an initial capacity of ten.
+     */
     public JIRAFields()
     {
         super();
     }
 
+    /**
+     * Constructs a list containing the elements of the specified collection, in the order they are returned by the
+     * collection's iterator.
+     *
+     * @param collection the collection whose elements are to be placed into this list
+     * @throws NullPointerException if the specified collection is null
+     */
     public JIRAFields(Collection<? extends JIRAField> collection)
     {
         super(collection);

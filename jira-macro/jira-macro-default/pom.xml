@@ -64,7 +64,9 @@
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-event</artifactId>
-      <version>${rendering.version}</version>
+      <!-- Override the rendering version used since otherwise we have some tests failing because of
+           https://jira.xwiki.org/browse/XRENDERING-401 which was fixed in XWiki Rendering 7.2M1 -->
+      <version>7.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

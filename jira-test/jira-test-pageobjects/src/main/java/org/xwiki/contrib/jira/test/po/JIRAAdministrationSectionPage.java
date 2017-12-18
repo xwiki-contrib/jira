@@ -31,16 +31,31 @@ import org.xwiki.administration.test.po.AdministrationSectionPage;
  */
 public class JIRAAdministrationSectionPage extends AdministrationSectionPage
 {
+    /**
+     * Construct an object representing the "JIRA" section.
+     */
     public JIRAAdministrationSectionPage()
     {
         super("JIRA");
     }
 
+    /**
+     * Get the Nth jira {@code id} xproperty for the {@code JIRA.JIRAConfigClass} xclass.
+     *
+     * @param number the position of the {@code JIRA.JIRAConfigClass} xobject in the table
+     * @return the xpoperty jira id
+     */
     public String getId(int number)
     {
         return getIdWebElement(number).getText();
     }
 
+    /**
+     * Fill the jira id value on the displayed input.
+     *
+     * @param number the position of the {@code JIRA.JIRAConfigClass} xobject in the table
+     * @param id the jira id to set
+     */
     public void setId(int number, String id)
     {
         WebElement idElement = getIdWebElement(number);
@@ -53,11 +68,23 @@ public class JIRAAdministrationSectionPage extends AdministrationSectionPage
         return getDriver().findElement(By.id(String.format("JIRA.JIRAConfigClass_%d_id", number)));
     }
 
+    /**
+     * Get the Nth jira {@code url} xproperty for the {@code JIRA.JIRAConfigClass} xclass.
+     *
+     * @param number the position of the {@code JIRA.JIRAConfigClass} xobject in the table
+     * @return the xpoperty jira url
+     */
     public String getURL(int number)
     {
         return getURLWebElement(number).getText();
     }
 
+    /**
+     * Fill the jira url value on the displayed input.
+     *
+     * @param number the position of the {@code JIRA.JIRAConfigClass} xobject in the table
+     * @param url the jira url to set
+     */
     public void setURL(int number, String url)
     {
         WebElement idElement = getURLWebElement(number);
