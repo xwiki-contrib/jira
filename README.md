@@ -4,7 +4,7 @@ JIRA-related components (Macro, API, Configuration).
 
 * Project Lead: [Vincent Massol](http://www.xwiki.org/xwiki/bin/view/XWiki/VincentMassol)
 * Documentation & Downloads: 
-  * [JIRA Macro](http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA Macro)
+  * [JIRA Macro](http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Macro)
   * [JIRA Administration](http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Administration/)
   * [JIRA Scripting API](http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Module)
 * [Issue Tracker](http://jira.xwiki.org/browse/MJIRA)
