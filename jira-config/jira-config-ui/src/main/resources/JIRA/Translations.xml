@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>admin.jira=JIRA
 jira.config.label=JIRA Instance Definitions
-jira.config.label.hint=Defines access to JIRA instances and associates an id to each. This id can then be used in various JIRA components whenever a JIRA instance is required, such as in a parameter for the JIRA Macro.
+jira.config.label.hint=Defines access to JIRA instances and associates an ID to each. This ID can then be used in various JIRA components whenever a JIRA instance is required, such as in a parameter for the JIRA Macro.
 jira.config.id=Id
 jira.config.url=JIRA URL
 jira.config.username=Username
