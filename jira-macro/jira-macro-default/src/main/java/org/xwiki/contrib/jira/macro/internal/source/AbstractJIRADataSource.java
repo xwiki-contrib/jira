@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -86,8 +87,12 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
             // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
             document = createSAXBuilder().build(new URL(computeFullURL(jiraServer, jqlQuery, maxCount)));
         } catch (Exception e) {
-            throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]",
-                jiraServer.getURL(), jqlQuery), e);
+            // In order to prevent showing the full URL with the credentials we only display the root message and
+            // remove the credential part of the URL.
+            String rootCause = ExceptionUtils.getRootCauseMessage(e);
+            rootCause = StringUtils.replacePattern(rootCause, "&os_username.*&os_authType=basic", "xxx");
+            throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]. "
+                + "Root cause: [%s]", jiraServer.getURL(), jqlQuery, rootCause));
         }
         return document;
     }
