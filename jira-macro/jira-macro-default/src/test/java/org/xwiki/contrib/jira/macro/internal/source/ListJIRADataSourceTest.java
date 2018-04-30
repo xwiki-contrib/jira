@@ -173,22 +173,11 @@ public class ListJIRADataSourceTest
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
             this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", -1));
 
-        // With credentials
-        jiraServer = new JIRAServer("http://localhost/jira", "username", "password");
-        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
-            + "jqlQuery=query&os_username=username&os_password=password&os_authType=basic",
-            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", -1));
-
-        // With Max Count + credentials
-        jiraServer = new JIRAServer("http://localhost/jira", "username", "password");
-        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
-                + "jqlQuery=query&os_username=username&os_password=password&os_authType=basic&tempMax=5",
-            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", 5));
-
         // With Max Count and no credentials
         jiraServer = new JIRAServer("http://localhost/jira");
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
                 + "jqlQuery=query&tempMax=5",
             this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", 5));
     }
+
 }
