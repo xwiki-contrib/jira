@@ -19,14 +19,18 @@
  */
 package org.xwiki.contrib.jira.macro.internal.source;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jdom2.Document;
@@ -85,7 +89,13 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         try {
             // Note: we encode using UTF8 since it's the W3C recommendation.
             // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-            document = createSAXBuilder().build(new URL(computeFullURL(jiraServer, jqlQuery, maxCount)));
+
+            // JIRA-22: Using Basic Auth.
+            String urlString = computeFullURL(jiraServer, jqlQuery, maxCount);
+            URL url = new URL(urlString);
+            URLConnection connection = newConnectionFromUrl(url);
+            addBasicAuthentication(jiraServer, connection);
+            document = createSAXBuilder().build( connection.getInputStream() );
         } catch (Exception e) {
             // In order to prevent showing the full URL with the credentials we only display the root message and
             // remove the credential part of the URL.
@@ -97,19 +107,21 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         return document;
     }
 
+    protected URLConnection newConnectionFromUrl(URL url) throws IOException {
+        return url.openConnection();
+    }
+
+    private void addBasicAuthentication(JIRAServer jiraServer, URLConnection connection) {
+        if (StringUtils.isNotBlank(jiraServer.getUsername()) && StringUtils.isNotBlank(jiraServer.getPassword())) {
+            String creds = jiraServer.getUsername() + ":" + jiraServer.getPassword() ;
+            String basicAuth = "Basic " + new String(new Base64().encode(creds.getBytes()));
+            connection.setRequestProperty ("Authorization", basicAuth);
+        }
+    }
+
     protected String computeFullURL(JIRAServer jiraServer, String jqlQuery, int maxCount)
     {
-        String additionalQueryString;
-
-        // Add username/password if need be
-        if (!StringUtils.isBlank(jiraServer.getUsername())
-            && !StringUtils.isBlank(jiraServer.getPassword()))
-        {
-            additionalQueryString = String.format("&os_username=%s&os_password=%s&os_authType=basic",
-                encode(jiraServer.getUsername()), encode(jiraServer.getPassword()));
-        } else {
-            additionalQueryString = "";
-        }
+        String additionalQueryString = "" ;
 
         // Restrict number of issues returned if need be
         if (maxCount > -1) {
