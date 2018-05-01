@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
-    <version>6.4-9</version>
+    <version>8.4-10</version>
   </parent>
   <groupId>org.xwiki.contrib.jira</groupId>
   <artifactId>jira</artifactId>
@@ -51,7 +51,7 @@
     </developer>
   </developers>
   <properties>
-    <xwiki.compatibility.previous.version>8.3</xwiki.compatibility.previous.version>
+    <xwiki.compatibility.previous.version>8.4</xwiki.compatibility.previous.version>
     <xwiki.issueManagement.jira.id>JIRA</xwiki.issueManagement.jira.id>
   </properties>
   <modules>
@@ -70,37 +70,6 @@
             <include>**/*Test.java</include>
             <include>**/*IntegrationTests.java</include>
           </includes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <!--
-           List of specific CLIRR excludes. Example:
-
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/ircbot/IRCBot</className>
-              <method>void initialize(java.lang.String)</method>
-              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
-                IRC Bot application in a subwiki</justification>
-              </difference>
-
-           See http://mojo.codehaus.org/clirr-maven-plugin/examples/ignored-differences.html
-          -->
-          <ignored>
-            <!--
-             Remove the following ignores after we release the current version as final
-            -->
-          </ignored>
-          <excludes>
-            <exclude>**/internal/**</exclude>
-            <exclude>**/test/**</exclude>
-            <!--
-             Remove the following excludes after we release the current version as final
-            -->
-          </excludes>
         </configuration>
       </plugin>
     </plugins>

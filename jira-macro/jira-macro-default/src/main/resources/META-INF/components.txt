@@ -1,6 +1,7 @@
 org.xwiki.contrib.jira.macro.internal.JIRAMacro
 org.xwiki.contrib.jira.macro.internal.source.ListJIRADataSource
 org.xwiki.contrib.jira.macro.internal.source.JQLJIRADataSource
+org.xwiki.contrib.jira.macro.internal.source.HTTPJIRAFetcher
 org.xwiki.contrib.jira.macro.internal.displayer.TableJIRADisplayer
 org.xwiki.contrib.jira.macro.internal.displayer.ListJIRADisplayer
 org.xwiki.contrib.jira.macro.internal.displayer.EnumJIRADisplayer

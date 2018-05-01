@@ -26,6 +26,11 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.*;
 
 /**
@@ -37,11 +42,22 @@ import static org.junit.Assert.*;
 public class JIRAMacroTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public WireMockRule wireMock = new WireMockRule(8889);
+
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
     public void verifyMacro() throws Exception
     {
+        // Setup Wiremock to simulate a JIRA instance
+        this.wireMock.stubFor(get(urlMatching(
+            "\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "text/xml")
+                .withBodyFile("input.xml")));
+
         // Navigate to the JIRA Admin UI and set up a JIRA instance pointing to localhost
 
         // Verify that there is a jira section
@@ -52,7 +68,7 @@ public class JIRAMacroTest extends AbstractTest
         wikiAdministrationPage.clickSection("Applications", "JIRA");
         JIRAAdministrationSectionPage jiraPage = new JIRAAdministrationSectionPage();
         jiraPage.setId(0, "local");
-        jiraPage.setURL(0, "http://localhost");
+        jiraPage.setURL(0, "http://localhost:8889");
         jiraPage.clickSave();
 
         // Now create a new page and try using the jira macro in it + verify that the scripting jira api works too

@@ -11,7 +11,7 @@
 beginDocument
 beginMacroMarkerStandalone [jira] []
 beginGroup [[class]=[xwikirenderingerror]]
-onWord [Failed to execute the [jira] macro. Click on this message for details.]
+onWord [Failed to execute the [jira] macro. Cause: [No JIRA Server found. You must specify a JIRA server, using the "url" macro parameter or using the "id" macro parameter to reference a server defined in the JIRA Macro configuration.]. Click on this message for details.]
 endGroup [[class]=[xwikirenderingerror]]
 beginGroup [[class]=[xwikirenderingerrordescription hidden]]
 onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: No JIRA Server found. You must specify a JIRA server, using the "url" macro parameter or using the "id" macro parameter to reference a server defined in the JIRA Macro configuration.${{{regex:.*}}}] [false]

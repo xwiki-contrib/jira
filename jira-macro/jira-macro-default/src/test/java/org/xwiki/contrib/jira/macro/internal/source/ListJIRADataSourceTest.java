@@ -21,10 +21,13 @@ package org.xwiki.contrib.jira.macro.internal.source;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -35,6 +38,8 @@ import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import static org.xwiki.contrib.jira.macro.JIRAField.*;
 import static org.junit.Assert.*;
@@ -62,10 +67,10 @@ public class ListJIRADataSourceTest
     @Test
     public void parseIds() throws Exception
     {
-        List<Pair<String, String>> expected = Arrays.<Pair<String, String>>asList(
-            new ImmutablePair<String, String>("ISSUE-1", ""),
-            new ImmutablePair<String, String>("ISSUE-2", "Whatever"),
-            new ImmutablePair<String, String>("ISSUE-3", ""));
+        List<Pair<String, String>> expected = Arrays.asList(
+            new ImmutablePair<>("ISSUE-1", ""),
+            new ImmutablePair<>("ISSUE-2", "Whatever"),
+            new ImmutablePair<>("ISSUE-3", ""));
         assertEquals(expected,
             this.mocker.getComponentUnderTest().parseIds("\nISSUE-1\nISSUE-2 |Whatever \n ISSUE-3\n"));
     }
@@ -73,9 +78,9 @@ public class ListJIRADataSourceTest
     @Test
     public void constructJQLQuery() throws Exception
     {
-        List<Pair<String, String>> ids = Arrays.<Pair<String, String>>asList(
-            new ImmutablePair<String, String>("ISSUE-1", ""),
-            new ImmutablePair<String, String>("ISSUE-2", "Whatever"));
+        List<Pair<String, String>> ids = Arrays.asList(
+            new ImmutablePair<>("ISSUE-1", ""),
+            new ImmutablePair<>("ISSUE-2", "Whatever"));
         assertEquals("issueKey in (ISSUE-1,ISSUE-2)", this.mocker.getComponentUnderTest().constructJQLQuery(ids));
     }
 
@@ -90,10 +95,10 @@ public class ListJIRADataSourceTest
     @Test
     public void buildIssues() throws Exception
     {
-        Document document = new SAXBuilder().build(getClass().getResourceAsStream("/input.xml"));
-        List<Pair<String, String>> ids = Arrays.<Pair<String, String>>asList(
-            new ImmutablePair<String, String>("XWIKI-1000", ""),
-            new ImmutablePair<String, String>("XWIKI-1001", "Note"));
+        Document document = new SAXBuilder().build(getClass().getResourceAsStream("/__files/input.xml"));
+        List<Pair<String, String>> ids = Arrays.asList(
+            new ImmutablePair<>("XWIKI-1000", ""),
+            new ImmutablePair<>("XWIKI-1001", "Note"));
 
         List<Element> issues = this.mocker.getComponentUnderTest().buildIssues(document, ids);
 
@@ -179,5 +184,4 @@ public class ListJIRADataSourceTest
                 + "jqlQuery=query&tempMax=5",
             this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", 5));
     }
-
 }

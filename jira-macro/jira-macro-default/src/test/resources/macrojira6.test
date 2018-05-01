@@ -3,7 +3,7 @@
 .input|xwiki/2.0
 .# Test the "list" style.
 .#-----------------------------------------------------
-{{jira url="http://localhost" style="list"}}
+{{jira url="http://localhost:8889" style="list"}}
 XWIKI-1000
 XWIKI-1001
 {{/jira}}
@@ -11,7 +11,7 @@ XWIKI-1001
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [jira] [url=http://localhost|style=list] [XWIKI-1000
+beginMacroMarkerStandalone [jira] [url=http://localhost:8889|style=list] [XWIKI-1000
 XWIKI-1001]
 beginList [BULLETED]
 beginListItem
@@ -35,6 +35,6 @@ onSpace
 onVerbatim [On jetty, non-default skins are not usable] [true]
 endListItem
 endList [BULLETED]
-endMacroMarkerStandalone [jira] [url=http://localhost|style=list] [XWIKI-1000
+endMacroMarkerStandalone [jira] [url=http://localhost:8889|style=list] [XWIKI-1000
 XWIKI-1001]
 endDocument
