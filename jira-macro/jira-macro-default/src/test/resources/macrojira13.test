@@ -1,10 +1,10 @@
 .runTransformations
-.#-----------------------------------------------------
+.#-----------------------------------------------------------
 .input|xwiki/2.0
-.# Use the default parameters for the JIRA Macro
-.# (i.e. List source and Table style)
-.#-----------------------------------------------------
-{{jira url="http://localhost:8889"}}
+.# Test authentication support. Verification that credentials
+.# have been passed is done in IntegrationTests.
+.#-----------------------------------------------------------
+{{jira id="jira-auth"}}
 XWIKI-1000
 XWIKI-1001
 {{/jira}}
@@ -12,7 +12,7 @@ XWIKI-1001
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [jira] [url=http://localhost:8889] [XWIKI-1000
+beginMacroMarkerStandalone [jira] [id=jira-auth] [XWIKI-1000
 XWIKI-1001]
 beginTable
 beginTableRow
@@ -50,7 +50,7 @@ beginTableCell
 onImage [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/images/icons/status_closed.gif]] [false] [[alt]=[Closed][title]=[Closed]]
 endTableCell
 beginTableCell
-onVerbatim [${{{regex:.*}}}-Mar-2007] [true]
+onVerbatim [19-Mar-2007] [true]
 endTableCell
 endTableRow
 beginTableRow
@@ -69,10 +69,10 @@ beginTableCell
 onImage [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/images/icons/status_open.gif]] [false] [[alt]=[Open][title]=[Open]]
 endTableCell
 beginTableCell
-onVerbatim [${{{regex:.*}}}-Mar-2007] [true]
+onVerbatim [19-Mar-2007] [true]
 endTableCell
 endTableRow
 endTable
-endMacroMarkerStandalone [jira] [url=http://localhost:8889] [XWIKI-1000
+endMacroMarkerStandalone [jira] [id=jira-auth] [XWIKI-1000
 XWIKI-1001]
 endDocument

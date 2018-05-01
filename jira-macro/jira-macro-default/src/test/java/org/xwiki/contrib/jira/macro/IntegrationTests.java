@@ -19,9 +19,24 @@
  */
 package org.xwiki.contrib.jira.macro;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.xwiki.contrib.jira.config.JIRAConfiguration;
+import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import com.github.tomakehurst.wiremock.WireMockServer;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -34,4 +49,51 @@ import org.xwiki.test.annotation.AllComponents;
 @AllComponents
 public class IntegrationTests
 {
+    private static WireMockServer server;
+
+    @BeforeClass
+    public static void setUp()
+    {
+        // Simulate a fake JIRA instance using WireMock
+        server = new WireMockServer(8889);
+        server.start();
+
+        // Default answer when no authentication is required
+        server.stubFor(get(urlMatching(
+            "\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "text/xml")
+                .withBodyFile("input.xml")));
+
+        // Default answer when authentication is required
+        server.stubFor(get(urlMatching(
+            "\\/auth\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*"))
+            .withBasicAuth("username", "password")
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "text/xml")
+                .withBodyFile("input.xml")));
+    }
+
+    @RenderingTestSuite.Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
+    {
+        // Register various JIRAServer configurations:
+        // - one with authentication
+        // - one without authentication
+        JIRAConfiguration configuration = componentManager.registerMockComponent(JIRAConfiguration.class);
+        Map<String, JIRAServer> servers = new HashMap<>();
+        JIRAServer server1 = new JIRAServer("http://localhost:8889");
+        servers.put("jira-noauth", server1);
+        JIRAServer server2 = new JIRAServer("http://localhost:8889/auth", "username", "password");
+        servers.put("jira-auth", server2);
+        when(configuration.getJIRAServers()).thenReturn(servers);
+    }
+
+    @AfterClass
+    public static void tearDown()
+    {
+        server.stop();
+    }
 }

@@ -3,7 +3,7 @@
 .input|xwiki/2.0
 .# Test passing a parameter to a field fisplayer
 .#-----------------------------------------------------
-{{jira url="http://localhost" fields="'Custom Link'!url" parameters="field.url.label='custom label'"}}
+{{jira url="http://localhost:8889" fields="'Custom Link'!url" parameters="field.url.label='custom label'"}}
 XWIKI-1000
 XWIKI-1001
 {{/jira}}
@@ -11,7 +11,7 @@ XWIKI-1001
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [jira] [url=http://localhost|fields='Custom Link'!url|parameters=field.url.label='custom label'] [XWIKI-1000
+beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields='Custom Link'!url|parameters=field.url.label='custom label'] [XWIKI-1000
 XWIKI-1001]
 beginTable
 beginTableRow
@@ -31,6 +31,6 @@ beginTableCell
 endTableCell
 endTableRow
 endTable
-endMacroMarkerStandalone [jira] [url=http://localhost|fields='Custom Link'!url|parameters=field.url.label='custom label'] [XWIKI-1000
+endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields='Custom Link'!url|parameters=field.url.label='custom label'] [XWIKI-1000
 XWIKI-1001]
 endDocument

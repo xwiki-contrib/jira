@@ -3,14 +3,14 @@
 .input|xwiki/2.0
 .# JQL source and table display
 .#-----------------------------------------------------
-{{jira url="http://localhost" source="jql"}}
+{{jira url="http://localhost:8889" source="jql"}}
 issueKey in (XWIKI-1000,XWIKI-1001)
 {{/jira}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [jira] [url=http://localhost|source=jql] [issueKey in (XWIKI-1000,XWIKI-1001)]
+beginMacroMarkerStandalone [jira] [url=http://localhost:8889|source=jql] [issueKey in (XWIKI-1000,XWIKI-1001)]
 beginTable
 beginTableRow
 beginTableHeadCell
@@ -70,5 +70,5 @@ onVerbatim [${{{regex:.*}}}-Mar-2007] [true]
 endTableCell
 endTableRow
 endTable
-endMacroMarkerStandalone [jira] [url=http://localhost|source=jql] [issueKey in (XWIKI-1000,XWIKI-1001)]
+endMacroMarkerStandalone [jira] [url=http://localhost:8889|source=jql] [issueKey in (XWIKI-1000,XWIKI-1001)]
 endDocument

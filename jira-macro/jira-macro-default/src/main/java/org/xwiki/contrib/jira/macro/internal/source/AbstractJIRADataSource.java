@@ -20,7 +20,6 @@
 package org.xwiki.contrib.jira.macro.internal.source;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,16 +27,15 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
+import org.slf4j.Logger;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
+import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.contrib.jira.macro.JIRADataSource;
 
 /**
  * Common implementation for JIRA Data Source that knowns how to execute a JQL query on a JIRA instance and retrieve the
@@ -55,7 +53,13 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         "/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=";
 
     @Inject
-    protected JIRAConfiguration configuration;
+    private JIRAConfiguration configuration;
+
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private HTTPJIRAFetcher jiraFetcher;
 
     /**
      * @param document the XML document from which to extract JIRA issues
@@ -63,7 +67,7 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
      */
     protected Map<String, Element> buildIssues(Document document)
     {
-        Map<String, Element> issues = new LinkedHashMap<String, Element>();
+        Map<String, Element> issues = new LinkedHashMap<>();
         for (Element item : document.getRootElement().getChild("channel").getChildren("item")) {
             issues.put(item.getChildText(JIRAField.KEY.getId()), item);
         }
@@ -83,50 +87,31 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         Document document;
 
         try {
-            // Note: we encode using UTF8 since it's the W3C recommendation.
-            // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-            document = createSAXBuilder().build(new URL(computeFullURL(jiraServer, jqlQuery, maxCount)));
+            String urlString = computeFullURL(jiraServer, jqlQuery, maxCount);
+            document = this.jiraFetcher.fetch(urlString, jiraServer);
         } catch (Exception e) {
-            // In order to prevent showing the full URL with the credentials we only display the root message and
-            // remove the credential part of the URL.
-            String rootCause = ExceptionUtils.getRootCauseMessage(e);
-            rootCause = StringUtils.replacePattern(rootCause, "&os_username.*&os_authType=basic", "xxx");
-            throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]. "
-                + "Root cause: [%s]", jiraServer.getURL(), jqlQuery, rootCause));
+            throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]",
+                jiraServer.getURL(), jqlQuery), e);
         }
         return document;
     }
 
     protected String computeFullURL(JIRAServer jiraServer, String jqlQuery, int maxCount)
     {
-        String additionalQueryString;
-
-        // Add username/password if need be
-        if (!StringUtils.isBlank(jiraServer.getUsername())
-            && !StringUtils.isBlank(jiraServer.getPassword()))
-        {
-            additionalQueryString = String.format("&os_username=%s&os_password=%s&os_authType=basic",
-                encode(jiraServer.getUsername()), encode(jiraServer.getPassword()));
-        } else {
-            additionalQueryString = "";
-        }
+        StringBuilder additionalQueryString = new StringBuilder();
 
         // Restrict number of issues returned if need be
         if (maxCount > -1) {
-            additionalQueryString = String.format("%s%s", additionalQueryString,
-                "&tempMax=" + maxCount);
+            additionalQueryString.append("&tempMax=").append(maxCount);
         }
 
-        return String.format("%s%s%s%s", jiraServer.getURL(), JQL_URL_PREFIX, encode(jqlQuery), additionalQueryString);
-    }
+        // Note: we encode using UTF8 since it's the W3C recommendation.
+        // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
+        String fullURL = String.format("%s%s%s%s", jiraServer.getURL(), JQL_URL_PREFIX, encode(jqlQuery),
+            additionalQueryString);
+        this.logger.debug("Computed JIRA URL [{}]", fullURL);
 
-    /**
-     * @return the SAXBuilder instance to use to retrieve the data
-     */
-    protected SAXBuilder createSAXBuilder()
-    {
-        // Note: SAXBuilder is not thread-safe which is why we're instantiating a new one every time.
-        return new SAXBuilder();
+        return fullURL;
     }
 
     /**
