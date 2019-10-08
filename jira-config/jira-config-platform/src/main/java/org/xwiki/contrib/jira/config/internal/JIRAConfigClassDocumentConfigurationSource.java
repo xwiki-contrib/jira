@@ -19,6 +19,7 @@
  */
 package org.xwiki.contrib.jira.config.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,22 +91,20 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
 
         Map<String, JIRAServer> jiraServers = new HashMap<>();
         List<BaseObject> baseObjects = getJIRAServerBaseObjects();
-        if (baseObjects != null && !baseObjects.isEmpty()) {
-            for (BaseObject baseObject : baseObjects) {
-                JIRAServer jiraServer;
-                StringProperty idProperty = (StringProperty) baseObject.getField("id");
-                StringProperty urlProperty = (StringProperty) baseObject.getField("url");
-                if (!isPropertyEmpty(idProperty) && !isPropertyEmpty(urlProperty)) {
-                    StringProperty usernameProperty = (StringProperty) baseObject.getField("username");
-                    StringProperty passswordProperty = (StringProperty) baseObject.getField("password");
-                    if (!isPropertyEmpty(usernameProperty) && !isPropertyEmpty(passswordProperty)) {
-                        jiraServer = new JIRAServer(urlProperty.getValue(),
-                            usernameProperty.getValue(), passswordProperty.getValue());
-                    } else {
-                        jiraServer = new JIRAServer(urlProperty.getValue());
-                    }
-                    jiraServers.put(idProperty.getValue(), jiraServer);
+        for (BaseObject baseObject : baseObjects) {
+            JIRAServer jiraServer;
+            StringProperty idProperty = (StringProperty) baseObject.getField("id");
+            StringProperty urlProperty = (StringProperty) baseObject.getField("url");
+            if (!isPropertyEmpty(idProperty) && !isPropertyEmpty(urlProperty)) {
+                StringProperty usernameProperty = (StringProperty) baseObject.getField("username");
+                StringProperty passswordProperty = (StringProperty) baseObject.getField("password");
+                if (!isPropertyEmpty(usernameProperty) && !isPropertyEmpty(passswordProperty)) {
+                    jiraServer = new JIRAServer(urlProperty.getValue(),
+                        usernameProperty.getValue(), passswordProperty.getValue());
+                } else {
+                    jiraServer = new JIRAServer(urlProperty.getValue());
                 }
+                jiraServers.put(idProperty.getValue(), jiraServer);
             }
         }
         if (jiraServers.isEmpty()) {
@@ -121,14 +120,19 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
 
     private List<BaseObject> getJIRAServerBaseObjects() throws XWikiException
     {
+        List<BaseObject> jiraServerObjects = new ArrayList<>();
+
         DocumentReference documentReference = getFailsafeDocumentReference();
         LocalDocumentReference classReference = getClassReference();
         if (documentReference != null && classReference != null) {
             XWikiContext xcontext = this.xcontextProvider.get();
             XWikiDocument document = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
-            return document.getXObjects(classReference);
-        } else {
-            return null;
+            for (BaseObject baseObject : document.getXObjects(classReference)) {
+                if (baseObject != null) {
+                    jiraServerObjects.add(baseObject);
+                }
+            }
         }
+        return jiraServerObjects;
     }
 }
