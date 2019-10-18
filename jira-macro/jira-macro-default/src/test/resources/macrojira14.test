@@ -1,0 +1,42 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test the version and fixVersion fields when there are
+.# multiple versions specified.
+.#-----------------------------------------------------
+{{jira url="http://localhost:8889" fields="version,fixVersion" source="jql"}}
+whatever
+{{/jira}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=version,fixVersion|source=jql] [whatever]
+beginTable
+beginTableRow
+beginTableHeadCell
+onVerbatim [Affected Versions] [true]
+endTableHeadCell
+beginTableHeadCell
+onVerbatim [Fixed in] [true]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+onVerbatim [1.0 B1, 1.0 B2, 1.0 B3, 1.0 B4, 1.0 B5] [true]
+endTableCell
+beginTableCell
+onVerbatim [1.0 B6, 1.0 B7] [true]
+endTableCell
+endTableRow
+beginTableRow
+beginTableCell
+onVerbatim [1.0 B5] [true]
+endTableCell
+beginTableCell
+onVerbatim [1.0 B6] [true]
+endTableCell
+endTableRow
+endTable
+endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=version,fixVersion|source=jql] [whatever]
+endDocument

@@ -19,9 +19,13 @@
  */
 package org.xwiki.contrib.jira.macro.internal.displayer.field;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jdom2.Element;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
+import org.xwiki.text.StringUtils;
 
 /**
  * Helper to extract field values from JIRA XML.
@@ -37,13 +41,15 @@ public abstract class AbstractJIRAFieldDisplayer implements JIRAFieldDisplayer
      *
      * @param field the field for which to get the value
      * @param issue the XML representation of the JIRA issue from which to extract the field's value
-     * @return
+     * @return the string value of the field from the passed issue or null if not found
      */
     protected String getValue(JIRAField field, Element issue)
     {
+        List<String> texts = new ArrayList<>();
+
         // First, look for the field name in the default fields
-        String text = issue.getChildTextTrim(field.getId());
-        if (text == null) {
+        List<Element> textElements = issue.getChildren(field.getId());
+        if (textElements == null || textElements.isEmpty()) {
             // Not found as a default field. Verify if it's a custom field.
             Element customFieldsElement = issue.getChild("customfields");
             if (customFieldsElement != null) {
@@ -52,14 +58,21 @@ public abstract class AbstractJIRAFieldDisplayer implements JIRAFieldDisplayer
                     if (customFieldName != null && customFieldName.equals(field.getId())) {
                         // Found a matching field, render its value and stop looking
                         // Note: we only take into account the first "customfieldvalue" element for now. If a custom
-                        // field needs to hadle multiple values, it'll need a custom field displayer defined.
+                        // field needs to handle multiple values, it'll need a custom field displayer defined.
                         String value = customFieldElement.getChildren("customfieldvalues").get(0).getValue().trim();
-                        text = value;
+                        texts.add(value);
                         break;
                     }
                 }
             }
+        } else {
+            for (Element element : textElements) {
+                if (element != null) {
+                    texts.add(element.getTextTrim());
+                }
+            }
         }
-        return text;
+
+        return texts.isEmpty() ? null : StringUtils.join(texts, ", ");
     }
 }
