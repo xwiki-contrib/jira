@@ -36,6 +36,10 @@
     <!-- WireMock outputs some logs when it's stopping, thus we need to turn off console log validation till we find
          out how to tell WireMock to not do that. -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>JIRA Macro</xwiki.extension.name>
+    <!-- The extension's category -->
+    <xwiki.extension.category>macro</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>
