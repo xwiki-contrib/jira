@@ -55,7 +55,7 @@ public class EnumJIRADisplayer extends AbstractJIRADisplayer
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
-        List<Block> blocks = new ArrayList<Block>();
+        List<Block> blocks = new ArrayList<>();
 
         JIRAFields fields = normalizeFields(parameters);
         Iterator<Element> issueIt = issues.iterator();

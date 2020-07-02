@@ -58,11 +58,11 @@ public class ListJIRADisplayer extends AbstractJIRADisplayer
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
-        List<Block> listItemBlocks = new ArrayList<Block>();
+        List<Block> listItemBlocks = new ArrayList<>();
 
         JIRAFields fields = normalizeFields(parameters);
         for (Element issue : issues) {
-            List<Block> itemBlocks = new ArrayList<Block>();
+            List<Block> itemBlocks = new ArrayList<>();
             Iterator<JIRAField> it = fields.iterator();
             while (it.hasNext()) {
                 JIRAField field = it.next();
@@ -75,7 +75,7 @@ public class ListJIRADisplayer extends AbstractJIRADisplayer
             }
             listItemBlocks.add(new ListItemBlock(itemBlocks));
         }
-        return Arrays.<Block>asList(new BulletedListBlock(listItemBlocks));
+        return Arrays.asList(new BulletedListBlock(listItemBlocks));
     }
 
     @Override

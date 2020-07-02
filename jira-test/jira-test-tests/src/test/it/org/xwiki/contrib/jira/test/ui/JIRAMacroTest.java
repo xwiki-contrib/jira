@@ -48,7 +48,7 @@ public class JIRAMacroTest extends AbstractTest
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
-    public void verifyMacro() throws Exception
+    public void verifyMacro()
     {
         // Setup Wiremock to simulate a JIRA instance
         this.wireMock.stubFor(get(urlMatching(
@@ -82,9 +82,10 @@ public class JIRAMacroTest extends AbstractTest
 
         ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), velocity, "");
 
-        assertEquals("Type Key Summary Status Created Date\n"
+        // Since the macro is Async, wait for the expected content to be available
+        vp.waitUntilContent("\\QType Key Summary Status Created Date\n"
             + "XWIKI-1000 Improve PDF Output 19-Mar-2007\n"
             + "XWIKI-1001 On jetty, non-default skins are not usable 19-Mar-2007\n"
-            + "com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClient", vp.getContent());
+            + "com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClient\\E");
     }
 }

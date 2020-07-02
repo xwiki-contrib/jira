@@ -80,6 +80,7 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
      *            defined by the user then use default field names)
      * @return the list of JIRA fields to be displayed
      */
+    @SuppressWarnings("deprecation")
     protected JIRAFields normalizeFields(JIRAMacroParameters parameters)
     {
         JIRAFields fields = parameters.getFields();

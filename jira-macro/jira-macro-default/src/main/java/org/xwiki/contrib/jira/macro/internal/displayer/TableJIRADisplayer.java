@@ -60,21 +60,21 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
     @Override
     public List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters)
     {
-        List<Block> rowBlocks = new ArrayList<Block>();
+        List<Block> rowBlocks = new ArrayList<>();
 
         JIRAFields fields = normalizeFields(parameters);
 
         // Create the table headers for the specified fields
-        List<Block> headerCellBlocks = new ArrayList<Block>();
+        List<Block> headerCellBlocks = new ArrayList<>();
         for (JIRAField field : fields) {
-            headerCellBlocks.add(new TableHeadCellBlock(Arrays.<Block>asList(
+            headerCellBlocks.add(new TableHeadCellBlock(Arrays.asList(
                 new VerbatimBlock(computeFieldName(field), true))));
         }
         rowBlocks.add(new TableRowBlock(headerCellBlocks));
 
         // Construct the data rows, one row per issue
         for (Element issue : issues) {
-            List<Block> dataCellBlocks = new ArrayList<Block>();
+            List<Block> dataCellBlocks = new ArrayList<>();
             for (JIRAField field : fields) {
                 // Use the displayer for the field
                 dataCellBlocks.add(new TableCellBlock(getFieldDisplayer(field).displayField(field, issue, parameters)));
@@ -82,7 +82,7 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
             rowBlocks.add(new TableRowBlock(dataCellBlocks));
         }
 
-        return Arrays.<Block>asList(new TableBlock(rowBlocks));
+        return Arrays.asList(new TableBlock(rowBlocks));
     }
 
     @Override

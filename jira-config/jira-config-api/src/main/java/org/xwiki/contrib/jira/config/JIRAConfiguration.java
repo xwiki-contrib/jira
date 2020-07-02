@@ -37,4 +37,12 @@ public interface JIRAConfiguration
      *         used as a parameter of the Macro to point to a given JIRA server
      */
     Map<String, JIRAServer> getJIRAServers();
+
+    /**
+     * @return true if the JIRA macro content should be displayed asynchronously or not (defaults to true)
+     */
+    default boolean isAsync()
+    {
+        return true;
+    }
 }

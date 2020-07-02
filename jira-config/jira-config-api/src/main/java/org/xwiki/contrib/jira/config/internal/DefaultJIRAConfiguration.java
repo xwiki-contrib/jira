@@ -36,6 +36,8 @@ public class DefaultJIRAConfiguration implements JIRAConfiguration
 {
     private Map<String, JIRAServer> jiraServers = Collections.EMPTY_MAP;
 
+    private boolean isAsync;
+
     @Override
     public Map<String, JIRAServer> getJIRAServers()
     {
@@ -43,10 +45,24 @@ public class DefaultJIRAConfiguration implements JIRAConfiguration
     }
 
     /**
-     * @param jiraServers see {@link #getJIRAServers()} ()}
+     * @param jiraServers see {@link #getJIRAServers()}
      */
     public void setJIRAServers(Map<String, JIRAServer> jiraServers)
     {
         this.jiraServers = new HashMap<>(jiraServers);
+    }
+
+    @Override
+    public boolean isAsync()
+    {
+        return false;
+    }
+
+    /**
+      * @param async see {@link #isAsync()}
+     */
+    public void setAsync(boolean async)
+    {
+        this.isAsync = async;
     }
 }

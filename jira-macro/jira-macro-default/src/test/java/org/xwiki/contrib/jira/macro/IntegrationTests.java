@@ -46,6 +46,7 @@ import static org.mockito.Mockito.when;
  * @since 4.2M1
  */
 @RunWith(RenderingTestSuite.class)
+@RenderingTestSuite.Scope(pattern = ".*macrojira6.test")
 @AllComponents
 public class IntegrationTests
 {

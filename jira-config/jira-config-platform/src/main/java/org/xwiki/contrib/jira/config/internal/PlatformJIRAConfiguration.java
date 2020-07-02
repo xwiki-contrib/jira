@@ -42,16 +42,26 @@ public class PlatformJIRAConfiguration implements JIRAConfiguration
 {
     @Inject
     @Named("jira")
-    private ConfigurationSource jiraConfiguration;
+    private ConfigurationSource jiraConfigurationSource;
+
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesConfigurationSource;
 
     @Override
     public Map<String, JIRAServer> getJIRAServers()
     {
-        Map<String, JIRAServer> jiraServers = this.jiraConfiguration.getProperty("serverMappings");
+        Map<String, JIRAServer> jiraServers = this.jiraConfigurationSource.getProperty("serverMappings");
         // The returned value can be null if no xobject has been defined on the wiki config page.
         if (jiraServers == null) {
             jiraServers = Collections.emptyMap();
         }
         return jiraServers;
+    }
+
+    @Override
+    public boolean isAsync()
+    {
+        return this.xwikiPropertiesConfigurationSource.getProperty("jira.async", Boolean.TRUE);
     }
 }
