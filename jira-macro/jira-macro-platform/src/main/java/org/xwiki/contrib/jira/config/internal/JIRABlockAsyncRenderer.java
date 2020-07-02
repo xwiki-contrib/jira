@@ -70,12 +70,15 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 
     private DocumentReference sourceReference;
 
-    void initialize(AsyncJIRAMacro macro, JIRAMacroParameters parameters, String content,
+    private boolean isAsync;
+
+    void initialize(AsyncJIRAMacro macro, JIRAMacroParameters parameters, String content, boolean isAsync,
         MacroTransformationContext context)
     {
         this.macro = macro;
         this.parameters = parameters;
         this.content = content;
+        this.isAsync = isAsync;
         this.context = context;
 
         this.inline = context.isInline();
@@ -134,7 +137,7 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
     @Override
     public boolean isAsyncAllowed()
     {
-        return true;
+        return this.isAsync;
     }
 
     @Override
