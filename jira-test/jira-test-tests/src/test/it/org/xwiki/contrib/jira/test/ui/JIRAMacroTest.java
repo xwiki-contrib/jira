@@ -62,10 +62,10 @@ public class JIRAMacroTest extends AbstractTest
 
         // Verify that there is a jira section
         AdministrationPage wikiAdministrationPage = AdministrationPage.gotoPage();
-        assertTrue(wikiAdministrationPage.hasSection("Applications", "JIRA"));
+        assertTrue(wikiAdministrationPage.hasSection("Other", "JIRA"));
 
         // Setup a jira instance
-        wikiAdministrationPage.clickSection("Applications", "JIRA");
+        wikiAdministrationPage.clickSection("Other", "JIRA");
         JIRAAdministrationSectionPage jiraPage = new JIRAAdministrationSectionPage();
         jiraPage.setId(0, "local");
         jiraPage.setURL(0, "http://localhost:8889");
