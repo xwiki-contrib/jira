@@ -20,9 +20,11 @@
 package org.xwiki.contrib.jira.config.internal;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -40,17 +42,32 @@ public class DefaultJIRAConfigurationTest
     public MockitoComponentMockingRule<DefaultJIRAConfiguration> mocker =
         new MockitoComponentMockingRule<>(DefaultJIRAConfiguration.class);
 
+    private class CustomJIRAConfiguration implements JIRAConfiguration
+    {
+        @Override
+        public Map<String, JIRAServer> getJIRAServers()
+        {
+            return null;
+        }
+    }
+
     @Test
     public void getterAndSetters() throws Exception
     {
         DefaultJIRAConfiguration configuration = this.mocker.getComponentUnderTest();
 
         assertTrue(configuration.getJIRAServers().isEmpty());
-
         configuration.setJIRAServers(Collections.singletonMap("key", new JIRAServer("url", "username", "password")));
         assertEquals(1, configuration.getJIRAServers().size());
         assertEquals("url", configuration.getJIRAServers().get("key").getURL());
         assertEquals("username", configuration.getJIRAServers().get("key").getUsername());
         assertEquals("password", configuration.getJIRAServers().get("key").getPassword());
+
+        assertFalse(configuration.isAsync());
+        configuration.setAsync(true);
+        assertTrue(configuration.isAsync());
+
+        // Verify backward compatibility and that async is false by default
+        assertFalse(new CustomJIRAConfiguration().isAsync());
     }
 }

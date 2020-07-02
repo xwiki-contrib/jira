@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.macro.internal.JIRAMacro;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
@@ -50,6 +51,9 @@ public class AsyncJIRAMacro extends JIRAMacro
     @Inject
     private BlockAsyncRendererExecutor executor;
 
+    @Inject
+    private JIRAConfiguration jiraConfiguration;
+
     @Override
     public List<Block> execute(JIRAMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
@@ -60,7 +64,7 @@ public class AsyncJIRAMacro extends JIRAMacro
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Failed to create JIRA async renderer", e);
         }
-        renderer.initialize(this, parameters, content, context);
+        renderer.initialize(this, parameters, content, this.jiraConfiguration.isAsync(), context);
 
         AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
 

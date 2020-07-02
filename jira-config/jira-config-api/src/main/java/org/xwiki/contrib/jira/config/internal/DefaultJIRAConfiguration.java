@@ -55,7 +55,7 @@ public class DefaultJIRAConfiguration implements JIRAConfiguration
     @Override
     public boolean isAsync()
     {
-        return false;
+        return this.isAsync;
     }
 
     /**

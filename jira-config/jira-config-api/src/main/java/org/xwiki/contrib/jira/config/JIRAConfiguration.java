@@ -39,10 +39,10 @@ public interface JIRAConfiguration
     Map<String, JIRAServer> getJIRAServers();
 
     /**
-     * @return true if the JIRA macro content should be displayed asynchronously or not (defaults to true)
+     * @return true if the JIRA macro content should be displayed asynchronously or not
      */
     default boolean isAsync()
     {
-        return true;
+        return false;
     }
 }
