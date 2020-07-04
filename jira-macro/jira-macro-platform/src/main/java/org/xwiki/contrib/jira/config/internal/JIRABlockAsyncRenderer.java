@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.model.reference.DocumentReference;
@@ -45,6 +46,8 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 @Component(roles = JIRABlockAsyncRenderer.class)
 public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {
+    private static final String ESCAPE_CHAR = "_";
+
     @Inject
     private DocumentReferenceResolver<String> resolver;
 
@@ -89,9 +92,7 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             this.sourceReference = this.resolver.resolve(source);
         }
 
-        // Find index of the macro in the XDOM
-        long index = context.getXDOM().indexOf(context.getCurrentMacroBlock());
-        this.id = createId("rendering", "macro", "jira", source, index);
+        this.id = createId(source, context);
     }
 
     @Override
@@ -144,6 +145,25 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
     public boolean isCacheAllowed()
     {
         return false;
+    }
+
+    private List<String> createId(String source, MacroTransformationContext context)
+    {
+        // Find index of the macro in the XDOM to create a unique id.
+        long index = context.getXDOM().indexOf(context.getCurrentMacroBlock());
+
+        // Make sure we don't have a / or \ in the source so that it works on Tomcat by default even if Tomcat is not
+        // configured to support \ and / in URLs.
+        // Make "_" an escape character and thus:
+        // - replace "_" by "__"
+        // - replace "\" by "_"
+        // This keeps the unicity of the source reference.
+        // TODO: Remove when the parent pom is upgraded to the version of XWiki where
+        // https://jira.xwiki.org/browse/XWIKI-17515 has been fixed.
+        String escapedSource = StringUtils.replaceChars(source, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
+        escapedSource = StringUtils.replaceChars(escapedSource, "\\", ESCAPE_CHAR);
+
+        return createId("rendering", "macro", "jira", escapedSource, index);
     }
 
     private String getCurrentSource(MacroTransformationContext context)
