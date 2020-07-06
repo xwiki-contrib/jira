@@ -46,7 +46,9 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 @Component(roles = JIRABlockAsyncRenderer.class)
 public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {
-    private static final String ESCAPE_CHAR = "_";
+    private static final String ESCAPE_CHAR_SLASH = "_";
+
+    private static final String ESCAPE_CHAR_BACKSLASH = "-";
 
     @Inject
     private DocumentReferenceResolver<String> resolver;
@@ -154,14 +156,19 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 
         // Make sure we don't have a / or \ in the source so that it works on Tomcat by default even if Tomcat is not
         // configured to support \ and / in URLs.
-        // Make "_" an escape character and thus:
+        // Make "_" and "-" escape characters and thus:
         // - replace "_" by "__"
+        // - replace "-" by "--"
         // - replace "\" by "_"
+        // - replace "/" by "-"
         // This keeps the unicity of the source reference.
         // TODO: Remove when the parent pom is upgraded to the version of XWiki where
         // https://jira.xwiki.org/browse/XWIKI-17515 has been fixed.
-        String escapedSource = StringUtils.replaceChars(source, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
-        escapedSource = StringUtils.replaceChars(escapedSource, "\\", ESCAPE_CHAR);
+        String escapedSource = StringUtils.replaceEach(source,
+            new String[] { ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH },
+            new String[] { ESCAPE_CHAR_SLASH + ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH + ESCAPE_CHAR_BACKSLASH });
+        escapedSource = StringUtils.replaceEach(escapedSource, new String[] { "\\", "/" },
+            new String[] { ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH });
 
         return createId("rendering", "macro", "jira", escapedSource, index);
     }
