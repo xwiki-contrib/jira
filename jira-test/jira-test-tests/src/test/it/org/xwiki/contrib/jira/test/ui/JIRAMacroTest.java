@@ -107,7 +107,6 @@ public class JIRAMacroTest extends AbstractTest
                 public Boolean apply(WebDriver driver)
                 {
                     lastContent[0] = vp.getContent();
-                    System.out.println("trying...");
                     return this.pattern.matcher(lastContent[0]).matches();
                 }
             });
