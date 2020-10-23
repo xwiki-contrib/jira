@@ -19,7 +19,12 @@
  */
 package org.xwiki.contrib.jira.test.ui;
 
+import java.util.regex.Pattern;
+
 import org.junit.*;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.contrib.jira.test.po.JIRAAdministrationSectionPage;
 import org.xwiki.test.ui.AbstractTest;
@@ -83,9 +88,31 @@ public class JIRAMacroTest extends AbstractTest
         ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), velocity, "");
 
         // Since the macro is Async, wait for the expected content to be available
-        vp.waitUntilContent("\\QType Key Summary Status Created Date\n"
+        waitUntilContent("\\QType Key Summary Status Created Date\n"
             + "XWIKI-1000 Improve PDF Output 19-Mar-2007\n"
             + "XWIKI-1001 On jetty, non-default skins are not usable 19-Mar-2007\n"
-            + "com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClient\\E");
+            + "com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClient\\E", vp);
+    }
+
+    // TODO: Remove once the parent pom is updated to be Platform 12.10.
+    private void waitUntilContent(String expectedValue, ViewPage vp)
+    {
+        // Using an array to have an effectively final variable.
+        final String[] lastContent = new String[1];
+        try {
+            this.getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+            {
+                private Pattern pattern = Pattern.compile(expectedValue, 32);
+
+                public Boolean apply(WebDriver driver)
+                {
+                    driver.navigate().refresh();
+                    lastContent[0] = vp.getContent();
+                    return this.pattern.matcher(lastContent[0]).matches();
+                }
+            });
+        } catch (TimeoutException e) {
+            throw new TimeoutException(String.format("Got [%s]\nExpected [%s]", lastContent[0], expectedValue), e);
+        }
     }
 }
