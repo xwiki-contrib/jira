@@ -19,11 +19,15 @@
  */
 package org.xwiki.contrib.jira.macro.internal.source;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -43,6 +47,7 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
  * Fetches remotely the XML content at the passed URL.
@@ -54,6 +59,8 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 @Singleton
 public class HTTPJIRAFetcher
 {
+    private static final Pattern PATTERN = Pattern.compile("<h1>(.*)</h1>");
+
     /**
      * @param urlString the full JIRA URL to call
      * @param jiraServer the jira server data containing optional credentials (used to setup preemptive basic
@@ -103,9 +110,17 @@ public class HTTPJIRAFetcher
     protected Document retrieveRemoteDocument(CloseableHttpClient httpClient, HttpGet httpGet, HttpHost targetHost,
         HttpClientContext context) throws Exception
     {
-        try (CloseableHttpResponse response = httpClient.execute(targetHost, httpGet, context);) {
-            HttpEntity entity = response.getEntity();
-            return createSAXBuilder().build(entity.getContent());
+        try (CloseableHttpResponse response = httpClient.execute(targetHost, httpGet, context)) {
+            // Only parse the content if there was no error.
+            if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() < 300) {
+                HttpEntity entity = response.getEntity();
+                return createSAXBuilder().build(entity.getContent());
+            } else {
+                // The error message is in the HTML. We extract it to perform some good error-reporting, by extracting
+                // it from the <h1> tag.
+                throw new MacroExecutionException(String.format("Error = [%s]. URL = [%s]",
+                    extractErrorMessage(response.getEntity().getContent()), httpGet.getURI().toString()));
+            }
         }
     }
 
@@ -123,5 +138,18 @@ public class HTTPJIRAFetcher
     {
         // Note: SAXBuilder is not thread-safe which is why we're instantiating a new one every time.
         return new SAXBuilder();
+    }
+
+    private String extractErrorMessage(InputStream contentStream) throws Exception
+    {
+        String result;
+        String content = IOUtils.toString(contentStream, "UTF-8");
+        Matcher matcher = PATTERN.matcher(content);
+        if (matcher.find()) {
+            result = matcher.group(1);
+        } else {
+            result = "Unknown error";
+        }
+        return result;
     }
 }

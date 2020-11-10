@@ -5,13 +5,13 @@
 .# multiple versions specified.
 .#-----------------------------------------------------
 {{jira url="http://localhost:8889" fields="version,fixVersion" source="jql"}}
-whatever
+XWIKI-1000
 {{/jira}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=version,fixVersion|source=jql] [whatever]
+beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=version,fixVersion|source=jql] [XWIKI-1000]
 beginTable
 beginTableRow
 beginTableHeadCell
@@ -38,5 +38,5 @@ onVerbatim [1.0 B6] [true]
 endTableCell
 endTableRow
 endTable
-endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=version,fixVersion|source=jql] [whatever]
+endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=version,fixVersion|source=jql] [XWIKI-1000]
 endDocument

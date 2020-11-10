@@ -46,7 +46,6 @@ import static org.mockito.Mockito.when;
  * @since 4.2M1
  */
 @RunWith(RenderingTestSuite.class)
-@RenderingTestSuite.Scope(pattern = ".*macrojira6.test")
 @AllComponents
 public class IntegrationTests
 {
@@ -59,9 +58,17 @@ public class IntegrationTests
         server = new WireMockServer(8889);
         server.start();
 
+        // Default answer for testingrequesting a non-existing JIRA issue
+        server.stubFor(get(urlMatching(
+            "\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*NOTEXISTING.*"))
+            .willReturn(aResponse()
+                .withStatus(400)
+                .withHeader("Content-Type", "text/html")
+                .withBodyFile("notfound.html")));
+
         // Default answer when no authentication is required
         server.stubFor(get(urlMatching(
-            "\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*"))
+            "\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*XWIKI-1000.*"))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "text/xml")
