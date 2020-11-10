@@ -20,6 +20,7 @@
 package org.xwiki.contrib.jira.config.internal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -67,6 +68,12 @@ public class AsyncJIRAMacro extends JIRAMacro
         renderer.initialize(this, parameters, content, this.jiraConfiguration.isAsync(), context);
 
         AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
+
+        // This will set a non-null Request Context which made the macro fail in XWiki 12.9RC1+ because of a breakage
+        // in https://jira.xwiki.org/browse/XWIKI-17946. Fixed in https://jira.xwiki.org/browse/XWIKI-18048 for XWiki
+        // 12.10RC1.
+        // TODO: Remove once we upgrade the parent to XWiki 12.10+.
+        configuration.setContextEntries(Collections.emptySet());
 
         // Execute the renderer
         Block result;
