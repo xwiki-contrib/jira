@@ -37,7 +37,7 @@
          out how to tell WireMock to not do that. -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>JIRA Macro</xwiki.extension.name>
+    <xwiki.extension.name>JIRA Base Macro</xwiki.extension.name>
     <!-- The extension's category -->
     <xwiki.extension.category>macro</xwiki.extension.category>
   </properties>
