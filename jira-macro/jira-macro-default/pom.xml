@@ -40,6 +40,26 @@
     <xwiki.extension.name>JIRA Base Macro</xwiki.extension.name>
     <!-- The extension's category -->
     <xwiki.extension.category>macro</xwiki.extension.category>
+
+    <!-- Components -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro/jira
+      org.xwiki.contrib.jira.macro.JIRADataSource/jql
+      org.xwiki.contrib.jira.macro.JIRADataSource/list
+      org.xwiki.contrib.jira.macro.JIRADisplayer/enum
+      org.xwiki.contrib.jira.macro.JIRADisplayer/list
+      org.xwiki.contrib.jira.macro.JIRADisplayer/table
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/default
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/updated
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/resolved
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/status
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/created
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/key
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/type
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/type/url
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/type/html
+      org.xwiki.contrib.jira.macro.JIRAFieldDisplayer/type/date
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>
