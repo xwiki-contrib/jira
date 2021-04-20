@@ -41,7 +41,7 @@
 
     <!-- Components -->
     <xwiki.extension.components>
-      org.xwiki.rendering.macro/jira
+      org.xwiki.rendering.macro.Macro/jira
     </xwiki.extension.components>
   </properties>
   <dependencies>

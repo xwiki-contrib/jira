@@ -43,7 +43,7 @@
 
     <!-- Components -->
     <xwiki.extension.components>
-      org.xwiki.rendering.macro/jira
+      org.xwiki.rendering.macro.Macro/jira
       org.xwiki.contrib.jira.macro.JIRADataSource/jql
       org.xwiki.contrib.jira.macro.JIRADataSource/list
       org.xwiki.contrib.jira.macro.JIRADisplayer/enum
