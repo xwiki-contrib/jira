@@ -25,6 +25,10 @@
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
 xwikiModule {
+  goals = 'clean deploy jacoco:report sonar:sonar'
   profiles = 'quality,integration-tests'
   sonar = true
+  // Build with Java 14 since Sonar requires Java 11+ and we want at the same time to verify that this extension
+  // builds with the latest java LTS version.
+  javaTool = 'java14'
 }
