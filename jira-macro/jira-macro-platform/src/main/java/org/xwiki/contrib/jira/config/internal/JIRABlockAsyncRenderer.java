@@ -43,6 +43,12 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 
+/**
+ * Render the JIRA macro content asynchronously.
+ *
+ * @since 8.6
+ * @version $Id$
+ */
 @Component(roles = JIRABlockAsyncRenderer.class)
 public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {

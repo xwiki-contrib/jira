@@ -10,7 +10,7 @@ JIRA-related components (Macro, API, Configuration).
 * [Issue Tracker](http://jira.xwiki.org/browse/MJIRA)
 * Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists), [IRC](http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
 * [Development Practices](http://dev.xwiki.org)
-* Minimal XWiki version supported: XWiki 11.10
+* Minimal XWiki version supported: XWiki 12.10
 * License: LGPL 2.1
 * Translations: N/A
 * Sonar Dashboard: N/A

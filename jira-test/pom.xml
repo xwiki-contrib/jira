@@ -36,8 +36,14 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <modules>
-    <!-- Sorted Alphabetically -->
     <module>jira-test-pageobjects</module>
-    <module>jira-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>jira-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

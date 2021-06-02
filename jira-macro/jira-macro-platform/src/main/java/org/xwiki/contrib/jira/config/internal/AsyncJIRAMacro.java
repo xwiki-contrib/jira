@@ -40,6 +40,13 @@ import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
+/**
+ * Overrides the {@link JIRAMacro} to make it work asynchronously. This is done so that the JIRA macro can be used
+ * in XWiki Rendering (the non-async version) or in XWiki Platform (the async version).
+ *
+ * @since 8.6
+ * @version $Id$
+ */
 @Component
 @Named("jira")
 @Singleton
