@@ -13,5 +13,5 @@ JIRA-related components (Macro, API, Configuration).
 * Minimal XWiki version supported: XWiki 12.10
 * License: LGPL 2.1
 * Translations: N/A
-* Sonar Dashboard: N/A
+* Sonar Dashboard: [![Status](https://sonarcloud.io/api/project_badges/measure?project=org.xwiki.contrib.jira:jira&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.xwiki.contrib.jira:jira)
 * Continuous Integration Status: [![Build Status](http://ci.xwiki.org/buildStatus/icon?job=XWiki Contrib/jira/master)](http://ci.xwiki.org/view/Contrib/job/XWiki%20Contrib/job/jira/job/master/)
