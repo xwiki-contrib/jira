@@ -65,7 +65,18 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     @Override
     protected String getCacheId()
     {
+        // Use the same cache for all config wiki pages data. This is working because this extension is forced to be
+        // installed on the root namespace (and thus there's a single JIRAConfigClassDocumentConfigurationSource
+        // component across the whole wiki farm). We prefix each cache key with the wiki id, see #getCacheKeyPrefix()
         return "configuration.document.jira";
+    }
+
+    @Override
+    protected String getCacheKeyPrefix()
+    {
+        // Override the default behavior which is to use the full wiki document reference. Since the doc reference is
+        // the same in all wikis, we only need the wiki reference in the cache.
+        return this.wikiManager.getCurrentWikiId();
     }
 
     @Override

@@ -33,6 +33,9 @@
   <description>Implementation of the JIRA configuration using wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <!-- Make sure that the components of this module are real singletons across the wiki farm, so that they use the
+         same config cache (even when this jira extension is installed on several wikis) -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>
