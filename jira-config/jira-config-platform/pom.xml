@@ -30,12 +30,16 @@
   <artifactId>jira-config-platform</artifactId>
   <name>JIRA - Config - Platform API</name>
   <packaging>jar</packaging>
-  <description>Implementation of the JIRA configuration using wiki pages</description>
+  <description>JIRA configuration using wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Make sure that the components of this module are real singletons across the wiki farm, so that they use the
          same config cache (even when this jira extension is installed on several wikis) -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Page-based JIRA Configuration</xwiki.extension.name>
+    <!-- The extension's category -->
+    <xwiki.extension.category>jar</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

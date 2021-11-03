@@ -30,7 +30,7 @@
   <artifactId>jira-macro-platform</artifactId>
   <name>JIRA - Macro - Platform-related Implementation</name>
   <packaging>jar</packaging>
-  <description>Fetches information from a JIRA server and displays them as a table, list or enumeration</description>
+  <description>Fetches information asynchronously from a JIRA server and displays them as a table, list or enumeration</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JIRA Macro</xwiki.extension.name>

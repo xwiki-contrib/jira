@@ -30,9 +30,13 @@
   <artifactId>jira-config-api</artifactId>
   <name>JIRA - Config - Default API</name>
   <packaging>jar</packaging>
-  <description>API for getting the JIRA configuration</description>
+  <description>JIRA configuration API and in-memory implementation</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>In-Memory JIRA Configuration</xwiki.extension.name>
+    <!-- The extension's category -->
+    <xwiki.extension.category>jar</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>
