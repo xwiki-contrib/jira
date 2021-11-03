@@ -21,13 +21,10 @@ package org.xwiki.contrib.jira.macro.internal.source;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -37,9 +34,8 @@ import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import static org.xwiki.contrib.jira.macro.JIRAField.*;
 import static org.junit.Assert.*;
@@ -52,11 +48,14 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 4.2M1
  */
+@ComponentList({
+    DefaultJIRAServerResolver.class
+})
 public class ListJIRADataSourceTest
 {
     @Rule
     public MockitoComponentMockingRule<ListJIRADataSource> mocker =
-        new MockitoComponentMockingRule<>(ListJIRADataSource.class);
+        new MockitoComponentMockingRule<>(ListJIRADataSource.class, Arrays.asList(JIRAServerResolver.class));
 
     @Test
     public void parseIdsWhenNull() throws Exception

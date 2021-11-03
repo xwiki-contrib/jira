@@ -26,7 +26,9 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.async.AsyncContext;
@@ -64,6 +66,9 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 
     @Inject
     private ErrorBlockGenerator errorBlockGenerator;
+
+    @Inject
+    private JIRAServerResolver jiraServerResolver;
 
     private List<String> id;
 
@@ -168,15 +173,30 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
         // - replace "\" by "_"
         // - replace "/" by "-"
         // This keeps the unicity of the source reference.
-        // TODO: Remove when the parent pom is upgraded to the version of XWiki where
-        // https://jira.xwiki.org/browse/XWIKI-17515 has been fixed.
+        // TODO: Remove when the parent pom is upgraded to 13.0+ (i.e where https://jira.xwiki.org/browse/XWIKI-17515
+        //  has been fixed).
         String escapedSource = StringUtils.replaceEach(source,
             new String[] { ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH },
             new String[] { ESCAPE_CHAR_SLASH + ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH + ESCAPE_CHAR_BACKSLASH });
         escapedSource = StringUtils.replaceEach(escapedSource, new String[] { "\\", "/" },
             new String[] { ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH });
 
-        return createId("rendering", "macro", "jira", escapedSource, index);
+        // Note: make sure we don't cache if a different jira url is used or if a different user is used for the same
+        // jira url since different users can have different permissions on jira.
+        String jiraURL;
+        String username = null;
+        try {
+            JIRAServer jiraServer = this.jiraServerResolver.resolve(this.parameters);
+            jiraURL = jiraServer.getURL();
+            username = jiraServer.getUsername();
+        } catch (MacroExecutionException e) {
+            // The jira url is not set nor an id set (or the id points to a not-defined JIRA URL), so we cannot get the
+            // value. The macro will fail to display. We cache the result based on the id if it's defined. Otherwise,
+            // we don't use the jira url.
+            jiraURL = this.parameters.getId();
+        }
+
+        return createId("rendering", "macro", "jira", escapedSource, index, jiraURL, username);
     }
 
     private String getCurrentSource(MacroTransformationContext context)

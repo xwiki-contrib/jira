@@ -40,6 +40,8 @@ import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
+import com.xpn.xwiki.internal.context.XWikiContextContextStore;
+
 /**
  * Overrides the {@link JIRAMacro} to make it work asynchronously. This is done so that the JIRA macro can be used
  * in XWiki Rendering (the non-async version) or in XWiki Platform (the async version).
@@ -76,11 +78,9 @@ public class AsyncJIRAMacro extends JIRAMacro
 
         AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
 
-        // This will set a non-null Request Context which made the macro fail in XWiki 12.9RC1+ because of a breakage
-        // in https://jira.xwiki.org/browse/XWIKI-17946. Fixed in https://jira.xwiki.org/browse/XWIKI-18048 for XWiki
-        // 12.10RC1.
-        // TODO: Remove once we upgrade the parent to XWiki 12.10+.
-        configuration.setContextEntries(Collections.emptySet());
+        // Take into account the current wiki since the jira config document can be located in each wiki (without this
+        // all config document will be taken from the main wiki).
+        configuration.setContextEntries(Collections.singleton(XWikiContextContextStore.PROP_WIKI));
 
         // Execute the renderer
         Block result;
