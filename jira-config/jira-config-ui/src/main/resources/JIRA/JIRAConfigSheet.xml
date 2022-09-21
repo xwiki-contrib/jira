@@ -73,7 +73,7 @@
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="submit" value="$services.localization.render('jira.config.save')" name="formactionsac" class="button" /&gt;
     &lt;span class="buttonwrapper"&gt;
-      &lt;a href="$configDoc.getURL('edit', "xpage=editobject&amp;amp;xaction=addObject&amp;amp;className=$escapetool.url($configClassName)&amp;amp;xredirect=$escapetool.url(${redirect})")" class="xobject-add-control"&gt;$services.localization.render('jira.config.add')&lt;/a&gt;
+      &lt;a href="$configDoc.getURL('objectadd', "classname=$escapetool.url($configClassName)&amp;amp;form_token=$!{services.csrf.getToken()}&amp;amp;xredirect=$escapetool.url(${redirect})")" class="xobject-add-control"&gt;$services.localization.render('jira.config.add')&lt;/a&gt;
     &lt;/span&gt;
   &lt;/form&gt;
 {{/html}}
