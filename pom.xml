@@ -31,14 +31,14 @@
   <artifactId>jira</artifactId>
   <packaging>pom</packaging>
   <name>JIRA - Parent POM</name>
-  <version>8.6.4</version>
+  <version>8.7-SNAPSHOT</version>
   <description>Parent POM for JIRA-related modules</description>
   <url>http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA%20Macro</url>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/jira.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/jira.git</developerConnection>
     <url>https://github.com/xwiki-contrib/jira/tree/master</url>
-    <tag>jira-8.6.4</tag>
+    <tag>HEAD</tag>
   </scm>
   <developers>
     <developer>
