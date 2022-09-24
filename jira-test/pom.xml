@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
-    <version>14.7</version>
+    <version>13.10.7</version>
   </parent>
   <groupId>org.xwiki.contrib.jira</groupId>
   <artifactId>jira-test</artifactId>
@@ -36,8 +36,6 @@
   <properties>
     <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Skip the Java 11 release warning since we need Java 8 for the 12.10 parent dep -->
-    <xwiki.enforcer.enforce-java.skip>true</xwiki.enforcer.enforce-java.skip>
   </properties>
   <modules>
     <module>jira-test-pageobjects</module>
