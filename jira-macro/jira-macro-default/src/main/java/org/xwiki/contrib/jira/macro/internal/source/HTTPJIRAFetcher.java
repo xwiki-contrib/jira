@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.inject.Singleton;
+import javax.xml.XMLConstants;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -132,6 +133,10 @@ public class HTTPJIRAFetcher
     private SAXBuilder createSAXBuilder()
     {
         // Note: SAXBuilder is not thread-safe which is why we're instantiating a new one every time.
-        return new SAXBuilder();
+        SAXBuilder builder = new SAXBuilder();
+        // Note: Prevent XXE attacks
+        builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        return builder;
     }
 }
