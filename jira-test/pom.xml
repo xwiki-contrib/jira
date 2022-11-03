@@ -29,7 +29,7 @@
   </parent>
   <groupId>org.xwiki.contrib.jira</groupId>
   <artifactId>jira-test</artifactId>
-  <version>8.7-SNAPSHOT</version>
+  <version>8.6.5</version>
   <name>JIRA - Tests - Parent POM</name>
   <packaging>pom</packaging>
   <description>JIRA - Tests - Parent POM</description>
@@ -60,4 +60,8 @@
       <name>XWiki Development Team</name>
     </developer>
   </developers>
+
+  <scm>
+    <tag>jira-8.6.5</tag>
+  </scm>
 </project>
