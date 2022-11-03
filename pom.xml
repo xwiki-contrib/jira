@@ -51,7 +51,6 @@
     </developer>
   </developers>
   <properties>
-    <xwiki.compatibility.previous.version>8.6.5</xwiki.compatibility.previous.version>
     <xwiki.issueManagement.jira.id>JIRA</xwiki.issueManagement.jira.id>
     <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
   </properties>
