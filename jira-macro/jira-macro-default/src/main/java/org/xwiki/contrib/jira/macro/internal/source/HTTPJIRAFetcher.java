@@ -23,7 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.inject.Singleton;
-import javax.xml.XMLConstants;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -134,9 +133,9 @@ public class HTTPJIRAFetcher
     {
         // Note: SAXBuilder is not thread-safe which is why we're instantiating a new one every time.
         SAXBuilder builder = new SAXBuilder();
-        // Note: Prevent XXE attacks
-        builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        // Note: Prevent XXE attacks by disabling completely DTDs. This is possible since JIRA returns an XML content
+        // that doesn't use a DTD.
+        builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         return builder;
     }
 }
