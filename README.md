@@ -1,15 +1,15 @@
-# JIRA Components
+# JIRA Integration
 
 JIRA-related components (Macro, API, Configuration).
 
-* Project Lead: [Vincent Massol](http://www.xwiki.org/xwiki/bin/view/XWiki/VincentMassol)
+* Project Lead: [Vincent Massol](https://www.xwiki.org/xwiki/bin/view/XWiki/VincentMassol)
 * Documentation & Downloads: 
-  * [JIRA Macro](http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Macro)
-  * [JIRA Administration](http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Administration/)
-  * [JIRA Scripting API](http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Module)
-* [Issue Tracker](http://jira.xwiki.org/browse/MJIRA)
-* Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists), [IRC](http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
-* [Development Practices](http://dev.xwiki.org)
+  * [JIRA Macro](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Macro)
+  * [JIRA Administration](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Administration/)
+  * [JIRA Scripting API](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Module)
+* [Issue Tracker](https://jira.xwiki.org/browse/MJIRA)
+* Communication: [Forum](https://forum.xwiki.org), [Chat](https://dev.xwiki.org/xwiki/bin/view/Community/Chat)
+* [Development Practices](https://dev.xwiki.org)
 * Minimal XWiki version supported: XWiki 12.10
 * License: LGPL 2.1
 * Translations: N/A
