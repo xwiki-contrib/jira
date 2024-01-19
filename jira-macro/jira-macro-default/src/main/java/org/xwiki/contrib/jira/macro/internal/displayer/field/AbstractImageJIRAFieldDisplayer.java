@@ -54,6 +54,7 @@ public abstract class AbstractImageJIRAFieldDisplayer implements JIRAFieldDispla
                 Map<String, String> resourceParameters = new HashMap<String, String>();
                 resourceParameters.put("alt", fieldElement.getText());
                 resourceParameters.put("title", fieldElement.getText());
+                resourceParameters.put("data-xwiki-lightbox", "false");
                 result = Arrays.<Block>asList(new ImageBlock(reference, false, resourceParameters));
             }
         }
