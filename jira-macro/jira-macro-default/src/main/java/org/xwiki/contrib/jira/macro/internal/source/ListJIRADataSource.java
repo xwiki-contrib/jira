@@ -91,7 +91,7 @@ public class ListJIRADataSource extends AbstractJIRADataSource
         // them in the same order as passed in the issueIds parameter.
         Map<String, Element> mappedIssues = buildIssues(document);
 
-        List<Element> issues = new ArrayList<Element>();
+        List<Element> issues = new ArrayList<>();
         for (Pair<String, String> id : issueIds) {
             Element issue = mappedIssues.get(id.getLeft());
             if (issue != null) {
@@ -133,7 +133,7 @@ public class ListJIRADataSource extends AbstractJIRADataSource
      */
     public List<Pair<String, String>> parseIds(String macroContent)
     {
-        List<Pair<String, String>> ids = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> ids = new ArrayList<>();
         if (macroContent != null) {
             for (String issueLine : macroContent.split("\\r?\\n")) {
                 // Split on pipe symbol
@@ -141,7 +141,7 @@ public class ListJIRADataSource extends AbstractJIRADataSource
                 String note = StringUtils.substringAfter(issueLine, PIPE).trim();
                 // Only add if the issue is not empty
                 if (StringUtils.isNotBlank(issue)) {
-                    ids.add(new ImmutablePair<String, String>(issue, note));
+                    ids.add(new ImmutablePair<>(issue, note));
                 }
             }
         }

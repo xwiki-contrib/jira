@@ -57,18 +57,18 @@ public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
         String key = issue.getChildText(JIRAField.KEY.getId());
         if (key != null) {
             String link = issue.getChildText(JIRAField.LINK.getId());
-            List<Block> labelBlocks = Arrays.<Block>asList(new VerbatimBlock(key, true));
+            List<Block> labelBlocks = Arrays.asList(new VerbatimBlock(key, true));
 
             // If the Issue is closed then display it striked-out
             String resolutionId = issue.getChild(JIRAField.RESOLUTION.getId()).getAttributeValue("id");
             if (!"-1".equals(resolutionId)) {
                 // The issue is resolved
-                labelBlocks = Arrays.<Block>asList(new FormatBlock(labelBlocks, Format.STRIKEDOUT));
+                labelBlocks = Arrays.asList(new FormatBlock(labelBlocks, Format.STRIKEDOUT));
             }
 
             if (link != null) {
                 ResourceReference reference = new ResourceReference(link, ResourceType.URL);
-                result = Arrays.<Block>asList(new LinkBlock(labelBlocks, reference, true));
+                result = Arrays.asList(new LinkBlock(labelBlocks, reference, true));
             } else {
                 result = labelBlocks;
             }

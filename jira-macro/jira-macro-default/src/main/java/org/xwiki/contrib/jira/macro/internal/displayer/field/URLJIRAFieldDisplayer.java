@@ -59,9 +59,9 @@ public class URLJIRAFieldDisplayer extends AbstractJIRAFieldDisplayer
             if (StringUtils.isBlank(label)) {
                 label = value;
             }
-            List<Block> labelBlocks = Arrays.<Block>asList(new VerbatimBlock(label, true));
+            List<Block> labelBlocks = Arrays.asList(new VerbatimBlock(label, true));
             ResourceReference reference = new ResourceReference(value, ResourceType.URL);
-            result = Arrays.<Block>asList(new LinkBlock(labelBlocks, reference, true));
+            result = Arrays.asList(new LinkBlock(labelBlocks, reference, true));
         }
 
         return result;

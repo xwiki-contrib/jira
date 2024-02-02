@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
@@ -54,10 +53,6 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 @Component(roles = JIRABlockAsyncRenderer.class)
 public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {
-    private static final String ESCAPE_CHAR_SLASH = "_";
-
-    private static final String ESCAPE_CHAR_BACKSLASH = "-";
-
     @Inject
     private DocumentReferenceResolver<String> resolver;
 
@@ -165,22 +160,6 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
         // Find index of the macro in the XDOM to create a unique id.
         long index = context.getXDOM().indexOf(context.getCurrentMacroBlock());
 
-        // Make sure we don't have a / or \ in the source so that it works on Tomcat by default even if Tomcat is not
-        // configured to support \ and / in URLs.
-        // Make "_" and "-" escape characters and thus:
-        // - replace "_" by "__"
-        // - replace "-" by "--"
-        // - replace "\" by "_"
-        // - replace "/" by "-"
-        // This keeps the unicity of the source reference.
-        // TODO: Remove when the parent pom is upgraded to 13.0+ (i.e where https://jira.xwiki.org/browse/XWIKI-17515
-        //  has been fixed).
-        String escapedSource = StringUtils.replaceEach(source,
-            new String[] { ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH },
-            new String[] { ESCAPE_CHAR_SLASH + ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH + ESCAPE_CHAR_BACKSLASH });
-        escapedSource = StringUtils.replaceEach(escapedSource, new String[] { "\\", "/" },
-            new String[] { ESCAPE_CHAR_SLASH, ESCAPE_CHAR_BACKSLASH });
-
         // Note: make sure we don't cache if a different jira url is used or if a different user is used for the same
         // jira url since different users can have different permissions on jira.
         String jiraURL;
@@ -196,7 +175,7 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             jiraURL = this.parameters.getId();
         }
 
-        return createId("rendering", "macro", "jira", escapedSource, index, jiraURL, username);
+        return createId("rendering", "macro", "jira", source, index, jiraURL, username);
     }
 
     private String getCurrentSource(MacroTransformationContext context)

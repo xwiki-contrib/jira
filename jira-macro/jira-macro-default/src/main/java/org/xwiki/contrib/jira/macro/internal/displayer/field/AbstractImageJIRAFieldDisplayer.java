@@ -51,11 +51,11 @@ public abstract class AbstractImageJIRAFieldDisplayer implements JIRAFieldDispla
             String iconURL = getURL(issue);
             if (iconURL != null) {
                 ResourceReference reference = new ResourceReference(iconURL, ResourceType.URL);
-                Map<String, String> resourceParameters = new HashMap<String, String>();
+                Map<String, String> resourceParameters = new HashMap<>();
                 resourceParameters.put("alt", fieldElement.getText());
                 resourceParameters.put("title", fieldElement.getText());
                 resourceParameters.put("data-xwiki-lightbox", "false");
-                result = Arrays.<Block>asList(new ImageBlock(reference, false, resourceParameters));
+                result = Arrays.asList(new ImageBlock(reference, false, resourceParameters));
             }
         }
         return result;

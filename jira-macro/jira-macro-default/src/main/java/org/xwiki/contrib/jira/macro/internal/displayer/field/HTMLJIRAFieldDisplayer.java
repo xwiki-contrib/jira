@@ -52,7 +52,7 @@ public class HTMLJIRAFieldDisplayer extends AbstractJIRAFieldDisplayer
 
         String value = getValue(field, issue);
         if (value != null) {
-            result = Arrays.<Block>asList(new RawBlock(value, Syntax.HTML_4_01));
+            result = Arrays.asList(new RawBlock(value, Syntax.HTML_4_01));
         }
 
         return result;

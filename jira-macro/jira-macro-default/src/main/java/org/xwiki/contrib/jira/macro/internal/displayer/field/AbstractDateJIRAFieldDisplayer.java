@@ -34,7 +34,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.VerbatimBlock;
 
 /**
- * Common Field Displayer for Dates. Parses field in the JIRA date format and generates date the format
+ * Common Field Displayer for Dates. Parses field in the JIRA date format and generates dates in the format
  * {@code dd-MMM-yyyy}.
  *
  * @version $Id$
@@ -60,9 +60,9 @@ public abstract class AbstractDateJIRAFieldDisplayer extends AbstractJIRAFieldDi
         if (date != null) {
             try {
                 Date parsedDate = this.jiraDateFormat.parse(date);
-                result = Arrays.<Block>asList(new VerbatimBlock(this.displayDateFormat.format(parsedDate), true));
+                result = Arrays.asList(new VerbatimBlock(this.displayDateFormat.format(parsedDate), true));
             } catch (ParseException e) {
-                result = Arrays.<Block>asList(new VerbatimBlock(date, true));
+                result = Arrays.asList(new VerbatimBlock(date, true));
             }
         } else {
             result = Collections.emptyList();

@@ -49,7 +49,7 @@ public class DefaultJIRAFieldDisplayer extends AbstractJIRAFieldDisplayer
 
         String value = getValue(field, issue);
         if (value != null) {
-            result = Arrays.<Block>asList(new VerbatimBlock(value, true));
+            result = Arrays.asList(new VerbatimBlock(value, true));
         }
 
         return result;

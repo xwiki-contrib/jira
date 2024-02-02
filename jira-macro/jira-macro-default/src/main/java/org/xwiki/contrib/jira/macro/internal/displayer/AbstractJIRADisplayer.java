@@ -89,7 +89,8 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
         } else {
             // Normalize field data, i.e. fill up any blank by using default field data
 
-            // Step 1: For backward-compatiblity reasons, use the field names defined in the macro parameters if defined
+            // Step 1: For backward-compatibility reasons, use the field names defined in the macro parameters if
+            // defined
             if (parameters.getFieldNames() != null) {
                 List<String> fieldNames = parameters.getFieldNames();
                 for (int i = 0; i < fields.size(); i++) {
