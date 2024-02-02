@@ -31,7 +31,7 @@
   <artifactId>jira</artifactId>
   <packaging>pom</packaging>
   <name>JIRA - Parent POM</name>
-  <version>8.8-SNAPSHOT</version>
+  <version>8.6.7-SNAPSHOT</version>
   <description>Parent POM for JIRA-related modules</description>
   <url>http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA%20Macro</url>
   <scm>
