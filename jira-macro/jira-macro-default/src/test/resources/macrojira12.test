@@ -1,7 +1,7 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test passing a parameter to a field fisplayer
+.# Test passing a parameter to a field displayer
 .#-----------------------------------------------------
 {{jira url="http://localhost:8889" fields="'Custom Link'!url" parameters="field.url.label='custom label'"}}
 XWIKI-1000

@@ -58,7 +58,7 @@ public class JIRAServer
     }
 
     /**
-     * @return the JIRA server's url prefix (e.g. {@code http://jira.xwiki.org})
+     * @return the JIRA server's url prefix (e.g. {@code https://jira.xwiki.org})
      */
     public String getURL()
     {
