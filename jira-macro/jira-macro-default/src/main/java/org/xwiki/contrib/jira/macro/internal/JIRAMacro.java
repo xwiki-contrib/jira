@@ -19,6 +19,7 @@
  */
 package org.xwiki.contrib.jira.macro.internal;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -71,7 +72,7 @@ public class JIRAMacro extends AbstractMacro<JIRAMacroParameters>
     public JIRAMacro()
     {
         super("JIRA", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), JIRAMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
