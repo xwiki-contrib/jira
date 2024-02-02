@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
-    <version>13.10</version>
+    <version>14.10</version>
   </parent>
   <groupId>org.xwiki.contrib.jira</groupId>
   <artifactId>jira</artifactId>
   <packaging>pom</packaging>
   <name>JIRA - Parent POM</name>
-  <version>8.6.7-SNAPSHOT</version>
+  <version>8.8-SNAPSHOT</version>
   <description>Parent POM for JIRA-related modules</description>
   <url>http://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA%20Macro</url>
   <scm>
@@ -99,6 +99,7 @@
             </dependency>
           </dependencies>
         </plugin>
+
       </plugins>
     </pluginManagement>
   </build>
