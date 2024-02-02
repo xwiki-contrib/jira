@@ -1,0 +1,27 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Display the JIRA labels column (scalar value)
+.#-----------------------------------------------------
+{{jira url="http://localhost:8889" fields="labels"}}
+XWIKI-1000
+{{/jira}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=labels] [XWIKI-1000]
+beginTable
+beginTableRow
+beginTableHeadCell
+onVerbatim [Labels] [true]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+onVerbatim [label1, label2] [true]
+endTableCell
+endTableRow
+endTable
+endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=labels] [XWIKI-1000]
+endDocument

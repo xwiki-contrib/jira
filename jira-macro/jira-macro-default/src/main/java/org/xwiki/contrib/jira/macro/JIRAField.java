@@ -112,6 +112,11 @@ public class JIRAField
     public static final JIRAField LINK;
 
     /**
+     * JIRA Labels field.
+     */
+    public static final JIRAField LABELS;
+
+    /**
      * Special field used by the List Data Source which allows the user to define notes for a given issue.
      */
     public static final String NOTE = "note";
@@ -125,54 +130,52 @@ public class JIRAField
 
     private static final String DATE_TYPE = "date";
 
+    private static final String URL_TYPE = "url";
+
+    private static final String LIST_TYPE = "list";
+
+    private static final String NUMBER_TYPE = "number";
+
     private static final String TYPE_ID = "type";
 
     static {
         SUMMARY = new JIRAField("summary", "Summary", TEXT_TYPE);
-        DEFAULT_FIELDS.put(SUMMARY.getId(), SUMMARY);
-
         KEY = new JIRAField("key", "Key", TEXT_TYPE);
-        DEFAULT_FIELDS.put(KEY.getId(), KEY);
-
         TYPE = new JIRAField(TYPE_ID, "Type", TEXT_TYPE);
-        DEFAULT_FIELDS.put(TYPE.getId(), TYPE);
-
         STATUS = new JIRAField("status", "Status", TEXT_TYPE);
-        DEFAULT_FIELDS.put(STATUS.getId(), STATUS);
-
         ASSIGNEE = new JIRAField("assignee", "Assignee", TEXT_TYPE);
-        DEFAULT_FIELDS.put(ASSIGNEE.getId(), ASSIGNEE);
-
         REPORTER = new JIRAField("reporter", "Reporter", TEXT_TYPE);
-        DEFAULT_FIELDS.put(REPORTER.getId(), REPORTER);
-
         CREATED = new JIRAField("created", "Created Date", DATE_TYPE);
-        DEFAULT_FIELDS.put(CREATED.getId(), CREATED);
-
         UPDATED = new JIRAField("updated", "Updated Date", DATE_TYPE);
-        DEFAULT_FIELDS.put(UPDATED.getId(), UPDATED);
-
         RESOLVED = new JIRAField("resolved", "Resolved Date", DATE_TYPE);
-        DEFAULT_FIELDS.put(RESOLVED.getId(), RESOLVED);
-
         FIXVERSION = new JIRAField("fixVersion", "Fixed in", TEXT_TYPE);
-        DEFAULT_FIELDS.put(FIXVERSION.getId(), FIXVERSION);
-
         VERSION = new JIRAField("version", "Affected Versions", TEXT_TYPE);
-        DEFAULT_FIELDS.put(VERSION.getId(), VERSION);
-
         COMPONENT = new JIRAField("component", "Component", TEXT_TYPE);
-        DEFAULT_FIELDS.put(COMPONENT.getId(), COMPONENT);
-
-        VOTES = new JIRAField("votes", "Votes", "number");
-        DEFAULT_FIELDS.put(VOTES.getId(), VOTES);
-
+        VOTES = new JIRAField("votes", "Votes", NUMBER_TYPE);
         RESOLUTION = new JIRAField("resolution", "Resolution", TEXT_TYPE);
-        DEFAULT_FIELDS.put(RESOLUTION.getId(), RESOLUTION);
-
-        LINK = new JIRAField("link", "Link", "url");
-        DEFAULT_FIELDS.put(LINK.getId(), LINK);
+        LINK = new JIRAField("link", "Link", URL_TYPE);
+        LABELS = new JIRAField("labels", "Labels", LIST_TYPE);
     }
+
+    static {
+        DEFAULT_FIELDS.put(SUMMARY.getId(), SUMMARY);
+        DEFAULT_FIELDS.put(KEY.getId(), KEY);
+        DEFAULT_FIELDS.put(TYPE.getId(), TYPE);
+        DEFAULT_FIELDS.put(STATUS.getId(), STATUS);
+        DEFAULT_FIELDS.put(ASSIGNEE.getId(), ASSIGNEE);
+        DEFAULT_FIELDS.put(REPORTER.getId(), REPORTER);
+        DEFAULT_FIELDS.put(CREATED.getId(), CREATED);
+        DEFAULT_FIELDS.put(UPDATED.getId(), UPDATED);
+        DEFAULT_FIELDS.put(RESOLVED.getId(), RESOLVED);
+        DEFAULT_FIELDS.put(FIXVERSION.getId(), FIXVERSION);
+        DEFAULT_FIELDS.put(VERSION.getId(), VERSION);
+        DEFAULT_FIELDS.put(COMPONENT.getId(), COMPONENT);
+        DEFAULT_FIELDS.put(VOTES.getId(), VOTES);
+        DEFAULT_FIELDS.put(RESOLUTION.getId(), RESOLUTION);
+        DEFAULT_FIELDS.put(LINK.getId(), LINK);
+        DEFAULT_FIELDS.put(LABELS.getId(), LABELS);
+    }
+
     private String id;
 
     private String label;

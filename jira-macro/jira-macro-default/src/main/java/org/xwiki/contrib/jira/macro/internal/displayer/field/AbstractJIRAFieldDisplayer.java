@@ -35,6 +35,8 @@ import org.xwiki.text.StringUtils;
  */
 public abstract class AbstractJIRAFieldDisplayer implements JIRAFieldDisplayer
 {
+    private static final String LIST_TYPE = "list";
+
     /**
      * Get the field value from the passed XML represented as an {@link Element} and look in custom fields when not
      * found in the default jira fields.
@@ -51,28 +53,58 @@ public abstract class AbstractJIRAFieldDisplayer implements JIRAFieldDisplayer
         List<Element> textElements = issue.getChildren(field.getId());
         if (textElements == null || textElements.isEmpty()) {
             // Not found as a default field. Verify if it's a custom field.
-            Element customFieldsElement = issue.getChild("customfields");
-            if (customFieldsElement != null) {
-                for (Element customFieldElement : customFieldsElement.getChildren("customfield")) {
-                    String customFieldName = customFieldElement.getChildTextTrim("customfieldname");
-                    if (customFieldName != null && customFieldName.equals(field.getId())) {
-                        // Found a matching field, render its value and stop looking
-                        // Note: we only take into account the first "customfieldvalue" element for now. If a custom
-                        // field needs to handle multiple values, it'll need a custom field displayer defined.
-                        String value = customFieldElement.getChildren("customfieldvalues").get(0).getValue().trim();
-                        texts.add(value);
-                        break;
-                    }
-                }
-            }
+            texts.addAll(getCustomElement(field, issue));
         } else {
-            for (Element element : textElements) {
-                if (element != null) {
+            // Get standard fields
+            texts.addAll(getStandardElement(textElements, field));
+        }
+
+        return texts.isEmpty() ? null : StringUtils.join(texts, ", ");
+    }
+
+    private List<String> getStandardElement(List<Element> textElements, JIRAField field)
+    {
+        List<String> texts = new ArrayList<>();
+        for (Element element : textElements) {
+            if (element != null) {
+                if (LIST_TYPE.equals(field.getType())) {
+                    texts.addAll(getListElements(element));
+                } else {
                     texts.add(element.getTextTrim());
                 }
             }
         }
+        return texts;
+    }
+    private List<String> getCustomElement(JIRAField field, Element issue)
+    {
+        List<String> texts = new ArrayList<>();
+        Element customFieldsElement = issue.getChild("customfields");
+        if (customFieldsElement != null) {
+            for (Element customFieldElement : customFieldsElement.getChildren("customfield")) {
+                String customFieldName = customFieldElement.getChildTextTrim("customfieldname");
+                if (customFieldName != null && customFieldName.equals(field.getId())) {
+                    // Found a matching field, render its value and stop looking
+                    // Note: we only take into account the first "customfieldvalue" element for now. If a custom
+                    // field needs to handle multiple values, it'll need a custom field displayer defined.
+                    String value = customFieldElement.getChildren("customfieldvalues").get(0).getValue().trim();
+                    texts.add(value);
+                    break;
+                }
+            }
+        }
+        return texts;
+    }
 
-        return texts.isEmpty() ? null : StringUtils.join(texts, ", ");
+    private List<String> getListElements(Element element)
+    {
+        List<String> texts = new ArrayList<>();
+        List<Element> subTextElements = element.getChildren();
+        if (subTextElements != null) {
+            for (Element subElement : subTextElements) {
+                texts.add(subElement.getTextTrim());
+            }
+        }
+        return texts;
     }
 }
