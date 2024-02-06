@@ -116,8 +116,8 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             resultBlocks = this.macro.executeCodeMacro(this.parameters, this.content, this.context);
         } catch (MacroExecutionException e) {
             // Display the error in the result
-            resultBlocks = this.errorBlockGenerator.generateErrorBlocks("Failed to execute the JIRA macro", e,
-                this.inline);
+            resultBlocks = this.errorBlockGenerator.generateErrorBlocks(this.inline, null,
+                "Failed to execute the JIRA macro", null, e);
         }
 
         resultBlocks = Arrays.asList(wrapInMacroMarker(this.context.getCurrentMacroBlock(), resultBlocks));
