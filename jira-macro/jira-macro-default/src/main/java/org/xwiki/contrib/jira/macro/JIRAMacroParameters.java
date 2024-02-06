@@ -162,10 +162,10 @@ public class JIRAMacroParameters
 
     /**
      * @param fieldNames see {@link #getFieldNames()}
-     * @deprecated starting with 8.3 use {@link #setFields(JIRAFields)} using the format {@code id:label!type}
+     * @deprecated use {@link #setFields(JIRAFields)} using the format {@code id:label!type}
      */
     @PropertyDescription("the pretty names of the fields in the order in which they are displayed")
-    @Deprecated
+    @Deprecated(since = "8.3")
     public void setFieldNames(List<String> fieldNames)
     {
         this.fieldNames = fieldNames;
@@ -174,9 +174,9 @@ public class JIRAMacroParameters
     /**
      * @return the names to use for JIRA issue fields for Displayers displaying the field names (eg the Table
      *         Data Source)
-     * @deprecated starting with 8.3 use {@link #setFields(JIRAFields)} using the format {@code id:label!type}
+     * @deprecated use {@link #setFields(JIRAFields)} using the format {@code id:label!type}
      */
-    @Deprecated
+    @Deprecated(since = "8.3")
     public List<String> getFieldNames()
     {
         return this.fieldNames;
@@ -203,7 +203,6 @@ public class JIRAMacroParameters
      * @param maxCount see {@link #getMaxCount()}
      */
     @PropertyDescription("the max number of JIRA issues to display")
-    @Deprecated
     public void setMaxCount(int maxCount)
     {
         this.maxCount = maxCount;
