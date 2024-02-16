@@ -78,7 +78,7 @@
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-standalone</artifactId>
-      <version>2.27.2</version>
+      <version>3.0.1</version>
       <scope>test</scope>
     </dependency>
     <!-- Wiremock requires servlet api 3.1 -->
