@@ -19,6 +19,9 @@
  */
 package org.xwiki.contrib.jira.config;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.text.XWikiToStringBuilder;
+
 /**
  * Represents all data related to a JIRA server: url and credentials to access it.
  *
@@ -79,5 +82,17 @@ public class JIRAServer
     public String getPassword()
     {
         return this.password;
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder = builder.append("URL", getURL());
+        // Never display the password for security reasons.
+        if (getUsername() != null) {
+            builder = builder.append("Username", getUsername());
+        }
+        return builder.toString();
     }
 }

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,25 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.contrib.jira.config.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.contrib.jira</groupId>
-    <artifactId>jira</artifactId>
-    <version>9.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>jira-config</artifactId>
-  <name>JIRA - Config - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>JIRA Configuration modules (API, Admin UI)</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>jira-config-api</module>
-    <module>jira-config-platform</module>
-    <module>jira-config-ui</module>
-  </modules>
-</project>
+import org.junit.jupiter.api.Test;
+import org.xwiki.contrib.jira.config.JIRAServer;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Unit tests for {@link org.xwiki.contrib.jira.config.JIRAServer}.
+ *
+ * @version $Id$
+ */
+class JIRAServerTest
+{
+    @Test
+    void verifyToString()
+    {
+        JIRAServer server = new JIRAServer("https://jira.xwiki.org", "username", "password");
+        assertEquals("URL = [https://jira.xwiki.org], Username = [username]", server.toString());
+    }
+}
