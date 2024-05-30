@@ -32,6 +32,7 @@
   <packaging>jar</packaging>
   <description>Provides scripting access to JIRA using JIRA's Client API (JRJC)</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JIRA Scripting API</xwiki.extension.name>
     <!-- The extension's category -->
@@ -43,25 +44,6 @@
       org.xwiki.script.service.ScriptService/jira
     </xwiki.extension.components>
   </properties>
-  <!--dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>32.0.1-jre</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.errorprone</groupId>
-        <artifactId>error_prone_annotations</artifactId>
-        <version>2.18.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.checkerframework</groupId>
-        <artifactId>checker-qual</artifactId>
-        <version>3.33.0</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement-->
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib.jira</groupId>
