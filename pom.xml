@@ -76,35 +76,6 @@
         </configuration>
       </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <!-- TODO: Remove once the parent pom depends on XWiki Commons 13.2RC1+.
-             See http://jira.xwiki.org/browse/XCOMMONS-2150 -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <!-- Specify the version of the code so that it doesn't depend on the Java version used to build XWiki -->
-            <source>8</source>
-          </configuration>
-        </plugin>
-        <!-- Use a more recent version of Spoon to avoid URL classloader issue with Java 17. We need to build with
-             Java 17 since SonarQube requires it now -->
-        <plugin>
-          <groupId>fr.inria.gforge.spoon</groupId>
-          <artifactId>spoon-maven-plugin</artifactId>
-          <version>3.8.0</version>
-          <dependencies>
-            <dependency>
-              <groupId>fr.inria.gforge.spoon</groupId>
-              <artifactId>spoon-core</artifactId>
-              <version>10.4.2</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-
-      </plugins>
-    </pluginManagement>
   </build>
   <profiles>
     <profile>
