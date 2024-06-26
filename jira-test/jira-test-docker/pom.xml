@@ -81,11 +81,9 @@
       <version>2.27.2</version>
       <scope>test</scope>
     </dependency>
-    <!-- Wiremock requires servlet api 3.1 -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
