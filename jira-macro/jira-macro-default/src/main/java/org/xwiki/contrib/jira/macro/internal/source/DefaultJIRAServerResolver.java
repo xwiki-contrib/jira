@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
@@ -43,7 +44,7 @@ public class DefaultJIRAServerResolver implements JIRAServerResolver
     private JIRAConfiguration configuration;
 
     @Override
-    public JIRAServer resolve(JIRAMacroParameters parameters) throws MacroExecutionException
+    public JIRAServer resolve(AbstractJIRAMacroParameters parameters) throws MacroExecutionException
     {
         JIRAServer jiraServer;
 

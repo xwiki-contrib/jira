@@ -30,13 +30,8 @@ import org.xwiki.properties.annotation.PropertyDescription;
  * @version $Id$
  * @since 4.2M1
  */
-public class JIRAMacroParameters
+public class JIRAMacroParameters extends AbstractJIRAMacroParameters
 {
-    /**
-     * @see #getURL()
-     */
-    private String url;
-
     /**
      * @see #getSource()
      */
@@ -62,49 +57,9 @@ public class JIRAMacroParameters
      */
     private List<String> fieldTypes;
 
-    /**
-     * @see #getId()
-     */
-    private String id;
-
     private Properties extraParameters = new Properties();
 
     private int maxCount = -1;
-
-    /**
-     * @param url see {@link #getURL()}
-     */
-    @PropertyDescription("the JIRA Server URL")
-    public void setURL(String url)
-    {
-        this.url = url;
-    }
-
-    /**
-     * @return the JIRA Server URL (e.g. {@code http://jira.xwiki.org})
-     */
-    public String getURL()
-    {
-        return this.url;
-    }
-
-    /**
-     * @param id see {@link #getId()}
-     */
-    @PropertyDescription("the configuration id of the JIRA Server URL to use")
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
-    /**
-     * @return the configuration id of the JIRA Server URL to use (defined in the Macro configuration settings). Note
-     *         that if a URL is specified it'll take precedence over this parameter.
-     */
-    public String getId()
-    {
-        return this.id;
-    }
 
     /**
      * @param source see {@link #getSource()}

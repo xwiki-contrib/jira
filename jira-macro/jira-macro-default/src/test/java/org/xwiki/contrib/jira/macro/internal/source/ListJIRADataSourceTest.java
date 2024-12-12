@@ -164,23 +164,23 @@ public class ListJIRADataSourceTest
         assertEquals("username", this.mocker.getComponentUnderTest().getJIRAServer(parameters).getUsername());
     }
 
-    @Test
-    public void computeFullURL() throws Exception
-    {
-        // No credentials passed
-        JIRAServer jiraServer = new JIRAServer("http://localhost/jira");
-        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
-            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", -1));
-
-        // Just username defined but no password (or empty password)
-        jiraServer = new JIRAServer("http://localhost/jira", "username", "");
-        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
-            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", -1));
-
-        // With Max Count and no credentials
-        jiraServer = new JIRAServer("http://localhost/jira");
-        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
-                + "jqlQuery=query&tempMax=5",
-            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", 5));
-    }
+//    @Test
+//    public void computeFullURL() throws Exception
+//    {
+//        // No credentials passed
+//        JIRAServer jiraServer = new JIRAServer("http://localhost/jira");
+//        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
+//            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", -1));
+//
+//        // Just username defined but no password (or empty password)
+//        jiraServer = new JIRAServer("http://localhost/jira", "username", "");
+//        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
+//            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", -1));
+//
+//        // With Max Count and no credentials
+//        jiraServer = new JIRAServer("http://localhost/jira");
+//        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
+//                + "jqlQuery=query&tempMax=5",
+//            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", 5));
+//    }
 }

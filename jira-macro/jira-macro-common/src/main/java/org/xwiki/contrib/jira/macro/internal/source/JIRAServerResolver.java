@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,24 +16,27 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.contrib.jira.macro.internal.source;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.contrib.jira</groupId>
-    <artifactId>jira</artifactId>
-    <version>9.1-SNAPSHOT</version>
-  </parent>
-  <artifactId>jira-macro</artifactId>
-  <name>JIRA - Macro - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>JIRA - Macro - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>jira-macro-charts</module>
-    <module>jira-macro-common</module>
-    <module>jira-macro-default</module>
-    <module>jira-macro-platform</module>
-  </modules>
-</project>
+import org.xwiki.component.annotation.Role;
+import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters;
+import org.xwiki.rendering.macro.MacroExecutionException;
+
+/**
+ * Resolve the {@link org.xwiki.contrib.jira.config.JIRAServer} from the Macro parameters and configuration.
+ *
+ * @version $Id$
+ * @since 8.6.3
+ */
+@Role
+public interface JIRAServerResolver
+{
+    /**
+     * @param parameters the parameters of the called jira macro
+     * @return the resolved {@link JIRAServer} taken from the macro parameters if defined or from the configuration
+     * @throws MacroExecutionException if it cannot be resolved (not defined in either places)
+     */
+    JIRAServer resolve(AbstractJIRAMacroParameters parameters) throws MacroExecutionException;
+}

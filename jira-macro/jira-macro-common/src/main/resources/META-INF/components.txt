@@ -1,0 +1,2 @@
+org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher
+org.xwiki.contrib.jira.macro.internal.JIRAURLHelper

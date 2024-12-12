@@ -19,8 +19,6 @@
  */
 package org.xwiki.contrib.jira.macro.internal.source;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,9 +26,9 @@ import javax.inject.Inject;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.slf4j.Logger;
-import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
+import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
@@ -45,23 +43,14 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  */
 public abstract class AbstractJIRADataSource implements JIRADataSource
 {
-    /**
-     * URL Prefix to use to build the full JQL URL (doesn't contain the JQL query itself which needs to be appended).
-     */
-    private static final String JQL_URL_PREFIX =
-        "/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=";
-
-    @Inject
-    private JIRAConfiguration configuration;
-
-    @Inject
-    private Logger logger;
-
     @Inject
     private HTTPJIRAFetcher jiraFetcher;
 
     @Inject
     private JIRAServerResolver jiraServerResolver;
+
+    @Inject
+    private JIRAURLHelper urlHelper;
 
     /**
      * @param document the XML document from which to extract JIRA issues
@@ -92,31 +81,13 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         Document document;
 
         try {
-            String urlString = computeFullURL(jiraServer, jqlQuery, maxCount);
+            String urlString = this.urlHelper.getSearchURL(jiraServer, jqlQuery, maxCount);
             document = this.jiraFetcher.fetch(urlString, jiraServer);
         } catch (Exception e) {
             throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]",
                 jiraServer.getURL(), jqlQuery), e);
         }
         return document;
-    }
-
-    protected String computeFullURL(JIRAServer jiraServer, String jqlQuery, int maxCount)
-    {
-        StringBuilder additionalQueryString = new StringBuilder();
-
-        // Restrict number of issues returned if need be
-        if (maxCount > -1) {
-            additionalQueryString.append("&tempMax=").append(maxCount);
-        }
-
-        // Note: we encode using UTF8 since it's the W3C recommendation.
-        // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-        String fullURL = String.format("%s%s%s%s", jiraServer.getURL(), JQL_URL_PREFIX, encode(jqlQuery),
-            additionalQueryString);
-        this.logger.debug("Computed JIRA URL [{}]", fullURL);
-
-        return fullURL;
     }
 
     /**
@@ -127,14 +98,5 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
     protected JIRAServer getJIRAServer(JIRAMacroParameters parameters) throws MacroExecutionException
     {
         return this.jiraServerResolver.resolve(parameters);
-    }
-
-    private String encode(String content)
-    {
-        try {
-            return URLEncoder.encode(content, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Missing UTF-8 encoding", e);
-        }
     }
 }

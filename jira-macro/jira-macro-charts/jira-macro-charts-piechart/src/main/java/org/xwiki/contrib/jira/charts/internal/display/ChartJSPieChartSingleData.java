@@ -17,26 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.macro.internal.source;
+package org.xwiki.contrib.jira.charts.internal.display;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-import org.xwiki.rendering.macro.MacroExecutionException;
+import java.util.List;
 
-/**
- * Resolve the {@link org.xwiki.contrib.jira.config.JIRAServer} from the Macro parameters and configuration.
- *
- * @version $Id$
- * @since 8.6.3
- */
-@Role
-public interface JIRAServerResolver
+public class ChartJSPieChartSingleData
 {
-    /**
-     * @param parameters the parameters of the called jira macro
-     * @return the resolved {@link JIRAServer} taken from the macro parameters if defined or from the configuration
-     * @throws MacroExecutionException if it cannot be resolved (not defined in either places)
-     */
-    JIRAServer resolve(JIRAMacroParameters parameters) throws MacroExecutionException;
+    private String label;
+    private List<Long> data;
+
+    public String getLabel()
+    {
+        return label;
+    }
+
+    public void setLabel(String label)
+    {
+        this.label = label;
+    }
+
+    public List<Long> getData()
+    {
+        return data;
+    }
+
+    public void setData(List<Long> data)
+    {
+        this.data = data;
+    }
 }
