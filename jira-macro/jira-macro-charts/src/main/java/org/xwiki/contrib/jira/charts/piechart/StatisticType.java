@@ -19,7 +19,13 @@
  */
 package org.xwiki.contrib.jira.charts.piechart;
 
-public enum ByType
+/**
+ * Define the type of statistics to display in with the pie chart graph.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
+public enum StatisticType
 {
     CUSTOM(null),
     STATUS("statuses"),
@@ -31,7 +37,7 @@ public enum ByType
 
     private final String queryName;
 
-    ByType(String queryName)
+    StatisticType(String queryName)
     {
         this.queryName = queryName;
     }

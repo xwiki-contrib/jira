@@ -38,7 +38,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -72,7 +71,7 @@ public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters
      */
     public JIRAPieChartMacro()
     {
-        super("jiraPieChart", DESCRIPTION, new DefaultContentDescriptor(false), JIRAPieChartMacroParameters.class);
+        super("jiraPieChart", DESCRIPTION, null, JIRAPieChartMacroParameters.class);
         setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
     }
 

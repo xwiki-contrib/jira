@@ -20,12 +20,9 @@
 package org.xwiki.contrib.jira.charts.internal.createdvsresolved;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.http.NameValuePair;
@@ -35,14 +32,7 @@ import org.xwiki.contrib.jira.charts.createdvsresolved.DisplayVersion;
 import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
-import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
-import org.xwiki.contrib.jira.charts.piechart.ByType;
-import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
-import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
-import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
-import org.xwiki.rendering.macro.MacroExecutionException;
 
 @Component
 @Singleton

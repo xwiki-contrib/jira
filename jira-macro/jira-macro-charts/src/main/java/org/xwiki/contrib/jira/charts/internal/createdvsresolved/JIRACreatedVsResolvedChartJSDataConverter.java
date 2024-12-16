@@ -56,7 +56,9 @@ public class JIRACreatedVsResolvedChartJSDataConverter
             JIRACreatedVsResolvedSingleData singleData = data.getData();
             resolvedData.add(singleData.getResolved().getCount());
             createdData.add(singleData.getCreated().getCount());
-            trendData.add(singleData.getUnresolvedTrend().getCount());
+            if (parameters.isDisplayTrend()) {
+                trendData.add(singleData.getUnresolvedTrend().getCount());
+            }
         }
 
         chartJSDataSource.setLabels(labels);
@@ -70,12 +72,16 @@ public class JIRACreatedVsResolvedChartJSDataConverter
         resolvedDataSet.setLabel("Resolved");
         resolvedDataSet.setFill(false);
 
-        ChartJSDataSetSingleData trendDataSet = new ChartJSDataSetSingleData();
-        trendDataSet.setData(trendData);
-        trendDataSet.setLabel("Trend");
-        trendDataSet.setFill(false);
+        List<ChartJSDataSetSingleData> dataSets = new ArrayList<>(List.of(createdDataSet, resolvedDataSet));
+        if (parameters.isDisplayTrend()) {
+            ChartJSDataSetSingleData trendDataSet = new ChartJSDataSetSingleData();
+            trendDataSet.setData(trendData);
+            trendDataSet.setLabel("Trend");
+            trendDataSet.setFill(false);
+            dataSets.add(trendDataSet);
+        }
 
-        chartJSDataSource.setDatasets(List.of(createdDataSet, resolvedDataSet, trendDataSet));
+        chartJSDataSource.setDatasets(dataSets);
 
         return chartJSDataSource;
     }

@@ -35,13 +35,10 @@ import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacr
 import org.xwiki.contrib.jira.charts.internal.JIRADataChartJSDataConverter;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
 import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
-import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
-import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,7 +59,7 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
      * The description of the macro.
      */
     private static final String DESCRIPTION =
-        "Displays a pie chart based on the performed query.";
+        "Displays a line chart displaying the created vs resolved issues based on the performed query.";
 
     @Inject
     private JIRAChartDataFetcher<JIRACreatedVsResolvedMacroParameters, JIRACreatedVsResolvedDataSource> dataFetcher;
@@ -75,8 +72,7 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
      */
     public JIRACreatedVsResolvedMacro()
     {
-        super("jiraPieChart", DESCRIPTION, new DefaultContentDescriptor(false),
-            JIRACreatedVsResolvedMacroParameters.class);
+        super("jiraCreatedVsResolved", DESCRIPTION, null, JIRACreatedVsResolvedMacroParameters.class);
         setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
     }
 

@@ -20,16 +20,32 @@
 package org.xwiki.contrib.jira.charts;
 
 import org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
 
+/**
+ * Define the parameters common to all chart macros.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public abstract class AbstractChartMacroParameters extends AbstractJIRAMacroParameters
 {
     private String query;
 
+    /**
+     * @return the JQL query to perform for getting issues.
+     */
     public String getQuery()
     {
         return query;
     }
 
+    /**
+     * @param query see {@link #getQuery()}.
+     */
+    @PropertyDescription("the JQL query for getting issues.")
+    @PropertyMandatory
     public void setQuery(String query)
     {
         this.query = query;

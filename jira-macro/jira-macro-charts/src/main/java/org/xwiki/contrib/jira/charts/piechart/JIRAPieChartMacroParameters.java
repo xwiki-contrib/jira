@@ -20,27 +20,54 @@
 package org.xwiki.contrib.jira.charts.piechart;
 
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
+import org.xwiki.properties.annotation.PropertyAdvanced;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
 
+/**
+ * Define the parameters for the JIRA Pie Chart macro.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
 {
-    private ByType type;
+
+    private StatisticType type;
     private String customType;
 
-    public ByType getType()
+    /**
+     * @return the type of statistics to display in the pie chart.
+     */
+    public StatisticType getType()
     {
         return type;
     }
 
-    public void setType(ByType type)
+    /**
+     * @param type see {@link #getType()}.
+     */
+    @PropertyDescription("The type of statistics to display in the pie chart.")
+    @PropertyMandatory
+    public void setType(StatisticType type)
     {
         this.type = type;
     }
 
+    /**
+     * @return the name of a custom field to use for the statistics.
+     */
     public String getCustomType()
     {
         return customType;
+
     }
 
+    /**
+     * @param customType see {@link #getCustomType()}.
+     */
+    @PropertyDescription("The name of a custom field to use for the statistics.")
+    @PropertyAdvanced
     public void setCustomType(String customType)
     {
         this.customType = customType;
