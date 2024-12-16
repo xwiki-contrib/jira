@@ -1,3 +1,0 @@
-org.xwiki.contrib.jira.charts.internal.DataSourceToChartJSDataSourceConverter
-org.xwiki.contrib.jira.charts.internal.JIRAPieChartDataFetcher
-org.xwiki.contrib.jira.charts.internal.JIRAPieChartMacro

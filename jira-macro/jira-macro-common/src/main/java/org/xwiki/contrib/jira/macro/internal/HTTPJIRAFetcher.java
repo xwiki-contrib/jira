@@ -49,6 +49,8 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+
 /**
  * Fetches remotely the XML content at the passed URL.
  *
@@ -79,6 +81,14 @@ public class HTTPJIRAFetcher
         });
     }
 
+    private ObjectMapper getObjectMapper()
+    {
+        return new ObjectMapper()
+            // We don't want the parsing to fail on unknown properties: we want to have possibility to ignore some
+            // values and to avoid issue in case of evolution of the returns
+            .disable(FAIL_ON_UNKNOWN_PROPERTIES);
+    }
+
     /**
      * Fetch and parse a JSON based on the given information.
      * @param url the full JIRA URL to call
@@ -93,8 +103,9 @@ public class HTTPJIRAFetcher
     {
         return performRequest(url, jiraServer, is -> {
             try {
-                return new ObjectMapper().readValue(is, type);
+                return getObjectMapper().readValue(is, type);
             } catch (IOException e) {
+                // FIXME: this is ugly
                 throw new RuntimeException(e);
             }
         });

@@ -30,18 +30,31 @@
     <version>9.1-SNAPSHOT</version>
   </parent>
   <artifactId>jira-macro-charts</artifactId>
-  <name>JIRA - Macro - Charts - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>JIRA - Macro - Charts - Parent POM</description>
-  <modules>
-    <module>jira-macro-charts-common</module>
-    <module>jira-macro-charts-piechart</module>
-  </modules>
-
+  <name>JIRA - Macro - Charts</name>
+  <packaging>jar</packaging>
+  <description>Allow to display charts reusing JIRA statistics.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>JIRA Charts Macro</xwiki.extension.name>
+    <!-- The extension's category -->
+    <xwiki.extension.category>macro</xwiki.extension.category>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib.jira</groupId>
       <artifactId>jira-macro-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>application-chartjs-ui</artifactId>
+      <version>1.6.3</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.contrib.jira</groupId>
+      <artifactId>jira-macro-common</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -22,12 +22,14 @@ package org.xwiki.contrib.jira.macro.internal;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -124,13 +126,9 @@ public class JIRAURLHelper
      * @param queryParameters the parameters of the request
      * @return the URL to perform the query.
      */
-    public String getChartURL(JIRAServer server, GadgetType gadgetType, Map<String, String> queryParameters)
+    public String getChartURL(JIRAServer server, GadgetType gadgetType, List<NameValuePair> queryParameters)
     {
-        String queryString = URLEncodedUtils.format(queryParameters.entrySet()
-                .stream()
-                .map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList()),
-            StandardCharsets.UTF_8);
+        String queryString = URLEncodedUtils.format(queryParameters, StandardCharsets.UTF_8);
         return String.format("%s%s%s?%s", server.getURL(), GADGET_REST_ENDPOINT, gadgetType.getEndpoint(), queryString);
     }
 
