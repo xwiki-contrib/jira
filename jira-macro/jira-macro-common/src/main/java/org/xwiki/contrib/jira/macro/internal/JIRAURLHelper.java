@@ -23,15 +23,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
@@ -46,6 +43,21 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 @Singleton
 public class JIRAURLHelper
 {
+    /**
+     * REST endpoint to access directly the statistics for the gadgets.
+     */
+    private static final String GADGET_REST_ENDPOINT = "/rest/gadget/1.0/";
+
+    /**
+     * URL Prefix to use to build the full JQL URL (doesn't contain the JQL query itself which needs to be appended).
+     */
+    private static final String JQL_SEARCH_URL_PREFIX =
+        "/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=";
+
+
+    @Inject
+    private Logger logger;
+
     /**
      * The type of gadgets we want to request and their corresponding endpoints.
      */
@@ -66,7 +78,7 @@ public class JIRAURLHelper
          */
         TWO_DIMENSIONAL_CHARTS("twodimensionalfilterstats/generate");
 
-        final String endpoint;
+        private final String endpoint;
 
         GadgetType(String endpoint)
         {
@@ -81,20 +93,6 @@ public class JIRAURLHelper
             return endpoint;
         }
     }
-
-    @Inject
-    private Logger logger;
-
-    /**
-     * REST endpoint to access directly the statistics for the gadgets.
-     */
-    private static final String GADGET_REST_ENDPOINT = "/rest/gadget/1.0/";
-
-    /**
-     * URL Prefix to use to build the full JQL URL (doesn't contain the JQL query itself which needs to be appended).
-     */
-    private static final String JQL_SEARCH_URL_PREFIX =
-        "/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=";
 
     /**
      * @param server the actual JIRA server to request

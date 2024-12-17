@@ -19,38 +19,63 @@
  */
 package org.xwiki.contrib.jira.charts.internal.createdvsresolved.source;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for created vs resolved charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRACreatedVsResolvedSingleData
 {
     private JIRACreatedVsResolvedCountValue created;
     private JIRACreatedVsResolvedCountValue resolved;
     private JIRACreatedVsResolvedCountValue unresolvedTrend;
 
+    /**
+     * @return the number of created tickets.
+     */
     public JIRACreatedVsResolvedCountValue getCreated()
     {
         return created;
     }
 
+    /**
+     * @param created see {@link #getCreated()}.
+     */
     public void setCreated(JIRACreatedVsResolvedCountValue created)
     {
         this.created = created;
     }
 
+    /**
+     * @return the number of resolved tickets.
+     */
     public JIRACreatedVsResolvedCountValue getResolved()
     {
         return resolved;
     }
 
+    /**
+     * @param resolved see {@link #getResolved()}.
+     */
     public void setResolved(
         JIRACreatedVsResolvedCountValue resolved)
     {
         this.resolved = resolved;
     }
 
+    /**
+     * @return the computed trend or {@code null} if no trend is requested.
+     */
     public JIRACreatedVsResolvedCountValue getUnresolvedTrend()
     {
         return unresolvedTrend;
     }
 
+    /**
+     * @param unresolvedTrend see {@link #getUnresolvedTrend()}.
+     */
     public void setUnresolvedTrend(JIRACreatedVsResolvedCountValue unresolvedTrend)
     {
         this.unresolvedTrend = unresolvedTrend;

@@ -21,42 +21,67 @@ package org.xwiki.contrib.jira.charts.internal.createdvsresolved.source;
 
 import java.util.List;
 
-import org.xwiki.contrib.jira.charts.internal.AbstractJIRADataSource;
+import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for created vs resolved charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRACreatedVsResolvedDataSource extends AbstractJIRADataSource
 {
     private JIRACreatedVsResolvedTotalsData totals;
     private List<JIRACreatedVsResolvedTimeData> results;
     private List<JIRACreatedVsResolvedVersionData> versions;
 
+    /**
+     * @return the data of the totals returned by the query.
+     * @see JIRACreatedVsResolvedTotalsData
+     */
     public JIRACreatedVsResolvedTotalsData getTotals()
     {
         return totals;
     }
 
+    /**
+     * @param totals see {@link #getTotals()}.
+     */
     public void setTotals(JIRACreatedVsResolvedTotalsData totals)
     {
         this.totals = totals;
     }
 
+    /**
+     * @return the statistics results.
+     */
     public List<JIRACreatedVsResolvedTimeData> getResults()
     {
         return results;
     }
 
+    /**
+     * @param results see {@link #getResults()}.
+     */
     public void setResults(
         List<JIRACreatedVsResolvedTimeData> results)
     {
         this.results = results;
     }
 
+    /**
+     * @return the information about the versions.
+     */
     public List<JIRACreatedVsResolvedVersionData> getVersions()
     {
         return versions;
     }
 
-    public void setVersions(
-        List<JIRACreatedVsResolvedVersionData> versions)
+    /**
+     * @param versions see {@link #getVersions()}.
+     */
+    public void setVersions(List<JIRACreatedVsResolvedVersionData> versions)
     {
         this.versions = versions;
     }

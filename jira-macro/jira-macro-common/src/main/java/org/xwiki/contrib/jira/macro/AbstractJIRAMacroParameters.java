@@ -20,6 +20,7 @@
 package org.xwiki.contrib.jira.macro;
 
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyGroup;
 
 /**
  * Common parameters for all JIRA macros.
@@ -43,6 +44,7 @@ public abstract class AbstractJIRAMacroParameters
      * @param url see {@link #getURL()}
      */
     @PropertyDescription("the JIRA Server URL")
+    @PropertyGroup("instance")
     public void setURL(String url)
     {
         this.url = url;
@@ -60,6 +62,7 @@ public abstract class AbstractJIRAMacroParameters
      * @param id see {@link #getId()}
      */
     @PropertyDescription("the configuration id of the JIRA Server URL to use")
+    @PropertyGroup("instance")
     public void setId(String id)
     {
         this.id = id;

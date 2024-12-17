@@ -32,6 +32,12 @@ import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSo
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 
+/**
+ * Dedicated component to fetch piechart information from JIRA.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 @Component
 @Singleton
 public class JIRAPieChartDataFetcher
@@ -42,9 +48,6 @@ public class JIRAPieChartDataFetcher
     {
         StatisticType type = parameters.getType();
         String statType = type.getQueryName();
-        if (type == StatisticType.CUSTOM) {
-            statType = parameters.getCustomType();
-        }
         return List.of(new BasicNameValuePair("statType", statType));
     }
 

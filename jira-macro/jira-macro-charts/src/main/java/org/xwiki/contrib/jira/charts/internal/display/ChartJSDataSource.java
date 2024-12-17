@@ -21,26 +21,45 @@ package org.xwiki.contrib.jira.charts.internal.display;
 
 import java.util.List;
 
+/**
+ * POJO defining the format of data requested by ChartJS.
+ * This class aims at being automatically serialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class ChartJSDataSource
 {
-    List<String> labels;
-    List<ChartJSDataSetSingleData> datasets;
+    private List<String> labels;
+    private List<ChartJSDataSetSingleData> datasets;
 
+    /**
+     * @return the list of labels corresponding to each data.
+     */
     public List<String> getLabels()
     {
         return labels;
     }
 
+    /**
+     * @param labels see {@link #getLabels()}.
+     */
     public void setLabels(List<String> labels)
     {
         this.labels = labels;
     }
 
+    /**
+     * @return the list of datasets to display.
+     */
     public List<ChartJSDataSetSingleData> getDatasets()
     {
         return datasets;
     }
 
+    /**
+     * @param datasets see {@link #getDatasets()}.
+     */
     public void setDatasets(List<ChartJSDataSetSingleData> datasets)
     {
         this.datasets = datasets;

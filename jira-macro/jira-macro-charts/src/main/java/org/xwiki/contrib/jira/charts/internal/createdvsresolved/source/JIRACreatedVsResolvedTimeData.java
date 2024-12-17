@@ -21,37 +21,62 @@ package org.xwiki.contrib.jira.charts.internal.createdvsresolved.source;
 
 import java.util.Date;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for created vs resolved charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRACreatedVsResolvedTimeData
 {
     private Date start;
     private Date end;
     private JIRACreatedVsResolvedSingleData data;
 
+    /**
+     * @return the starting date of the period used for gathering data.
+     */
     public Date getStart()
     {
         return start;
     }
 
+    /**
+     * @param start see {@link #getStart()}.
+     */
     public void setStart(Date start)
     {
         this.start = start;
     }
 
+    /**
+     * @return the ending date of the period used for gathering data.
+     */
     public Date getEnd()
     {
         return end;
     }
 
+    /**
+     * @param end see {@link #getEnd()}.
+     */
     public void setEnd(Date end)
     {
         this.end = end;
     }
 
+    /**
+     * @return the actual data for the given period.
+     */
     public JIRACreatedVsResolvedSingleData getData()
     {
         return data;
     }
 
+    /**
+     * @param data see {@link #getData()}.
+     */
     public void setData(JIRACreatedVsResolvedSingleData data)
     {
         this.data = data;

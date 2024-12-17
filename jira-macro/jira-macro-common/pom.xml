@@ -33,7 +33,9 @@
   <name>JIRA - Macro - Common</name>
   <packaging>jar</packaging>
   <description>Common abstractions and utilities of all JIRA macros.</description>
-
+  <properties>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.jdom</groupId>

@@ -34,11 +34,19 @@ import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 
+/**
+ * Dedicated data fetcher for the created vs resolved specific gadget endpoint.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 @Component
 @Singleton
 public class JIRACreatedVsResolvedDataFetcher
     extends AbstractJIRAChartDataFetcher<JIRACreatedVsResolvedMacroParameters, JIRACreatedVsResolvedDataSource>
 {
+    private static final String FIELD = "field";
+
     @Override
     public JIRAURLHelper.GadgetType getGadgetType()
     {
@@ -49,10 +57,10 @@ public class JIRACreatedVsResolvedDataFetcher
     public List<NameValuePair> getCustomQueryParameters(JIRACreatedVsResolvedMacroParameters parameters)
     {
         List<NameValuePair> result = new ArrayList<>();
-        result.add(new BasicNameValuePair("field", "created"));
-        result.add(new BasicNameValuePair("field", "resolved"));
+        result.add(new BasicNameValuePair(FIELD, "created"));
+        result.add(new BasicNameValuePair(FIELD, "resolved"));
         if (parameters.isDisplayTrend()) {
-            result.add(new BasicNameValuePair("field", "unresolvedTrend"));
+            result.add(new BasicNameValuePair(FIELD, "unresolvedTrend"));
         }
         result.add(new BasicNameValuePair("period", parameters.getPeriod().name().toLowerCase(Locale.ROOT)));
         String operation = (parameters.isCount()) ? "count" : "cumulative";

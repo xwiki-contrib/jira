@@ -27,14 +27,24 @@ import javax.inject.Inject;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
+import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
-public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroParameters, U extends AbstractJIRADataSource>
-    implements JIRAChartDataFetcher<T, U>
+/**
+ * Abstract implementation of components allowing to request information from JIRA REST gadget endpoint.
+ *
+ * @param <T> the type of the macro parameters for which to request information.
+ * @param <U> the type of the JIRA data source to obtain.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
+public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroParameters,
+    U extends AbstractJIRADataSource> implements JIRAChartDataFetcher<T, U>
 {
     @Inject
     private JIRAURLHelper urlHelper;
@@ -62,7 +72,14 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
         }
     }
 
+    /**
+     * @return the type of requested gadget.
+     */
     public abstract JIRAURLHelper.GadgetType getGadgetType();
 
+    /**
+     * @param parameters the macro parameters to use for building the request.
+     * @return the list of parameters that should be used for creating the URL query string.
+     */
     public abstract List<NameValuePair> getCustomQueryParameters(T parameters);
 }

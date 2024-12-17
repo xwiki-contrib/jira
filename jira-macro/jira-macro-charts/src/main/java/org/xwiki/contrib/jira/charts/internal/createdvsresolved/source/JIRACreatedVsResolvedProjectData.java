@@ -19,37 +19,62 @@
  */
 package org.xwiki.contrib.jira.charts.internal.createdvsresolved.source;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for created vs resolved charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRACreatedVsResolvedProjectData
 {
-    private long id;
+    private String id;
     private String name;
     private String key;
 
-    public long getId()
+    /**
+     * @return the internal identifier of the project.
+     */
+    public String getId()
     {
         return id;
     }
 
-    public void setId(long id)
+    /**
+     * @param id see {@link #getId()}.
+     */
+    public void setId(String id)
     {
         this.id = id;
     }
 
+    /**
+     * @return the name of the project.
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * @param name see {@link #getName()}.
+     */
     public void setName(String name)
     {
         this.name = name;
     }
 
+    /**
+     * @return the technical key of the project.
+     */
     public String getKey()
     {
         return key;
     }
 
+    /**
+     * @param key see {@link #getKey()}.
+     */
     public void setKey(String key)
     {
         this.key = key;

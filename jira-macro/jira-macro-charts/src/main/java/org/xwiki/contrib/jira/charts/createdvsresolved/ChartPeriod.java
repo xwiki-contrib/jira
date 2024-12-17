@@ -19,12 +19,41 @@
  */
 package org.xwiki.contrib.jira.charts.createdvsresolved;
 
+/**
+ * Define the possible period of time to use for getting created vs resolved statistics.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public enum ChartPeriod
 {
+    /**
+     * To retrieve data split by hour.
+     */
     HOURLY,
+
+    /**
+     * To retrieve data split by day.
+     */
     DAILY,
+
+    /**
+     * To retrieve data split by week.
+     */
     WEEKLY,
+
+    /**
+     * To retrieve data split by month.
+     */
     MONTHLY,
+
+    /**
+     * To retrieve data split by quarter.
+     */
     QUARTERLY,
+
+    /**
+     * To retrieve data split by year.
+     */
     YEARLY;
 }

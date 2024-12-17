@@ -21,37 +21,62 @@ package org.xwiki.contrib.jira.charts.internal.display;
 
 import java.util.List;
 
+/**
+ * POJO defining the format of data requested by ChartJS.
+ * This class aims at being automatically serialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class ChartJSDataSetSingleData
 {
     private String label;
     private boolean fill;
     private List<Long> data;
 
+    /**
+     * @return the label of the data to be displayed.
+     */
     public String getLabel()
     {
         return label;
     }
 
+    /**
+     * @param label see {@link #getLabel()}.
+     */
     public void setLabel(String label)
     {
         this.label = label;
     }
 
+    /**
+     * @return the actual data represented as a list of values.
+     */
     public List<Long> getData()
     {
         return data;
     }
 
+    /**
+     * @param data see {@link #getData()}.
+     */
     public void setData(List<Long> data)
     {
         this.data = data;
     }
 
+    /**
+     * @return {@code true} if the shape of the graph should be filled, {@code false} if it should remain empty.
+     */
     public boolean isFill()
     {
         return fill;
     }
 
+    /**
+     * @param fill see {@link #isFill()}.
+     */
     public void setFill(boolean fill)
     {
         this.fill = fill;

@@ -19,26 +19,45 @@
  */
 package org.xwiki.contrib.jira.charts.internal.createdvsresolved.source;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for created vs resolved charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRACreatedVsResolvedTotalsData
 {
     private long created;
     private long resolved;
 
+    /**
+     * @return total number of created tickets.
+     */
     public long getCreated()
     {
         return created;
     }
 
+    /**
+     * @param created see {@link #getCreated()}.
+     */
     public void setCreated(long created)
     {
         this.created = created;
     }
 
+    /**
+     * @return total number of resolved tickets.
+     */
     public long getResolved()
     {
         return resolved;
     }
 
+    /**
+     * @param resolved see {@link #getResolved()}.
+     */
     public void setResolved(long resolved)
     {
         this.resolved = resolved;

@@ -37,10 +37,14 @@ public class JIRACreatedVsResolvedMacroParameters extends AbstractChartMacroPara
     private boolean displayTrend;
     private DisplayVersion displayVersion;
 
+    /**
+     * Default constructor.
+     */
     public JIRACreatedVsResolvedMacroParameters()
     {
         this.isCount = true;
         this.displayVersion = DisplayVersion.NONE;
+        this.daysPreviously = 60;
     }
 
     /**

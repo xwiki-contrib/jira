@@ -27,21 +27,50 @@ package org.xwiki.contrib.jira.charts.piechart;
  */
 public enum StatisticType
 {
-    CUSTOM(null),
+    /**
+     * Retrieve statistics based on issue statuses.
+     */
     STATUS("statuses"),
-    FIX_VERSION("fixVersions"),
+
+    /**
+     * Retrieve statistics based on issue fix versions.
+     */
+    FIX_VERSION("allFixfor"),
+
+    /**
+     * Retrieve statistics based on issue assignees.
+     */
     ASSIGNEE("assignees"),
+
+    /**
+     * Retrieve statistics based on issue priorities.
+     */
     PRIORITY("priorities"),
+
+    /**
+     * Retrieve statistics based on issue components.
+     */
     COMPONENT("components"),
-    TYPE("types");
+
+    /**
+     * Retrieve statistics based on issue types.
+     */
+    ISSUE_TYPE("issuetype");
 
     private final String queryName;
 
+    /**
+     * Default constructor.
+     * @param queryName the actual name to be used in the endpoint.
+     */
     StatisticType(String queryName)
     {
         this.queryName = queryName;
     }
 
+    /**
+     * @return the value to be used in the REST endpoint.
+     */
     public String getQueryName()
     {
         return queryName;

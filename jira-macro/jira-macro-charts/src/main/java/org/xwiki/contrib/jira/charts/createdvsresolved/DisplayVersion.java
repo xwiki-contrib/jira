@@ -19,9 +19,27 @@
  */
 package org.xwiki.contrib.jira.charts.createdvsresolved;
 
+/**
+ * Define the possible values for displaying versions in created vs resolved charts.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public enum DisplayVersion
 {
+    /**
+     * Display only the major versions.
+     */
+    // FIXME: not supported yet, note that the REST API doesn't provide that info so it would need local computation.
     ONLY_MAJOR,
+
+    /**
+     * Display all versions.
+     */
     ALL,
+
+    /**
+     * Display no version.
+     */
     NONE;
 }

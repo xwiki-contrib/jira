@@ -19,15 +19,28 @@
  */
 package org.xwiki.contrib.jira.charts.internal.createdvsresolved.source;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for created vs resolved charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRACreatedVsResolvedCountValue
 {
     private long count;
 
+    /**
+     * @return the number of occurrences.
+     */
     public long getCount()
     {
         return count;
     }
 
+    /**
+     * @param count see {@link #getCount()}.
+     */
     public void setCount(long count)
     {
         this.count = count;

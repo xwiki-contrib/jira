@@ -20,7 +20,6 @@
 package org.xwiki.contrib.jira.charts.piechart;
 
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
-import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 
@@ -32,9 +31,7 @@ import org.xwiki.properties.annotation.PropertyMandatory;
  */
 public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
 {
-
     private StatisticType type;
-    private String customType;
 
     /**
      * @return the type of statistics to display in the pie chart.
@@ -52,24 +49,5 @@ public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
     public void setType(StatisticType type)
     {
         this.type = type;
-    }
-
-    /**
-     * @return the name of a custom field to use for the statistics.
-     */
-    public String getCustomType()
-    {
-        return customType;
-
-    }
-
-    /**
-     * @param customType see {@link #getCustomType()}.
-     */
-    @PropertyDescription("The name of a custom field to use for the statistics.")
-    @PropertyAdvanced
-    public void setCustomType(String customType)
-    {
-        this.customType = customType;
     }
 }

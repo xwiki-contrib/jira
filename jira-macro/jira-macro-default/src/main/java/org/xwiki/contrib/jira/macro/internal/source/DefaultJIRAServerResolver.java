@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters;
-import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**

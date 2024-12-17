@@ -21,50 +21,64 @@ package org.xwiki.contrib.jira.charts.internal.piechart.source;
 
 import java.util.List;
 
-import org.xwiki.contrib.jira.charts.internal.AbstractJIRADataSource;
+import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for piechart charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRAPieChartDataSource extends AbstractJIRADataSource
 {
     private String statType;
-    private String customType;
     private long issueCount;
     private List<JIRAPieChartData> results;
 
+    /**
+     * @return the type of data requested.
+     */
     public String getStatType()
     {
         return statType;
     }
 
+    /**
+     * @param statType see {@link #getStatType()}.
+     */
     public void setStatType(String statType)
     {
         this.statType = statType;
     }
 
-    public String getCustomType()
-    {
-        return customType;
-    }
-
-    public void setCustomType(String customType)
-    {
-        this.customType = customType;
-    }
-
+    /**
+     * @return the total number of tickets of the query.
+     */
     public long getIssueCount()
     {
         return issueCount;
     }
 
+    /**
+     * @param issueCount see {@link #getIssueCount()}.
+     */
     public void setIssueCount(long issueCount)
     {
         this.issueCount = issueCount;
     }
 
+    /**
+     * @return the actual data results.
+     */
     public List<JIRAPieChartData> getResults()
     {
         return results;
     }
 
+    /**
+     * @param results see {@link #getResults()}.
+     */
     public void setResults(List<JIRAPieChartData> results)
     {
         this.results = results;

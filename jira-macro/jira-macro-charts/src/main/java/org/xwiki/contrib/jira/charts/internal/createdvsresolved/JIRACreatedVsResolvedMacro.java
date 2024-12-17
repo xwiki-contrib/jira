@@ -19,7 +19,6 @@
  */
 package org.xwiki.contrib.jira.charts.internal.createdvsresolved;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,7 +64,8 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
     private JIRAChartDataFetcher<JIRACreatedVsResolvedMacroParameters, JIRACreatedVsResolvedDataSource> dataFetcher;
 
     @Inject
-    private JIRADataChartJSDataConverter<JIRACreatedVsResolvedDataSource, JIRACreatedVsResolvedMacroParameters> converter;
+    private JIRADataChartJSDataConverter<JIRACreatedVsResolvedDataSource, JIRACreatedVsResolvedMacroParameters>
+        converter;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -97,6 +97,7 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
             throw new MacroExecutionException("Error when transforming data to JSON", e);
         }
 
+        // TODO: handle displaying the versions
         Map<String, String> chartJSParameterMap = new LinkedHashMap<>();
         chartJSParameterMap.put("type", "line");
 

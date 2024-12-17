@@ -19,37 +19,62 @@
  */
 package org.xwiki.contrib.jira.charts.internal.piechart.source;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for piechart charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class JIRAPieChartData
 {
     private String key;
     private long value;
     private String url;
 
+    /**
+     * @return the actual label for that data, which depends on the requested data type.
+     */
     public String getKey()
     {
         return key;
     }
 
+    /**
+     * @param key see {@link #getKey()}.
+     */
     public void setKey(String key)
     {
         this.key = key;
     }
 
+    /**
+     * @return the actual value of the data.
+     */
     public long getValue()
     {
         return value;
     }
 
+    /**
+     * @param value see {@link #getValue()}.
+     */
     public void setValue(long value)
     {
         this.value = value;
     }
 
+    /**
+     * @return the URL of the filter query to access the tickets represented by the data.
+     */
     public String getUrl()
     {
         return url;
     }
 
+    /**
+     * @param url see {@link #getUrl()}.
+     */
     public void setUrl(String url)
     {
         this.url = url;

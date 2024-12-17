@@ -85,6 +85,7 @@ public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters
     public List<Block> execute(JIRAPieChartMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
+        // TODO: introduce a maximum number of elements to be displayed in the piechart (default should be 10)
         JIRAPieChartDataSource dataSource = this.dataFetcher.fetch(parameters, JIRAPieChartDataSource.class);
         ChartJSDataSource convert = this.converter.convert(dataSource, parameters);
         String json;

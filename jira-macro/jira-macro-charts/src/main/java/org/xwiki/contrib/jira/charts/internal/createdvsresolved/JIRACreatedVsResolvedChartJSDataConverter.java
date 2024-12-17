@@ -35,6 +35,12 @@ import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreat
 import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSetSingleData;
 import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
 
+/**
+ * Converter aiming at producing data for ChartJS macro based on obtained JIRA statistics.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 @Component
 @Singleton
 public class JIRACreatedVsResolvedChartJSDataConverter
@@ -61,6 +67,7 @@ public class JIRACreatedVsResolvedChartJSDataConverter
             }
         }
 
+        // FIXME: all labels should use translations.
         chartJSDataSource.setLabels(labels);
         ChartJSDataSetSingleData createdDataSet = new ChartJSDataSetSingleData();
         createdDataSet.setData(createdData);
@@ -102,6 +109,9 @@ public class JIRACreatedVsResolvedChartJSDataConverter
                 break;
 
             case HOURLY:
+                dateFormat.applyPattern("yyyy-MM-dd hh:mm");
+                break;
+
             case WEEKLY:
             case DAILY:
             default:

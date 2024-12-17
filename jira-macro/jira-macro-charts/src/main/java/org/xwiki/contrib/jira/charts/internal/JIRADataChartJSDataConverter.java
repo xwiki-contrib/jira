@@ -22,9 +22,25 @@ package org.xwiki.contrib.jira.charts.internal;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
+import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 
+/**
+ * Allow to convert JIRA representation of data in the format supported by ChartJS.
+ *
+ * @param <T> the type of the JIRA data representation.
+ * @param <U> the type of macro parameters.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 @Role
 public interface JIRADataChartJSDataConverter<T extends AbstractJIRADataSource, U extends AbstractChartMacroParameters>
 {
+    /**
+     * Convert the given data using the provided macro parameters, to obtain a ChartJS representation.
+     * @param dataSource the data to convert.
+     * @param macroParameters the parameters that have been used to obtain the data.
+     * @return a ChartJS representation of the data.
+     */
     ChartJSDataSource convert(T dataSource, U macroParameters);
 }
