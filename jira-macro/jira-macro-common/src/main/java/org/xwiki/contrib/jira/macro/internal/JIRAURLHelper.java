@@ -76,7 +76,7 @@ public class JIRAURLHelper
         /**
          * For the two dimensional grid charts.
          */
-        TWO_DIMENSIONAL_CHARTS("twodimensionalfilterstats/generate");
+        BIDIMENSIONAL_CHARTS("twodimensionalfilterstats/generate");
 
         private final String endpoint;
 

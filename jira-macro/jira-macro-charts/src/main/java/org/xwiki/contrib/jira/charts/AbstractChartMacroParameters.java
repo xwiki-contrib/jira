@@ -21,6 +21,8 @@ package org.xwiki.contrib.jira.charts;
 
 import org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyFeature;
+import org.xwiki.properties.annotation.PropertyGroup;
 import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
@@ -32,6 +34,7 @@ import org.xwiki.properties.annotation.PropertyMandatory;
 public abstract class AbstractChartMacroParameters extends AbstractJIRAMacroParameters
 {
     private String query;
+    private String filterId;
 
     /**
      * @return the JQL query to perform for getting issues.
@@ -45,9 +48,28 @@ public abstract class AbstractChartMacroParameters extends AbstractJIRAMacroPara
      * @param query see {@link #getQuery()}.
      */
     @PropertyDescription("the JQL query for getting issues.")
-    @PropertyMandatory
+    @PropertyGroup("query")
+    @PropertyFeature("query")
     public void setQuery(String query)
     {
         this.query = query;
+    }
+
+    /**
+     * @return the name of the saved JIRA filter to be used for the query.
+     */
+    public String getFilterId()
+    {
+        return filterId;
+    }
+
+    /**
+     * @param filterId see {@link #getFilterId()}.
+     */
+    @PropertyDescription("the name of the saved JIRA filter to be used for the query.")
+    @PropertyGroup("query")
+    public void setFilterId(String filterId)
+    {
+        this.filterId = filterId;
     }
 }

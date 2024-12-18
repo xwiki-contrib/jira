@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
@@ -59,7 +60,12 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     public U fetch(T parameters, Class<U> expectedType) throws MacroExecutionException
     {
         List<NameValuePair> parametersList = new ArrayList<NameValuePair>();
-        parametersList.add(new BasicNameValuePair("jql", parameters.getQuery()));
+
+        if (!StringUtils.isEmpty(parameters.getFilterId())) {
+            parametersList.add(new BasicNameValuePair("filterId", parameters.getFilterId()));
+        } else {
+            parametersList.add(new BasicNameValuePair("jql", parameters.getQuery()));
+        }
         parametersList.addAll(getCustomQueryParameters(parameters));
 
         JIRAServer server = this.jiraServerResolver.resolve(parameters);
