@@ -23,6 +23,13 @@ import java.util.List;
 
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for bidimensional table charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class BiDimensionalGridChartJIRADataSource extends AbstractJIRADataSource
 {
     private String xHeading;
@@ -31,51 +38,81 @@ public class BiDimensionalGridChartJIRADataSource extends AbstractJIRADataSource
     private BiDimensionalGridChartJIRARow firstRow;
     private List<BiDimensionalGridChartJIRARow> rows;
 
+    /**
+     * @return the heading name for x-axis.
+     */
     public String getxHeading()
     {
         return xHeading;
     }
 
+    /**
+     * @param xHeading see {@link #getxHeading()}.
+     */
     public void setxHeading(String xHeading)
     {
         this.xHeading = xHeading;
     }
 
+    /**
+     * @return the heading name for y-axis.
+     */
     public String getyHeading()
     {
         return yHeading;
     }
 
+    /**
+     * @param yHeading see {@link #getyHeading()}.
+     */
     public void setyHeading(String yHeading)
     {
         this.yHeading = yHeading;
     }
 
+    /**
+     * @return the total number of rows.
+     */
     public long getTotalRows()
     {
         return totalRows;
     }
 
+    /**
+     * @param totalRows see {@link #getTotalRows()}.
+     */
     public void setTotalRows(long totalRows)
     {
         this.totalRows = totalRows;
     }
 
+    /**
+     * @return all values for first row containing headings for each column.
+     */
     public BiDimensionalGridChartJIRARow getFirstRow()
     {
         return firstRow;
     }
 
+    /**
+     * @param firstRow see {@link #getFirstRow()}.
+     */
     public void setFirstRow(BiDimensionalGridChartJIRARow firstRow)
     {
         this.firstRow = firstRow;
     }
 
+    /**
+     * @return data for all rows.
+     */
     public List<BiDimensionalGridChartJIRARow> getRows()
     {
         return rows;
     }
 
+    /**
+     * @param rows see {@link #getRows()}.
+     */
     public void setRows(
         List<BiDimensionalGridChartJIRARow> rows)
     {

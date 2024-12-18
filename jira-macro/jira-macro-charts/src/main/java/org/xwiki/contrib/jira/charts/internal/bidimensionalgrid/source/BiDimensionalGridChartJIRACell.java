@@ -19,15 +19,28 @@
  */
 package org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for bidimensional table charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class BiDimensionalGridChartJIRACell
 {
     private String markup;
 
+    /**
+     * @return the actual content of a cell: this value contains some html code.
+     */
     public String getMarkup()
     {
         return markup;
     }
 
+    /**
+     * @param markup see {@link #getMarkup()}.
+     */
     public void setMarkup(String markup)
     {
         this.markup = markup;

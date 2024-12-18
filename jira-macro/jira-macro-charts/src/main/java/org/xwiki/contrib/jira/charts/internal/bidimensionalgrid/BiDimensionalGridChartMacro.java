@@ -46,6 +46,12 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.macro.RawBlockFilter;
 import org.xwiki.rendering.transformation.macro.RawBlockFilterParameters;
 
+/**
+ * Macro displaying a bidimensional table with JIRA issues statistics based on chosen x and y axis fields.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 @Component
 @Singleton
 @Named("jiraBiDimensionalGridChart")
@@ -55,7 +61,7 @@ public class BiDimensionalGridChartMacro extends AbstractMacro<BiDimensionGridCh
      * The description of the macro.
      */
     private static final String DESCRIPTION =
-        "Displays a line chart displaying the created vs resolved issues based on the performed query.";
+        "Displays a bidimensional table with JIRA issues statistics based on chosen x and y axis fields.";
 
     @Inject
     private JIRAChartDataFetcher<BiDimensionGridChartMacroParameter, BiDimensionalGridChartJIRADataSource> dataFetcher;

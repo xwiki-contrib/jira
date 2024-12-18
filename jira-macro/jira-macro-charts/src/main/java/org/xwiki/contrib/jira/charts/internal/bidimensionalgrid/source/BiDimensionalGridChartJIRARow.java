@@ -21,15 +21,28 @@ package org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source;
 
 import java.util.List;
 
+/**
+ * POJO describing JIRA answer when calling their /gadget/ REST API for bidimensional table charts.
+ * This aims at being automatically deserialized by Jackson.
+ *
+ * @version $Id$
+ * @since 9.1
+ */
 public class BiDimensionalGridChartJIRARow
 {
     private List<BiDimensionalGridChartJIRACell> cells;
 
+    /**
+     * @return values for all cells in this row.
+     */
     public List<BiDimensionalGridChartJIRACell> getCells()
     {
         return cells;
     }
 
+    /**
+     * @param cells see {@link #getCells()}.
+     */
     public void setCells(
         List<BiDimensionalGridChartJIRACell> cells)
     {

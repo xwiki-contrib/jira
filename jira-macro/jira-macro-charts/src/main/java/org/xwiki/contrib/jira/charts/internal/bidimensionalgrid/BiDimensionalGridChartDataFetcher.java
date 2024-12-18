@@ -33,7 +33,7 @@ import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.BiDimensi
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 
 /**
- * Dedicated data fetcher for the bidimensional chart specific gadget endpoint.
+ * Dedicated data fetcher for the bidimensional table chart specific gadget endpoint.
  *
  * @version $Id$
  * @since 9.1

@@ -20,7 +20,6 @@
 package org.xwiki.contrib.jira.macro;
 
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
 
 /**
@@ -46,7 +45,6 @@ public abstract class AbstractJIRAMacroParameters
      */
     @PropertyDescription("the JIRA Server URL")
     @PropertyGroup("instance")
-    @PropertyFeature("instance")
     public void setURL(String url)
     {
         this.url = url;

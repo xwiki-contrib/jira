@@ -21,9 +21,7 @@ package org.xwiki.contrib.jira.charts;
 
 import org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters;
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
-import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Define the parameters common to all chart macros.
@@ -49,7 +47,6 @@ public abstract class AbstractChartMacroParameters extends AbstractJIRAMacroPara
      */
     @PropertyDescription("the JQL query for getting issues.")
     @PropertyGroup("query")
-    @PropertyFeature("query")
     public void setQuery(String query)
     {
         this.query = query;
