@@ -75,6 +75,66 @@
           </includes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <analysisConfiguration>
+            <revapi.filter>
+              <archives>
+                <!-- We don't care about breakages coming from XWiki Standard. -->
+                <exclude>
+                  <item>org\.xwiki\.commons:.*:.*</item>
+                  <item>org\.xwiki\.rendering:.*:.*</item>
+                  <item>org\.xwiki\.platform:.*:.*</item>
+                </exclude>
+              </archives>
+            </revapi.filter>
+            <!-- It's important to use combine.children as otherwise the merged with revapi entries in the parent
+                 is not working well as individual items inside <item> are merged. For example, we get:
+
+                 <revapi.differences>
+                   <differences>
+                     <item>
+                       <criticality>allowed</criticality>
+                       <ignore>true</ignore>
+                       <code>java.class.removed</code>
+                       <old>interface org.xwiki.rendering.macro.figure.FigureTypeRecognizer</old>
+                       <justification>API moved to figure-macro-api, not a real breakage</justification>
+                       <new>method void org.xwiki.store.TemporaryAttachmentSessionsManager::temporarilyAtta[...]</new>
+                    </item>
+                  </differences>
+                  <justification>Unstable API</justification>
+                  <criticality>documented</criticality>
+                </revapi.differences>
+
+                Instead of:
+
+                <revapi.differences>
+                  <differences combine.children="append">
+                    <item>
+                      <ignore>true</ignore>
+                      <code>java.method.addedToInterface</code>
+                      <new>method void org.xwiki.store.TemporaryAttachmentSessionsManager::temporarilyAtta[...]</new>
+                      <justification>New method needed in the unstable interface for temporary [...].</justification>
+                    </item>
+                    [...]
+                    <item>
+                      <criticality>allowed</criticality>
+                      <ignore>true</ignore>
+                      <code>java.class.removed</code>
+                      <old>interface org.xwiki.rendering.macro.figure.FigureTypeRecognizer</old>
+                      <justification>API moved to figure-macro-api, not a real breakage</justification>
+                    </item>
+                  </differences>
+                  <justification>Unstable API</justification>
+                  <criticality>documented</criticality>
+                </revapi.differences>
+            -->
+
+          </analysisConfiguration>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <profiles>
