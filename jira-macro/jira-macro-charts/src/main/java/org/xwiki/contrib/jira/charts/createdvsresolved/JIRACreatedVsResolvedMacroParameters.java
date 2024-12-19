@@ -22,6 +22,7 @@ package org.xwiki.contrib.jira.charts.createdvsresolved;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.stability.Unstable;
 
 /**
  * Define the parameters for the JIRA Created Vs Resolved macro.
@@ -29,6 +30,7 @@ import org.xwiki.properties.annotation.PropertyMandatory;
  * @version $Id$
  * @since 10.0
  */
+@Unstable
 public class JIRACreatedVsResolvedMacroParameters extends AbstractChartMacroParameters
 {
     private ChartPeriod period;

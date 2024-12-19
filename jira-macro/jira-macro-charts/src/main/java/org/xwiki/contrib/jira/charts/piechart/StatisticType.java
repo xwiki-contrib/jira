@@ -19,12 +19,15 @@
  */
 package org.xwiki.contrib.jira.charts.piechart;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Define the type of statistics to display in with the pie chart graph.
  *
  * @version $Id$
  * @since 10.0
  */
+@Unstable
 public enum StatisticType
 {
     /**

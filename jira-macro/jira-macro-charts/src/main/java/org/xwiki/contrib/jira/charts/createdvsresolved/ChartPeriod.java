@@ -19,12 +19,15 @@
  */
 package org.xwiki.contrib.jira.charts.createdvsresolved;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Define the possible period of time to use for getting created vs resolved statistics.
  *
  * @version $Id$
  * @since 10.0
  */
+@Unstable
 public enum ChartPeriod
 {
     /**

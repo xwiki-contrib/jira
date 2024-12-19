@@ -23,6 +23,7 @@ import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.stability.Unstable;
 
 /**
  * Define the parameters for the JIRA Pie Chart macro.
@@ -30,6 +31,7 @@ import org.xwiki.properties.annotation.PropertyMandatory;
  * @version $Id$
  * @since 10.0
  */
+@Unstable
 public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
 {
     private StatisticType type;

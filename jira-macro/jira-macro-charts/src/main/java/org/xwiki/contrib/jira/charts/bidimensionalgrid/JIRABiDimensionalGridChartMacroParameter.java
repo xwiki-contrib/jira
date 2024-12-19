@@ -22,6 +22,7 @@ package org.xwiki.contrib.jira.charts.bidimensionalgrid;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.stability.Unstable;
 
 /**
  * Macro parameters for the bidimensional grid chart macro.
@@ -29,6 +30,7 @@ import org.xwiki.properties.annotation.PropertyMandatory;
  * @version $Id$
  * @since 10.0
  */
+@Unstable
 public class JIRABiDimensionalGridChartMacroParameter extends AbstractChartMacroParameters
 {
     private JIRAField xAxisField;

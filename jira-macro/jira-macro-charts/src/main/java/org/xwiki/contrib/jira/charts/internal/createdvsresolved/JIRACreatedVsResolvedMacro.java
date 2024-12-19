@@ -19,10 +19,10 @@
  */
 package org.xwiki.contrib.jira.charts.internal.createdvsresolved;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -75,7 +75,7 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
     public JIRACreatedVsResolvedMacro()
     {
         super(MACRO_NAME, DESCRIPTION, null, JIRACreatedVsResolvedMacroParameters.class);
-        setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -106,6 +106,6 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
 
         MacroBlock macroBlock = new MacroBlock("chartjs", chartJSParameterMap, json, false);
 
-        return Collections.singletonList(macroBlock);
+        return List.of(macroBlock);
     }
 }

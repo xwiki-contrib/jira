@@ -22,6 +22,7 @@ package org.xwiki.contrib.jira.charts;
 import org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyGroup;
+import org.xwiki.stability.Unstable;
 
 /**
  * Define the parameters common to all chart macros.
@@ -29,6 +30,7 @@ import org.xwiki.properties.annotation.PropertyGroup;
  * @version $Id$
  * @since 10.0
  */
+@Unstable
 public abstract class AbstractChartMacroParameters extends AbstractJIRAMacroParameters
 {
     private String query;

@@ -20,8 +20,8 @@
 package org.xwiki.contrib.jira.charts.internal.bidimensionalgrid;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -79,7 +79,7 @@ public class JIRABiDimensionalGridChartMacro extends AbstractMacro<JIRABiDimensi
     public JIRABiDimensionalGridChartMacro()
     {
         super(MACRO_NAME, DESCRIPTION, null, JIRABiDimensionalGridChartMacroParameter.class);
-        setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -107,7 +107,7 @@ public class JIRABiDimensionalGridChartMacro extends AbstractMacro<JIRABiDimensi
         }
 
         TableBlock tableBlock = new TableBlock(tableRows);
-        return Collections.singletonList(tableBlock);
+        return List.of(tableBlock);
     }
 
     private TableRowBlock getTableRow(JIRABiDimensionalGridChartJIRARow rowData,

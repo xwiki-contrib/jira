@@ -19,6 +19,8 @@
  */
 package org.xwiki.contrib.jira.charts.bidimensionalgrid;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Representation of possible fields to select for x and y axises fields in bidimensional table charts.
  *
@@ -27,6 +29,7 @@ package org.xwiki.contrib.jira.charts.bidimensionalgrid;
  */
 // TODO: this should probably be improved to not rely on an enum, and to allow giving custom fields...
 // see also JIRAField defined in jira macro
+@Unstable
 public enum JIRAField
 {
     /**

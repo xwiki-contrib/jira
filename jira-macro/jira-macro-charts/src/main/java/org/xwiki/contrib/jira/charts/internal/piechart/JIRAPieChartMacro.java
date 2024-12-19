@@ -19,10 +19,10 @@
  */
 package org.xwiki.contrib.jira.charts.internal.piechart;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,7 +74,7 @@ public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters
     public JIRAPieChartMacro()
     {
         super(MACRO_NAME, DESCRIPTION, null, JIRAPieChartMacroParameters.class);
-        setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -102,6 +102,6 @@ public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters
 
         MacroBlock macroBlock = new MacroBlock("chartjs", chartJSParameterMap, json, false);
 
-        return Collections.singletonList(macroBlock);
+        return List.of(macroBlock);
     }
 }

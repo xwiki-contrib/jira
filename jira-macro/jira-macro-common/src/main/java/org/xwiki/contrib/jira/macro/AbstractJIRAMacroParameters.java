@@ -21,6 +21,7 @@ package org.xwiki.contrib.jira.macro;
 
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyGroup;
+import org.xwiki.stability.Unstable;
 
 /**
  * Common parameters for all JIRA macros.
@@ -28,6 +29,7 @@ import org.xwiki.properties.annotation.PropertyGroup;
  * @version $Id$
  * @since 10.0
  */
+@Unstable
 public abstract class AbstractJIRAMacroParameters
 {
     /**
