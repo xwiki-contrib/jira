@@ -44,7 +44,6 @@ public class JIRACreatedVsResolvedMacroParameters extends AbstractChartMacroPara
     {
         this.isCount = true;
         this.displayVersion = DisplayVersion.NONE;
-        this.daysPreviously = 60;
     }
 
     /**
