@@ -27,7 +27,7 @@ import org.xwiki.properties.annotation.PropertyGroup;
  * Define the parameters common to all chart macros.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 public abstract class AbstractChartMacroParameters extends AbstractJIRAMacroParameters
 {

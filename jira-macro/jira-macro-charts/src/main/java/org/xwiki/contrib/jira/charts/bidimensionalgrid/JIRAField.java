@@ -23,7 +23,7 @@ package org.xwiki.contrib.jira.charts.bidimensionalgrid;
  * Representation of possible fields to select for x and y axises fields in bidimensional table charts.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 // TODO: this should probably be improved to not rely on an enum, and to allow giving custom fields...
 // see also JIRAField defined in jira macro

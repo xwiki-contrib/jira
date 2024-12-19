@@ -37,7 +37,7 @@ import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
  * Dedicated converter to transform the pie chart data information obtained from JIRA to ChartJS piechart data.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component
 @Singleton

@@ -27,11 +27,10 @@ import org.xwiki.properties.annotation.PropertyMandatory;
  * Macro parameters for the bidimensional grid chart macro.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
-public class BiDimensionGridChartMacroParameter extends AbstractChartMacroParameters
+public class JIRABiDimensionalGridChartMacroParameter extends AbstractChartMacroParameters
 {
-    // FIXME: right now the JIRAField is limiting to a predefined set of field?
     private JIRAField xAxisField;
     private JIRAField yAxisField;
     private int numberOfResults;
@@ -41,7 +40,7 @@ public class BiDimensionGridChartMacroParameter extends AbstractChartMacroParame
     /**
      * Default constructor.
      */
-    public BiDimensionGridChartMacroParameter()
+    public JIRABiDimensionalGridChartMacroParameter()
     {
         this.numberOfResults = 5;
         this.isSortAscending = true;

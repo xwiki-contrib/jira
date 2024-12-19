@@ -31,7 +31,7 @@ import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
  * @param <U> the type of macro parameters.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Role
 public interface JIRADataChartJSDataConverter<T extends AbstractJIRADataSource, U extends AbstractChartMacroParameters>

@@ -23,7 +23,7 @@ package org.xwiki.contrib.jira.charts.piechart;
  * Define the type of statistics to display in with the pie chart graph.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 public enum StatisticType
 {

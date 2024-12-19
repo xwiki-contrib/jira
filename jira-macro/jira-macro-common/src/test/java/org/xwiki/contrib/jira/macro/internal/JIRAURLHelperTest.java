@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link JIRAURLHelper}.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @ComponentTest
 class JIRAURLHelperTest

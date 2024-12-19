@@ -27,21 +27,21 @@ import javax.inject.Singleton;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.jira.charts.bidimensionalgrid.BiDimensionGridChartMacroParameter;
+import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRABiDimensionalGridChartMacroParameter;
 import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
-import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.BiDimensionalGridChartJIRADataSource;
+import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRADataSource;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 
 /**
  * Dedicated data fetcher for the bidimensional table chart specific gadget endpoint.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component
 @Singleton
-public class BiDimensionalGridChartDataFetcher
-    extends AbstractJIRAChartDataFetcher<BiDimensionGridChartMacroParameter, BiDimensionalGridChartJIRADataSource>
+public class JIRABiDimensionalGridChartDataFetcher
+    extends AbstractJIRAChartDataFetcher<JIRABiDimensionalGridChartMacroParameter, JIRABiDimensionalGridChartJIRADataSource>
 {
     @Override
     public JIRAURLHelper.GadgetType getGadgetType()
@@ -50,7 +50,7 @@ public class BiDimensionalGridChartDataFetcher
     }
 
     @Override
-    public List<NameValuePair> getCustomQueryParameters(BiDimensionGridChartMacroParameter parameters)
+    public List<NameValuePair> getCustomQueryParameters(JIRABiDimensionalGridChartMacroParameter parameters)
     {
         List<NameValuePair> result = new ArrayList<>();
         result.add(new BasicNameValuePair("xstattype", parameters.getxAxisField().getQueryName()));

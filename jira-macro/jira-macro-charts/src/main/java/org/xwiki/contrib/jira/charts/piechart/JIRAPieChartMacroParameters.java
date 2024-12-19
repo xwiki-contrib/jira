@@ -20,6 +20,7 @@
 package org.xwiki.contrib.jira.charts.piechart;
 
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
+import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 
@@ -27,11 +28,17 @@ import org.xwiki.properties.annotation.PropertyMandatory;
  * Define the parameters for the JIRA Pie Chart macro.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
 {
     private StatisticType type;
+    private int maxData;
+
+    public JIRAPieChartMacroParameters()
+    {
+        this.maxData = 10;
+    }
 
     /**
      * @return the type of statistics to display in the pie chart.
@@ -49,5 +56,24 @@ public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
     public void setType(StatisticType type)
     {
         this.type = type;
+    }
+
+    /**
+     * @return the maximum number of data to display in the pie chart.
+     */
+    public int getMaxData()
+    {
+        return maxData;
+    }
+
+    /**
+     * @param maxData see {@link #getMaxData()}.
+     */
+    @PropertyDescription("The maximum number of data to display in the pie chart: if there's more data they will be "
+        + "displayed aggregated.")
+    @PropertyAdvanced
+    public void setMaxData(int maxData)
+    {
+        this.maxData = maxData;
     }
 }

@@ -31,7 +31,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  * @param <U> the type of JIRA data source to obtain.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Role
 public interface JIRAChartDataFetcher<T extends AbstractChartMacroParameters, U extends AbstractJIRADataSource>

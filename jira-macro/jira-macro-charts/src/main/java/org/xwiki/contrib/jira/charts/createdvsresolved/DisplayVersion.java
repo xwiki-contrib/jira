@@ -23,7 +23,7 @@ package org.xwiki.contrib.jira.charts.createdvsresolved;
  * Define the possible values for displaying versions in created vs resolved charts.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 public enum DisplayVersion
 {

@@ -42,7 +42,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  * @param <U> the type of the JIRA data source to obtain.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroParameters,
     U extends AbstractJIRADataSource> implements JIRAChartDataFetcher<T, U>

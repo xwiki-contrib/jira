@@ -36,7 +36,7 @@ import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
  * Dedicated component to fetch piechart information from JIRA.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component
 @Singleton

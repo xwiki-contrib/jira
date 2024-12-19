@@ -28,11 +28,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.jira.charts.bidimensionalgrid.BiDimensionGridChartMacroParameter;
+import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRABiDimensionalGridChartMacroParameter;
 import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
-import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.BiDimensionalGridChartJIRACell;
-import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.BiDimensionalGridChartJIRADataSource;
-import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.BiDimensionalGridChartJIRARow;
+import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRACell;
+import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRADataSource;
+import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRARow;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.TableBlock;
@@ -50,13 +50,15 @@ import org.xwiki.rendering.transformation.macro.RawBlockFilterParameters;
  * Macro displaying a bidimensional table with JIRA issues statistics based on chosen x and y axis fields.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component
 @Singleton
-@Named("jiraBiDimensionalGridChart")
-public class BiDimensionalGridChartMacro extends AbstractMacro<BiDimensionGridChartMacroParameter>
+@Named(JIRABiDimensionalGridChartMacro.MACRO_NAME)
+public class JIRABiDimensionalGridChartMacro extends AbstractMacro<JIRABiDimensionalGridChartMacroParameter>
 {
+    static final String MACRO_NAME = "jiraBiDimensionalGridChart";
+
     /**
      * The description of the macro.
      */
@@ -64,7 +66,7 @@ public class BiDimensionalGridChartMacro extends AbstractMacro<BiDimensionGridCh
         "Displays a bidimensional table with JIRA issues statistics based on chosen x and y axis fields.";
 
     @Inject
-    private JIRAChartDataFetcher<BiDimensionGridChartMacroParameter, BiDimensionalGridChartJIRADataSource> dataFetcher;
+    private JIRAChartDataFetcher<JIRABiDimensionalGridChartMacroParameter, JIRABiDimensionalGridChartJIRADataSource> dataFetcher;
 
     @Inject
     @Named("html")
@@ -73,9 +75,9 @@ public class BiDimensionalGridChartMacro extends AbstractMacro<BiDimensionGridCh
     /**
      * Create and initialize the descriptor of the macro.
      */
-    public BiDimensionalGridChartMacro()
+    public JIRABiDimensionalGridChartMacro()
     {
-        super("jiraBiDimensionalGridChart", DESCRIPTION, null, BiDimensionGridChartMacroParameter.class);
+        super(MACRO_NAME, DESCRIPTION, null, JIRABiDimensionalGridChartMacroParameter.class);
         setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
     }
 
@@ -86,11 +88,11 @@ public class BiDimensionalGridChartMacro extends AbstractMacro<BiDimensionGridCh
     }
 
     @Override
-    public List<Block> execute(BiDimensionGridChartMacroParameter parameters, String content,
+    public List<Block> execute(JIRABiDimensionalGridChartMacroParameter parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        BiDimensionalGridChartJIRADataSource dataSource =
-            this.dataFetcher.fetch(parameters, BiDimensionalGridChartJIRADataSource.class);
+        JIRABiDimensionalGridChartJIRADataSource dataSource =
+            this.dataFetcher.fetch(parameters, JIRABiDimensionalGridChartJIRADataSource.class);
 
         RawBlockFilterParameters rawBlockFilterParameters = new RawBlockFilterParameters(context);
         rawBlockFilterParameters.setRestricted(true);
@@ -99,7 +101,7 @@ public class BiDimensionalGridChartMacro extends AbstractMacro<BiDimensionGridCh
         List<Block> tableRows = new ArrayList<>();
 
         tableRows.add(getTableRow(dataSource.getFirstRow(), rawBlockFilterParameters, true, dataSource.getyHeading()));
-        for (BiDimensionalGridChartJIRARow row : dataSource.getRows()) {
+        for (JIRABiDimensionalGridChartJIRARow row : dataSource.getRows()) {
             tableRows.add(getTableRow(row, rawBlockFilterParameters, false, null));
         }
 
@@ -107,7 +109,7 @@ public class BiDimensionalGridChartMacro extends AbstractMacro<BiDimensionGridCh
         return Collections.singletonList(tableBlock);
     }
 
-    private TableRowBlock getTableRow(BiDimensionalGridChartJIRARow rowData,
+    private TableRowBlock getTableRow(JIRABiDimensionalGridChartJIRARow rowData,
         RawBlockFilterParameters filterParameters, boolean isHead, String headingName)
         throws MacroExecutionException
     {
@@ -115,7 +117,7 @@ public class BiDimensionalGridChartMacro extends AbstractMacro<BiDimensionGridCh
         if (isHead) {
             tableCells.add(new TableHeadCellBlock(List.of(getCleanRawBlock(headingName, filterParameters))));
         }
-        for (BiDimensionalGridChartJIRACell cell : rowData.getCells()) {
+        for (JIRABiDimensionalGridChartJIRACell cell : rowData.getCells()) {
             List<Block> listBlock = List.of(getCleanRawBlock(cell.getMarkup(), filterParameters));
             Block cellBlock = (isHead) ? new TableHeadCellBlock(listBlock) : new TableCellBlock(listBlock);
             tableCells.add(cellBlock);

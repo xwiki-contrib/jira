@@ -39,7 +39,7 @@ import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
  * Converter aiming at producing data for ChartJS macro based on obtained JIRA statistics.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component
 @Singleton

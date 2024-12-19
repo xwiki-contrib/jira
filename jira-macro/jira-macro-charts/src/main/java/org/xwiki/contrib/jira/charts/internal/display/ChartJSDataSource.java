@@ -26,7 +26,7 @@ import java.util.List;
  * This class aims at being automatically serialized by Jackson.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 public class ChartJSDataSource
 {

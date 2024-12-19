@@ -24,7 +24,7 @@ package org.xwiki.contrib.jira.charts.internal.source;
  * Note that those POJOs aims at being automatically deserialized by Jackson and never instantiated manually.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 public abstract class AbstractJIRADataSource
 {

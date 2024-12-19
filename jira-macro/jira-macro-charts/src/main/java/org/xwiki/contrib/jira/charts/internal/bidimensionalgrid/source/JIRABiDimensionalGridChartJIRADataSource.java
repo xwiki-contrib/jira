@@ -28,15 +28,15 @@ import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
  * This aims at being automatically deserialized by Jackson.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
-public class BiDimensionalGridChartJIRADataSource extends AbstractJIRADataSource
+public class JIRABiDimensionalGridChartJIRADataSource extends AbstractJIRADataSource
 {
     private String xHeading;
     private String yHeading;
     private long totalRows;
-    private BiDimensionalGridChartJIRARow firstRow;
-    private List<BiDimensionalGridChartJIRARow> rows;
+    private JIRABiDimensionalGridChartJIRARow firstRow;
+    private List<JIRABiDimensionalGridChartJIRARow> rows;
 
     /**
      * @return the heading name for x-axis.
@@ -89,7 +89,7 @@ public class BiDimensionalGridChartJIRADataSource extends AbstractJIRADataSource
     /**
      * @return all values for first row containing headings for each column.
      */
-    public BiDimensionalGridChartJIRARow getFirstRow()
+    public JIRABiDimensionalGridChartJIRARow getFirstRow()
     {
         return firstRow;
     }
@@ -97,7 +97,7 @@ public class BiDimensionalGridChartJIRADataSource extends AbstractJIRADataSource
     /**
      * @param firstRow see {@link #getFirstRow()}.
      */
-    public void setFirstRow(BiDimensionalGridChartJIRARow firstRow)
+    public void setFirstRow(JIRABiDimensionalGridChartJIRARow firstRow)
     {
         this.firstRow = firstRow;
     }
@@ -105,7 +105,7 @@ public class BiDimensionalGridChartJIRADataSource extends AbstractJIRADataSource
     /**
      * @return data for all rows.
      */
-    public List<BiDimensionalGridChartJIRARow> getRows()
+    public List<JIRABiDimensionalGridChartJIRARow> getRows()
     {
         return rows;
     }
@@ -114,7 +114,7 @@ public class BiDimensionalGridChartJIRADataSource extends AbstractJIRADataSource
      * @param rows see {@link #getRows()}.
      */
     public void setRows(
-        List<BiDimensionalGridChartJIRARow> rows)
+        List<JIRABiDimensionalGridChartJIRARow> rows)
     {
         this.rows = rows;
     }

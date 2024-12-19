@@ -38,7 +38,7 @@ import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
  * Dedicated data fetcher for the created vs resolved specific gadget endpoint.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component
 @Singleton

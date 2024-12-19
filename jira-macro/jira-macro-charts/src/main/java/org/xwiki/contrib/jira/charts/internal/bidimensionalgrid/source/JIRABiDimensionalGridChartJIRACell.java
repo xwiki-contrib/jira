@@ -24,9 +24,9 @@ package org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source;
  * This aims at being automatically deserialized by Jackson.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
-public class BiDimensionalGridChartJIRACell
+public class JIRABiDimensionalGridChartJIRACell
 {
     private String markup;
 

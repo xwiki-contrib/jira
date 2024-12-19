@@ -37,7 +37,7 @@ import org.xwiki.contrib.jira.config.JIRAServer;
  * Utility component to build URLs for requesting JIRA.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component(roles = JIRAURLHelper.class)
 @Singleton

@@ -47,13 +47,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Displays a line chart based on the created vs resolved query statistics.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component
-@Named("jiraCreatedVsResolved")
+@Named(JIRACreatedVsResolvedMacro.MACRO_NAME)
 @Singleton
 public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResolvedMacroParameters>
 {
+    static final String MACRO_NAME = "jiraCreatedVsResolvedChart";
+
     /**
      * The description of the macro.
      */
@@ -72,7 +74,7 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
      */
     public JIRACreatedVsResolvedMacro()
     {
-        super("jiraCreatedVsResolved", DESCRIPTION, null, JIRACreatedVsResolvedMacroParameters.class);
+        super(MACRO_NAME, DESCRIPTION, null, JIRACreatedVsResolvedMacroParameters.class);
         setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
     }
 
@@ -89,6 +91,7 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
         JIRACreatedVsResolvedDataSource dataSource =
             this.dataFetcher.fetch(parameters, JIRACreatedVsResolvedDataSource.class);
 
+        // TODO: duplicated code, we could abstract this
         ChartJSDataSource convert = this.converter.convert(dataSource, parameters);
         String json;
         try {

@@ -28,7 +28,7 @@ import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
  * This aims at being automatically deserialized by Jackson.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 public class JIRAPieChartDataSource extends AbstractJIRADataSource
 {

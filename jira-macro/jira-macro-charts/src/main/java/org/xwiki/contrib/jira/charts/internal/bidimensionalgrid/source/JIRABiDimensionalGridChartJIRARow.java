@@ -26,16 +26,16 @@ import java.util.List;
  * This aims at being automatically deserialized by Jackson.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
-public class BiDimensionalGridChartJIRARow
+public class JIRABiDimensionalGridChartJIRARow
 {
-    private List<BiDimensionalGridChartJIRACell> cells;
+    private List<JIRABiDimensionalGridChartJIRACell> cells;
 
     /**
      * @return values for all cells in this row.
      */
-    public List<BiDimensionalGridChartJIRACell> getCells()
+    public List<JIRABiDimensionalGridChartJIRACell> getCells()
     {
         return cells;
     }
@@ -44,7 +44,7 @@ public class BiDimensionalGridChartJIRARow
      * @param cells see {@link #getCells()}.
      */
     public void setCells(
-        List<BiDimensionalGridChartJIRACell> cells)
+        List<JIRABiDimensionalGridChartJIRACell> cells)
     {
         this.cells = cells;
     }

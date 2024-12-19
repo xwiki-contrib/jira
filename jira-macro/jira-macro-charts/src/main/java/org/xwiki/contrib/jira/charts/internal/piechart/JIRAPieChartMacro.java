@@ -47,13 +47,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Displays a pie chart based on the performed query.
  *
  * @version $Id$
- * @since 9.1
+ * @since 10.0
  */
 @Component
-@Named("jiraPieChart")
+@Named(JIRAPieChartMacro.MACRO_NAME)
 @Singleton
 public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters>
 {
+    static final String MACRO_NAME = "jiraPieChart";
+
     /**
      * The description of the macro.
      */
@@ -71,7 +73,7 @@ public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters
      */
     public JIRAPieChartMacro()
     {
-        super("jiraPieChart", DESCRIPTION, null, JIRAPieChartMacroParameters.class);
+        super(MACRO_NAME, DESCRIPTION, null, JIRAPieChartMacroParameters.class);
         setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
     }
 
@@ -85,7 +87,7 @@ public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters
     public List<Block> execute(JIRAPieChartMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        // TODO: introduce a maximum number of elements to be displayed in the piechart (default should be 10)
+        // TODO: handle #getMaxData
         JIRAPieChartDataSource dataSource = this.dataFetcher.fetch(parameters, JIRAPieChartDataSource.class);
         ChartJSDataSource convert = this.converter.convert(dataSource, parameters);
         String json;
