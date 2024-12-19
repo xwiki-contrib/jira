@@ -52,11 +52,6 @@ public class JIRAMacroParameters extends AbstractJIRAMacroParameters
      */
     private List<String> fieldNames;
 
-    /**
-     * @see #getFieldNames()
-     */
-    private List<String> fieldTypes;
-
     private Properties extraParameters = new Properties();
 
     private int maxCount = -1;
