@@ -61,6 +61,7 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     {
         List<NameValuePair> parametersList = new ArrayList<NameValuePair>();
 
+        // TODO: check format of filterId
         if (!StringUtils.isEmpty(parameters.getFilterId())) {
             parametersList.add(new BasicNameValuePair("filterId", parameters.getFilterId()));
         } else {
