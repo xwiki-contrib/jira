@@ -17,26 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.macro.internal.source;
+package org.xwiki.contrib.jira.macro.internal;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-import org.xwiki.rendering.macro.MacroExecutionException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.IOUtils;
 
 /**
- * Resolve the {@link org.xwiki.contrib.jira.config.JIRAServer} from the Macro parameters and configuration.
+ * Extracts error messages from JIRA HTML responses.
  *
  * @version $Id$
- * @since 8.6.3
  */
-@Role
-public interface JIRAServerResolver
+public class ErrorMessageExtractor
 {
+    private static final Pattern PATTERN = Pattern.compile("<h1>(.*)</h1>");
+
     /**
-     * @param parameters the parameters of the called jira macro
-     * @return the resolved {@link JIRAServer} taken from the macro parameters if defined or from the configuration
-     * @throws MacroExecutionException if it cannot be resolved (not defined in either places)
+     * @param contentStream the stream containing the HTML content with the error message
+     * @return the extracted error message
+     * @throws IOException in case of reading error
      */
-    JIRAServer resolve(JIRAMacroParameters parameters) throws MacroExecutionException;
+    String extract(InputStream contentStream) throws IOException
+    {
+        String result;
+        String content = IOUtils.toString(contentStream, "UTF-8");
+        Matcher matcher = PATTERN.matcher(content);
+        if (matcher.find()) {
+            result = matcher.group(1);
+        } else {
+            result = "Unknown error";
+        }
+        return result;
+    }
 }

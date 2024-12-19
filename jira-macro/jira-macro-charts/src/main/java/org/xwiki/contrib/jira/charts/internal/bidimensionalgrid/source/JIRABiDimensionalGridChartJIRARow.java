@@ -17,39 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.macro.internal.source;
+package org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.io.IOUtils;
+import java.util.List;
 
 /**
- * Extracts error messages from JIRA HTML responses.
+ * POJO describing JIRA answer when calling their /gadget/ REST API for bidimensional table charts.
+ * This aims at being automatically deserialized by Jackson.
  *
  * @version $Id$
+ * @since 10.0
  */
-public class ErrorMessageExtractor
+public class JIRABiDimensionalGridChartJIRARow
 {
-    private static final Pattern PATTERN = Pattern.compile("<h1>(.*)</h1>");
+    private List<JIRABiDimensionalGridChartJIRACell> cells;
 
     /**
-     * @param contentStream the stream containing the HTML content with the error message
-     * @return the extracted error message
-     * @throws IOException in case of reading error
+     * @return values for all cells in this row.
      */
-    String extract(InputStream contentStream) throws IOException
+    public List<JIRABiDimensionalGridChartJIRACell> getCells()
     {
-        String result;
-        String content = IOUtils.toString(contentStream, "UTF-8");
-        Matcher matcher = PATTERN.matcher(content);
-        if (matcher.find()) {
-            result = matcher.group(1);
-        } else {
-            result = "Unknown error";
-        }
-        return result;
+        return cells;
+    }
+
+    /**
+     * @param cells see {@link #getCells()}.
+     */
+    public void setCells(
+        List<JIRABiDimensionalGridChartJIRACell> cells)
+    {
+        this.cells = cells;
     }
 }

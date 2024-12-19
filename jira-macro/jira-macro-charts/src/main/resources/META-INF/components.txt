@@ -1,0 +1,8 @@
+org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.JIRABiDimensionalGridChartDataFetcher
+org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.JIRABiDimensionalGridChartMacro
+org.xwiki.contrib.jira.charts.internal.createdvsresolved.JIRACreatedVsResolvedChartJSDataConverter
+org.xwiki.contrib.jira.charts.internal.createdvsresolved.JIRACreatedVsResolvedDataFetcher
+org.xwiki.contrib.jira.charts.internal.createdvsresolved.JIRACreatedVsResolvedMacro
+org.xwiki.contrib.jira.charts.internal.piechart.JIRAPieChartChartJSDataConverter
+org.xwiki.contrib.jira.charts.internal.piechart.JIRAPieChartDataFetcher
+org.xwiki.contrib.jira.charts.internal.piechart.JIRAPieChartMacro

@@ -131,7 +131,41 @@
                   <criticality>documented</criticality>
                 </revapi.differences>
             -->
-
+            <revapi.differences>
+              <criticality>allowed</criticality>
+              <justification>Those annotation have no impact on API and on macro usage: they just change
+              how the UI is handling these parameters.</justification>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.contrib.jira.macro.JIRAMacroParameters::setId(java.lang.String)</old>
+                  <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.macro.JIRAMacroParameters</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyGroup({"instance"})</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.contrib.jira.macro.JIRAMacroParameters::setURL(java.lang.String)</old>
+                  <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setURL(java.lang.String) @ org.xwiki.contrib.jira.macro.JIRAMacroParameters</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyGroup({"instance"})</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <criticality>allowed</criticality>
+              <justification>The macro parameters have been refactored to use a common abstraction, this
+              shouldn't have any impact.</justification>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class org.xwiki.contrib.jira.macro.JIRAMacroParameters</old>
+                  <new>class org.xwiki.contrib.jira.macro.JIRAMacroParameters</new>
+                  <superClass>org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters</superClass>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

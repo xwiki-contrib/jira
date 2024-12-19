@@ -28,17 +28,19 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.xwiki.contrib.jira.macro.JIRAField.*;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -51,36 +53,39 @@ import static org.mockito.Mockito.*;
 @ComponentList({
     DefaultJIRAServerResolver.class
 })
-public class ListJIRADataSourceTest
+@ComponentTest
+class ListJIRADataSourceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ListJIRADataSource> mocker =
-        new MockitoComponentMockingRule<>(ListJIRADataSource.class, Arrays.asList(JIRAServerResolver.class));
+    @InjectMockComponents
+    private ListJIRADataSource jiraDataSource;
+
+    @MockComponent
+    private JIRAConfiguration jiraConfiguration;
 
     @Test
-    public void parseIdsWhenNull() throws Exception
+    void parseIdsWhenNull() throws Exception
     {
-        assertEquals(Collections.emptyList(), this.mocker.getComponentUnderTest().parseIds(null));
+        assertEquals(Collections.emptyList(), this.jiraDataSource.parseIds(null));
     }
 
     @Test
-    public void parseIds() throws Exception
+    void parseIds() throws Exception
     {
         List<Pair<String, String>> expected = Arrays.asList(
             new ImmutablePair<>("ISSUE-1", ""),
             new ImmutablePair<>("ISSUE-2", "Whatever"),
             new ImmutablePair<>("ISSUE-3", ""));
         assertEquals(expected,
-            this.mocker.getComponentUnderTest().parseIds("\nISSUE-1\nISSUE-2 |Whatever \n ISSUE-3\n"));
+            this.jiraDataSource.parseIds("\nISSUE-1\nISSUE-2 |Whatever \n ISSUE-3\n"));
     }
 
     @Test
-    public void constructJQLQuery() throws Exception
+    void constructJQLQuery() throws Exception
     {
         List<Pair<String, String>> ids = Arrays.asList(
             new ImmutablePair<>("ISSUE-1", ""),
             new ImmutablePair<>("ISSUE-2", "Whatever"));
-        assertEquals("issueKey in (ISSUE-1,ISSUE-2)", this.mocker.getComponentUnderTest().constructJQLQuery(ids));
+        assertEquals("issueKey in (ISSUE-1,ISSUE-2)", this.jiraDataSource.constructJQLQuery(ids));
     }
 
     /**
@@ -92,14 +97,14 @@ public class ListJIRADataSourceTest
      * </ul>
      */
     @Test
-    public void buildIssues() throws Exception
+    void buildIssues() throws Exception
     {
         Document document = new SAXBuilder().build(getClass().getResourceAsStream("/__files/input.xml"));
         List<Pair<String, String>> ids = Arrays.asList(
             new ImmutablePair<>("XWIKI-1000", ""),
             new ImmutablePair<>("XWIKI-1001", "Note"));
 
-        List<Element> issues = this.mocker.getComponentUnderTest().buildIssues(document, ids);
+        List<Element> issues = this.jiraDataSource.buildIssues(document, ids);
 
         assertEquals(2, issues.size());
         Element issue1 = issues.get(0);
@@ -112,10 +117,10 @@ public class ListJIRADataSourceTest
     }
 
     @Test
-    public void getJIRAServerWhenNoneDefined() throws Exception
+    void getJIRAServerWhenNoneDefined() throws Exception
     {
         try {
-            this.mocker.getComponentUnderTest().getJIRAServer(new JIRAMacroParameters());
+            this.jiraDataSource.getJIRAServer(new JIRAMacroParameters());
             fail("should have thrown an exception");
         } catch (MacroExecutionException expected) {
             assertEquals("No JIRA Server found. You must specify a JIRA server, using the \"url\" macro parameter or "
@@ -125,12 +130,12 @@ public class ListJIRADataSourceTest
     }
 
     @Test
-    public void getJIRAServerWhenIdUsedButNoneDefined() throws Exception
+    void getJIRAServerWhenIdUsedButNoneDefined() throws Exception
     {
         JIRAMacroParameters parameters = new JIRAMacroParameters();
         parameters.setId("unknownid");
         try {
-            this.mocker.getComponentUnderTest().getJIRAServer(parameters);
+            this.jiraDataSource.getJIRAServer(parameters);
             fail("should have thrown an exception");
         } catch (MacroExecutionException expected) {
             assertEquals("The JIRA Server id [unknownid] is not defined in the macro's configuration. Please fix the "
@@ -139,48 +144,26 @@ public class ListJIRADataSourceTest
     }
 
     @Test
-    public void getJIRAServerWhenIdUsedAndDefined() throws Exception
+    void getJIRAServerWhenIdUsedAndDefined() throws Exception
     {
-        JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
-        when(configuration.getJIRAServers()).thenReturn(Collections.singletonMap("someid",
+        when(this.jiraConfiguration.getJIRAServers()).thenReturn(Collections.singletonMap("someid",
             new JIRAServer("http://localhost")));
 
         JIRAMacroParameters parameters = new JIRAMacroParameters();
         parameters.setId("someid");
-        assertEquals("http://localhost", this.mocker.getComponentUnderTest().getJIRAServer(parameters).getURL());
+        assertEquals("http://localhost", this.jiraDataSource.getJIRAServer(parameters).getURL());
     }
 
     @Test
-    public void getJIRAServerWhenURLSpecifiedAndMatchingConfigurationExist() throws Exception
+    void getJIRAServerWhenURLSpecifiedAndMatchingConfigurationExist() throws Exception
     {
-        JIRAConfiguration configuration = this.mocker.getInstance(JIRAConfiguration.class);
-        when(configuration.getJIRAServers()).thenReturn(Collections.singletonMap("whatever",
+        when(this.jiraConfiguration.getJIRAServers()).thenReturn(Collections.singletonMap("whatever",
             new JIRAServer("http://localhost", "username", "password")));
 
         JIRAMacroParameters parameters = new JIRAMacroParameters();
         parameters.setURL("http://localhost");
 
-        assertEquals("http://localhost", this.mocker.getComponentUnderTest().getJIRAServer(parameters).getURL());
-        assertEquals("username", this.mocker.getComponentUnderTest().getJIRAServer(parameters).getUsername());
-    }
-
-    @Test
-    public void computeFullURL() throws Exception
-    {
-        // No credentials passed
-        JIRAServer jiraServer = new JIRAServer("http://localhost/jira");
-        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
-            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", -1));
-
-        // Just username defined but no password (or empty password)
-        jiraServer = new JIRAServer("http://localhost/jira", "username", "");
-        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
-            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", -1));
-
-        // With Max Count and no credentials
-        jiraServer = new JIRAServer("http://localhost/jira");
-        assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
-                + "jqlQuery=query&tempMax=5",
-            this.mocker.getComponentUnderTest().computeFullURL(jiraServer, "query", 5));
+        assertEquals("http://localhost", this.jiraDataSource.getJIRAServer(parameters).getURL());
+        assertEquals("username", this.jiraDataSource.getJIRAServer(parameters).getUsername());
     }
 }
