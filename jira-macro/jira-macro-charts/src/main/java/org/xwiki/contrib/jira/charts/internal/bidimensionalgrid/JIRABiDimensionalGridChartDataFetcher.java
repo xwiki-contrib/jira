@@ -41,7 +41,8 @@ import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 @Component
 @Singleton
 public class JIRABiDimensionalGridChartDataFetcher
-    extends AbstractJIRAChartDataFetcher<JIRABiDimensionalGridChartMacroParameter, JIRABiDimensionalGridChartJIRADataSource>
+    extends AbstractJIRAChartDataFetcher<JIRABiDimensionalGridChartMacroParameter,
+    JIRABiDimensionalGridChartJIRADataSource>
 {
     @Override
     public JIRAURLHelper.GadgetType getGadgetType()

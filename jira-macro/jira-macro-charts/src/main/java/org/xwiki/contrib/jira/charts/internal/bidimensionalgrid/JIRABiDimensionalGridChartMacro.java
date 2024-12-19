@@ -66,7 +66,8 @@ public class JIRABiDimensionalGridChartMacro extends AbstractMacro<JIRABiDimensi
         "Displays a bidimensional table with JIRA issues statistics based on chosen x and y axis fields.";
 
     @Inject
-    private JIRAChartDataFetcher<JIRABiDimensionalGridChartMacroParameter, JIRABiDimensionalGridChartJIRADataSource> dataFetcher;
+    private JIRAChartDataFetcher<JIRABiDimensionalGridChartMacroParameter, JIRABiDimensionalGridChartJIRADataSource>
+        dataFetcher;
 
     @Inject
     @Named("html")

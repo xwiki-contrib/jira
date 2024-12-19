@@ -35,6 +35,9 @@ public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
     private StatisticType type;
     private int maxData;
 
+    /**
+     * Default constructor.
+     */
     public JIRAPieChartMacroParameters()
     {
         this.maxData = 10;
