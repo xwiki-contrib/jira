@@ -21,6 +21,10 @@ package org.xwiki.contrib.jira.charts.internal.display;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.text.XWikiToStringBuilder;
+
 /**
  * POJO defining the format of data requested by ChartJS.
  * This class aims at being automatically serialized by Jackson.
@@ -80,5 +84,41 @@ public class ChartJSDataSetSingleData
     public void setFill(boolean fill)
     {
         this.fill = fill;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ChartJSDataSetSingleData that = (ChartJSDataSetSingleData) o;
+
+        return new EqualsBuilder()
+            .append(fill, that.fill)
+            .append(label, that.label)
+            .append(data, that.data)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 63).append(label).append(fill).append(data).toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("label", label)
+            .append("fill", fill)
+            .append("data", data)
+            .toString();
     }
 }

@@ -50,8 +50,8 @@ public class JIRAPieChartChartJSDataConverter
         List<String> labels = new ArrayList<>();
         List<Long> values = new ArrayList<>();
 
-        List<JIRAPieChartData> results = dataSource.getResults();
-        Collections.sort(results);
+        List<JIRAPieChartData> results = new ArrayList<>(dataSource.getResults());
+        results.sort(Collections.reverseOrder());
 
         int loop = 0;
         long otherValue = 0;
@@ -66,6 +66,7 @@ public class JIRAPieChartChartJSDataConverter
         }
 
         if (loop > parameters.getMaxData()) {
+            // FIXME: use translations
             labels.add("Other data");
             values.add(otherValue);
         }

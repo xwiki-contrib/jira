@@ -85,6 +85,6 @@ public class JIRAPieChartData implements Comparable<JIRAPieChartData>
     @Override
     public int compareTo(JIRAPieChartData jiraPieChartData)
     {
-        return Math.round(jiraPieChartData.getValue() - this.getValue());
+        return Long.compare(this.value, jiraPieChartData.getValue());
     }
 }
