@@ -50,9 +50,24 @@ public class JIRAPieChartChartJSDataConverter
         List<String> labels = new ArrayList<>();
         List<Long> values = new ArrayList<>();
 
-        for (JIRAPieChartData result : dataSource.getResults()) {
-            labels.add(result.getKey());
-            values.add(result.getValue());
+        List<JIRAPieChartData> results = dataSource.getResults();
+        Collections.sort(results);
+
+        int loop = 0;
+        long otherValue = 0;
+        for (JIRAPieChartData result : results) {
+            if (loop < parameters.getMaxData()) {
+                labels.add(result.getKey());
+                values.add(result.getValue());
+            } else {
+                otherValue += result.getValue();
+            }
+            loop++;
+        }
+
+        if (loop > parameters.getMaxData()) {
+            labels.add("Other data");
+            values.add(otherValue);
         }
 
         ChartJSDataSource result = new ChartJSDataSource();

@@ -20,16 +20,18 @@
 package org.xwiki.contrib.jira.charts.internal.piechart.source;
 
 /**
- * POJO describing JIRA answer when calling their /gadget/ REST API for piechart charts.
- * This aims at being automatically deserialized by Jackson.
+ * POJO describing JIRA answer when calling their /gadget/ REST API for piechart charts. This aims at being
+ * automatically deserialized by Jackson.
  *
  * @version $Id$
  * @since 10.0
  */
-public class JIRAPieChartData
+public class JIRAPieChartData implements Comparable<JIRAPieChartData>
 {
     private String key;
+
     private long value;
+
     private String url;
 
     /**
@@ -78,5 +80,11 @@ public class JIRAPieChartData
     public void setUrl(String url)
     {
         this.url = url;
+    }
+
+    @Override
+    public int compareTo(JIRAPieChartData jiraPieChartData)
+    {
+        return Math.round(jiraPieChartData.getValue() - this.getValue());
     }
 }
