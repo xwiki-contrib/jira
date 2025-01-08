@@ -27,10 +27,13 @@ import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartData;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link JIRAPieChartChartJSDataConverter}.
@@ -42,6 +45,9 @@ class JIRAPieChartChartJSDataConverterTest
 {
     @InjectMockComponents
     private JIRAPieChartChartJSDataConverter converter;
+
+    @MockComponent
+    private ContextualLocalizationManager localizationManager;
 
     @Test
     void convert()
@@ -70,6 +76,9 @@ class JIRAPieChartChartJSDataConverterTest
         data5.setValue(14);
 
         dataSource.setResults(List.of(data1, data2, data3, data4, data5));
+
+        when(this.localizationManager.getTranslationPlain("rendering.macro.jiraPieChart.labels.otherData"))
+            .thenReturn("Other data");
 
         ChartJSDataSource expectedResult = new ChartJSDataSource();
         expectedResult.setLabels(List.of("key2", "key5", "key3", "Other data"));

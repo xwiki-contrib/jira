@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -34,6 +35,7 @@ import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreat
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedTimeData;
 import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSetSingleData;
 import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
  * Converter aiming at producing data for ChartJS macro based on obtained JIRA statistics.
@@ -46,6 +48,11 @@ import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
 public class JIRACreatedVsResolvedChartJSDataConverter
     implements JIRADataChartJSDataConverter<JIRACreatedVsResolvedDataSource, JIRACreatedVsResolvedMacroParameters>
 {
+    private static final String LOCALIZATION_PREFIX = "rendering.macro.jiraCreatedVsResolvedChart.labels.";
+
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
     @Override
     public ChartJSDataSource convert(JIRACreatedVsResolvedDataSource dataSource,
         JIRACreatedVsResolvedMacroParameters parameters)
@@ -67,23 +74,22 @@ public class JIRACreatedVsResolvedChartJSDataConverter
             }
         }
 
-        // FIXME: all labels should use translations.
         chartJSDataSource.setLabels(labels);
         ChartJSDataSetSingleData createdDataSet = new ChartJSDataSetSingleData();
         createdDataSet.setData(createdData);
-        createdDataSet.setLabel("Created");
+        createdDataSet.setLabel(this.localizationManager.getTranslationPlain(LOCALIZATION_PREFIX + "created"));
         createdDataSet.setFill(false);
 
         ChartJSDataSetSingleData resolvedDataSet = new ChartJSDataSetSingleData();
         resolvedDataSet.setData(resolvedData);
-        resolvedDataSet.setLabel("Resolved");
+        resolvedDataSet.setLabel(this.localizationManager.getTranslationPlain(LOCALIZATION_PREFIX + "resolved"));
         resolvedDataSet.setFill(false);
 
         List<ChartJSDataSetSingleData> dataSets = new ArrayList<>(List.of(createdDataSet, resolvedDataSet));
         if (parameters.isDisplayTrend()) {
             ChartJSDataSetSingleData trendDataSet = new ChartJSDataSetSingleData();
             trendDataSet.setData(trendData);
-            trendDataSet.setLabel("Trend");
+            trendDataSet.setLabel(this.localizationManager.getTranslationPlain(LOCALIZATION_PREFIX + "trend"));
             trendDataSet.setFill(false);
             dataSets.add(trendDataSet);
         }

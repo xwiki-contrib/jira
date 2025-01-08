@@ -65,7 +65,7 @@ public abstract class AbstractChartMacroParameters extends AbstractJIRAMacroPara
     /**
      * @param filterId see {@link #getFilterId()}.
      */
-    @PropertyDescription("the name of the saved JIRA filter to be used for the query.")
+    @PropertyDescription("the identifier of the saved JIRA filter to be used for the query.")
     @PropertyGroup("query")
     public void setFilterId(String filterId)
     {

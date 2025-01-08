@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -32,6 +33,7 @@ import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSetSingleData;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartData;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
  * Dedicated converter to transform the pie chart data information obtained from JIRA to ChartJS piechart data.
@@ -44,6 +46,9 @@ import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
 public class JIRAPieChartChartJSDataConverter
     implements JIRADataChartJSDataConverter<JIRAPieChartDataSource, JIRAPieChartMacroParameters>
 {
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
     @Override
     public ChartJSDataSource convert(JIRAPieChartDataSource dataSource, JIRAPieChartMacroParameters parameters)
     {
@@ -66,8 +71,7 @@ public class JIRAPieChartChartJSDataConverter
         }
 
         if (loop > parameters.getMaxData()) {
-            // FIXME: use translations
-            labels.add("Other data");
+            labels.add(this.localizationManager.getTranslationPlain("rendering.macro.jiraPieChart.labels.otherData"));
             values.add(otherValue);
         }
 
