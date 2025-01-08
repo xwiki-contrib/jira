@@ -29,19 +29,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartMacro;
 import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.JIRADataChartJSDataConverter;
-import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Displays a pie chart based on the performed query.
@@ -52,7 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 @Named(JIRAPieChartMacro.MACRO_NAME)
 @Singleton
-public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters>
+public class JIRAPieChartMacro extends AbstractJIRAChartMacro<JIRAPieChartMacroParameters, JIRAPieChartDataSource>
 {
     static final String MACRO_NAME = "jiraPieChart";
 
@@ -73,30 +69,28 @@ public class JIRAPieChartMacro extends AbstractMacro<JIRAPieChartMacroParameters
      */
     public JIRAPieChartMacro()
     {
-        super(MACRO_NAME, DESCRIPTION, null, JIRAPieChartMacroParameters.class);
+        super(MACRO_NAME, DESCRIPTION, JIRAPieChartMacroParameters.class);
         setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
+
     @Override
-    public boolean supportsInlineMode()
+    protected JIRAChartDataFetcher<JIRAPieChartMacroParameters, JIRAPieChartDataSource> getDataFetcher()
     {
-        return false;
+        return this.dataFetcher;
+    }
+
+    @Override
+    protected JIRADataChartJSDataConverter<JIRAPieChartDataSource, JIRAPieChartMacroParameters> getConverter()
+    {
+        return this.converter;
     }
 
     @Override
     public List<Block> execute(JIRAPieChartMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        // TODO: handle #getMaxData
-        JIRAPieChartDataSource dataSource = this.dataFetcher.fetch(parameters, JIRAPieChartDataSource.class);
-        ChartJSDataSource convert = this.converter.convert(dataSource, parameters);
-        String json;
-        try {
-            json = new ObjectMapper().writeValueAsString(convert);
-        } catch (JsonProcessingException e) {
-            throw new MacroExecutionException("Error when transforming data to JSON", e);
-        }
-
+        String json = this.getJSONData(parameters, JIRAPieChartDataSource.class);
         Map<String, String> chartJSParameterMap = new LinkedHashMap<>();
         chartJSParameterMap.put("type", "pie");
 

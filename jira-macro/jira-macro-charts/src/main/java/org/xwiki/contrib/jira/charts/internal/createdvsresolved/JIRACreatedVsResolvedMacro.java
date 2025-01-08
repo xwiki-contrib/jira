@@ -29,19 +29,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartMacro;
 import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.JIRADataChartJSDataConverter;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
-import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Displays a line chart based on the created vs resolved query statistics.
@@ -52,7 +48,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 @Named(JIRACreatedVsResolvedMacro.MACRO_NAME)
 @Singleton
-public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResolvedMacroParameters>
+public class JIRACreatedVsResolvedMacro
+    extends AbstractJIRAChartMacro<JIRACreatedVsResolvedMacroParameters, JIRACreatedVsResolvedDataSource>
 {
     static final String MACRO_NAME = "jiraCreatedVsResolvedChart";
 
@@ -74,32 +71,15 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
      */
     public JIRACreatedVsResolvedMacro()
     {
-        super(MACRO_NAME, DESCRIPTION, null, JIRACreatedVsResolvedMacroParameters.class);
+        super(MACRO_NAME, DESCRIPTION, JIRACreatedVsResolvedMacroParameters.class);
         setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
-    }
-
-    @Override
-    public boolean supportsInlineMode()
-    {
-        return false;
     }
 
     @Override
     public List<Block> execute(JIRACreatedVsResolvedMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        JIRACreatedVsResolvedDataSource dataSource =
-            this.dataFetcher.fetch(parameters, JIRACreatedVsResolvedDataSource.class);
-
-        // TODO: duplicated code, we could abstract this
-        ChartJSDataSource convert = this.converter.convert(dataSource, parameters);
-        String json;
-        try {
-            json = new ObjectMapper().writeValueAsString(convert);
-        } catch (JsonProcessingException e) {
-            throw new MacroExecutionException("Error when transforming data to JSON", e);
-        }
-
+        String json = getJSONData(parameters, JIRACreatedVsResolvedDataSource.class);
         // TODO: handle displaying the versions
         Map<String, String> chartJSParameterMap = new LinkedHashMap<>();
         chartJSParameterMap.put("type", "line");
@@ -107,5 +87,19 @@ public class JIRACreatedVsResolvedMacro extends AbstractMacro<JIRACreatedVsResol
         MacroBlock macroBlock = new MacroBlock("chartjs", chartJSParameterMap, json, false);
 
         return List.of(macroBlock);
+    }
+
+    @Override
+    protected JIRAChartDataFetcher<JIRACreatedVsResolvedMacroParameters, JIRACreatedVsResolvedDataSource>
+        getDataFetcher()
+    {
+        return this.dataFetcher;
+    }
+
+    @Override
+    protected JIRADataChartJSDataConverter<JIRACreatedVsResolvedDataSource, JIRACreatedVsResolvedMacroParameters>
+        getConverter()
+    {
+        return this.converter;
     }
 }
