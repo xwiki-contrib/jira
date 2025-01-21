@@ -20,23 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib.jira</groupId>
-    <artifactId>jira</artifactId>
+    <artifactId>jira-macro</artifactId>
     <version>10.0-SNAPSHOT</version>
   </parent>
-  <artifactId>jira-macro</artifactId>
-  <name>JIRA - Macro - Parent POM</name>
+  <artifactId>jira-macro-paste</artifactId>
+  <name>JIRA - Macro - CKEditor Paste Plugin - Parent POM</name>
   <packaging>pom</packaging>
-  <description>JIRA - Macro - Parent POM</description>
+  <description>The parent POM of the CKEditor paste plugin.</description>
   <modules>
-    <!-- Sorted Alphabetically -->
-    <module>jira-macro-charts</module>
-    <module>jira-macro-common</module>
-    <module>jira-macro-default</module>
-    <module>jira-macro-platform</module>
-    <module>jira-macro-paste</module>
+    <module>jira-macro-paste-ui</module>
+    <module>jira-macro-paste-api</module>
   </modules>
 </project>
