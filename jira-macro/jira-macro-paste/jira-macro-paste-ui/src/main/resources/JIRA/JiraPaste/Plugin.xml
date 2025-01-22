@@ -11,11 +11,11 @@
   <author>XWiki.Admin</author>
   <originalMetadataAuthor>XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>XWiki.Admin</contentAuthor>
-  <date>1737495040000</date>
+  <date>1737580664000</date>
   <contentUpdateDate>1737383663000</contentUpdateDate>
-  <version>1.45</version>
+  <version>1.57</version>
   <title>Plugin</title>
-  <comment>Update document after refactoring.</comment>
+  <comment/>
   <minorEdit>true</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
@@ -113,7 +113,7 @@
   var $ = jQuery;
   CKEDITOR.plugins.add('timestamp', {
     init: function (editor) {
-      let docUrl = new XWiki.Document('GetConfiguredUrls', 'JiraPaste').getURL('get', 'outputSyntax=plain');
+      let docUrl = new XWiki.Document(XWiki.Model.resolve('JIRA.JiraPaste.GetConfiguredUrls', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
       $.getJSON(docUrl)
         .done(function (response) {
           if (response.length &lt;= 0) {
@@ -122,21 +122,27 @@
           editor.config.jiraInstances = editor.config.jiraInstance || [];
           Array.prototype.push.apply(editor.config.jiraInstances, response);
           editor.on('paste', function (event) {
-            let parsedPaste = CKEDITOR.htmlParser.fragment.fromHtml(event.data.dataValue);
-            if (!parsedPaste.children || parsedPaste.children.length != 1) {
-              return;
-            }
-            let pastedElement = parsedPaste.children[0];
-            if (pastedElement.name != 'a') {
-              return;
-            }
-            if (!pastedElement.attributes || !pastedElement.attributes['href']) {
-              return;
+            let pastedURL = null;
+            if (URL.canParse(event.data.dataValue)) {
+              pastedURL = new URL(event.data.dataValue)
+            } else {
+              let parsedPaste = CKEDITOR.htmlParser.fragment.fromHtml(event.data.dataValue);
+              if (!parsedPaste.children || parsedPaste.children.length != 1) {
+                return;
+              }
+              let pastedElement = parsedPaste.children[0];
+              if (pastedElement.name != 'a') {
+                return;
+              }
+              if (!pastedElement.attributes || !pastedElement.attributes['href'] || !URL.canParse(pastedElement.attributes['href'])) {
+                return;
+              }
+              pastedURL = new URL(pastedElement.attributes['href']);
             }
             let matchingInstance;
             for (var i = 0; i &lt; editor.config.jiraInstances.length; i++) {
               let instance = editor.config.jiraInstances[i];
-              if (instance.url &amp;&amp; pastedElement.attributes['href'].startsWith(instance.url)) {
+              if (instance.url &amp;&amp; pastedURL.origin.startsWith(instance.url)) {
                 matchingInstance = instance;
                 break;
               }
@@ -144,21 +150,36 @@
             if (!matchingInstance) {
               return;
             }
-            const regex = /[A-Z]+-[0-9]+/g;
-            const found = pastedElement.attributes['href'].match(regex);
-            if (!found || found.length &lt;= 0) {
+
+            let paramStyle = 'list';
+            let macroInline = false;
+            let paramSource = 'jql';
+            let macroContent = pastedURL.searchParams.get('jql');
+            if (!macroContent) {
+              const regex = /[A-Z]+-[0-9]+/g;
+              macroContent = pastedURL.pathname.match(regex);
+              macroContent = macroContent &amp;&amp; macroContent[0];
+              paramStyle = 'enum';
+              macroInline = true;
+              paramSource = 'list';
+            }
+            
+            if (!macroContent) {
               return;
             }
             event.cancel();
             editor.execCommand('xwiki-macro-insert', {
               name: "jira",
-              inline: true,
+              inline: macroInline,
               parameters: {
                 id: matchingInstance.id || '',
                 url: (!matchingInstance.id &amp;&amp; matchingInstance.url) || '',
-                style: 'enum'
+                style: paramStyle,
+                fields: 'type,key,summary,status',
+                source: paramSource,
+                maxCount: 5
               },
-              content: found[0]
+              content: macroContent
             });
           });
         })
@@ -167,7 +188,8 @@
         });
     }
   });
-})();</code>
+})();
+</code>
     </property>
     <property>
       <name></name>
