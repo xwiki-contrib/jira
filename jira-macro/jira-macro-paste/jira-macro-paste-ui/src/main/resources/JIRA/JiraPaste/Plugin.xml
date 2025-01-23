@@ -1,24 +1,41 @@
-<?xml version='1.1' encoding='UTF-8'?>
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc version="1.5" reference="JIRA.JiraPaste.Plugin" locale="">
   <web>JIRA.JiraPaste</web>
   <name>Plugin</name>
   <language/>
-  <defaultLanguage>en</defaultLanguage>
+  <defaultLanguage/>
   <translation>0</translation>
-  <creator>XWiki.Admin</creator>
-  <creationDate>1737383663000</creationDate>
+  <creator>xwiki:XWiki.Admin</creator>
   <parent>WebHome</parent>
-  <author>XWiki.Admin</author>
-  <originalMetadataAuthor>XWiki.Admin</originalMetadataAuthor>
-  <contentAuthor>XWiki.Admin</contentAuthor>
-  <date>1737580664000</date>
-  <contentUpdateDate>1737383663000</contentUpdateDate>
-  <version>1.57</version>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
   <title>Plugin</title>
   <comment/>
-  <minorEdit>true</minorEdit>
+  <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content/>
   <object>
     <name>JIRA.JiraPaste.Plugin</name>
@@ -111,9 +128,11 @@
       <code>(function () {
   'use strict';
   var $ = jQuery;
-  CKEDITOR.plugins.add('timestamp', {
+  CKEDITOR.plugins.add('xwiki-jira-paste', {
     init: function (editor) {
-      let docUrl = new XWiki.Document(XWiki.Model.resolve('JIRA.JiraPaste.GetConfiguredUrls', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+      let docUrl =
+        new XWiki.Document(XWiki.Model.resolve('JIRA.JiraPaste.GetConfiguredUrls', XWiki.EntityType.DOCUMENT))
+        .getURL('get', 'outputSyntax=plain');
       $.getJSON(docUrl)
         .done(function (response) {
           if (response.length &lt;= 0) {
@@ -121,7 +140,20 @@
           }
           editor.config.jiraInstances = editor.config.jiraInstance || [];
           Array.prototype.push.apply(editor.config.jiraInstances, response);
+          var beforePasteCount = 0;
+          editor.on('beforePaste', function (event) {
+            // Could not find another way of detecting whether "ctrl shift v" was pressed or not. When pasting without
+            // formatting, two "beforePaste" events are being sent. One with "event.data.type == 'auto'" and one with
+            // "event.data.type == 'html'/'text'".
+            beforePasteCount++;
+          });
           editor.on('paste', function (event) {
+            // Skip resolve if pasting without formatting.
+            if (beforePasteCount &gt;= 2) {
+              beforePasteCount = 0;
+              return;
+            }
+            beforePasteCount = 0;
             let pastedURL = null;
             if (URL.canParse(event.data.dataValue)) {
               pastedURL = new URL(event.data.dataValue)
@@ -134,7 +166,8 @@
               if (pastedElement.name != 'a') {
                 return;
               }
-              if (!pastedElement.attributes || !pastedElement.attributes['href'] || !URL.canParse(pastedElement.attributes['href'])) {
+              if (!pastedElement.attributes || !pastedElement.attributes['href']
+                  || !URL.canParse(pastedElement.attributes['href'])) {
                 return;
               }
               pastedURL = new URL(pastedElement.attributes['href']);
@@ -163,7 +196,6 @@
               macroInline = true;
               paramSource = 'list';
             }
-            
             if (!macroContent) {
               return;
             }
@@ -184,7 +216,8 @@
           });
         })
         .fail(function (_jqxhr, textStatus, error) {
-          console.log(`Could not initialize the Jira Paste plugin. Failed to retrieve the configured jira instances. Error [${error}]. Message [${textStatus}].`);
+          console.log('Could not initialize the Jira Paste plugin. Failed to retrieve the configured jira instances.'
+            + `Error [${error}]. Message [${textStatus}].`);
         });
     }
   });
@@ -192,13 +225,13 @@
 </code>
     </property>
     <property>
-      <name></name>
+      <name/>
     </property>
     <property>
-      <parse/>
+      <parse>0</parse>
     </property>
     <property>
-      <use></use>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

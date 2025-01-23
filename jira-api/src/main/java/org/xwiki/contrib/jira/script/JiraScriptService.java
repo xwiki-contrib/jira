@@ -21,7 +21,6 @@ package org.xwiki.contrib.jira.script;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -72,8 +71,6 @@ public class JiraScriptService implements ScriptService
 
     private AuthenticationHandler getAuthenticationHandler(JIRAServer jiraServer)
     {
-        Map map;
-        map.isEmpty()
         AuthenticationHandler handler;
         if (StringUtils.isBlank(jiraServer.getUsername()) || StringUtils.isBlank(jiraServer.getPassword())) {
             handler = new AnonymousAuthenticationHandler();
