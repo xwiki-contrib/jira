@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -85,7 +86,9 @@ public class JIRAMacro extends AbstractMacro<JIRAMacroParameters>
     public List<Block> execute(JIRAMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return getDisplayer(parameters).display(getDataSource(parameters).getData(content, parameters), parameters);
+        List<Block> result =
+                getDisplayer(parameters).display(getDataSource(parameters).getData(content, parameters), parameters);
+        return context.isInline() ? result : Collections.singletonList(new GroupBlock(result));
     }
 
     /**

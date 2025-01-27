@@ -11,6 +11,7 @@ XWIKI-1000
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=labels] [XWIKI-1000]
+beginGroup
 beginTable
 beginTableRow
 beginTableHeadCell
@@ -23,5 +24,6 @@ onVerbatim [label1, label2] [true]
 endTableCell
 endTableRow
 endTable
+endGroup
 endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=labels] [XWIKI-1000]
 endDocument

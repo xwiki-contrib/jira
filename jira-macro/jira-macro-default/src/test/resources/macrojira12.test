@@ -13,6 +13,7 @@ XWIKI-1001
 beginDocument
 beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields='Custom Link'!url|parameters=field.url.label='custom label'] [XWIKI-1000
 XWIKI-1001]
+beginGroup
 beginTable
 beginTableRow
 beginTableHeadCell
@@ -31,6 +32,7 @@ beginTableCell
 endTableCell
 endTableRow
 endTable
+endGroup
 endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields='Custom Link'!url|parameters=field.url.label='custom label'] [XWIKI-1000
 XWIKI-1001]
 endDocument

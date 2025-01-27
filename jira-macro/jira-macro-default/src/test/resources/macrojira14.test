@@ -12,6 +12,7 @@ XWIKI-1000
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=version,fixVersion|source=jql] [XWIKI-1000]
+beginGroup
 beginTable
 beginTableRow
 beginTableHeadCell
@@ -38,5 +39,6 @@ onVerbatim [1.0 B6] [true]
 endTableCell
 endTableRow
 endTable
+endGroup
 endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=version,fixVersion|source=jql] [XWIKI-1000]
 endDocument
