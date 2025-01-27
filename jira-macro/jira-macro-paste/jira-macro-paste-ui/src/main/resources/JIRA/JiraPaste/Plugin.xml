@@ -184,7 +184,7 @@
               return;
             }
 
-            let paramStyle = 'list';
+            let paramStyle = 'table';
             let macroInline = false;
             let paramSource = 'jql';
             let macroContent = pastedURL.searchParams.get('jql');
@@ -209,7 +209,7 @@
                 style: paramStyle,
                 fields: 'type,key,summary,status',
                 source: paramSource,
-                maxCount: 5
+                maxCount: 20
               },
               content: macroContent
             });
