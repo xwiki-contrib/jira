@@ -62,6 +62,7 @@
     <module>jira-api</module>
     <module>jira-config</module>
     <module>jira-macro</module>
+    <module>jira-ckeditor</module>
   </modules>
   <build>
     <plugins>

@@ -37,6 +37,5 @@
     <module>jira-macro-common</module>
     <module>jira-macro-default</module>
     <module>jira-macro-platform</module>
-    <module>jira-macro-paste</module>
   </modules>
 </project>
