@@ -20,8 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="JIRA.JiraPaste.PluginEnabler" locale="">
-  <web>JIRA.JiraPaste</web>
+<xwikidoc version="1.5" reference="JIRA.Code.PastePlugin.PluginEnabler" locale="">
+  <web>JIRA.Code.PastePlugin</web>
   <name>PluginEnabler</name>
   <language/>
   <defaultLanguage/>
@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>JIRA.JiraPaste.PluginEnabler</name>
+    <name>JIRA.Code.PastePlugin.PluginEnabler</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>46b1983d-2cbb-41b5-8ef5-9173e9583e89</guid>
@@ -127,7 +127,7 @@
     <property>
       <code>require(['deferred!ckeditor'], function(ckeditorPromise) {
   ckeditorPromise.done(function(ckeditor) {
-    ckeditor.plugins.addExternal('xwiki-jira-paste', new XWiki.Document(XWiki.Model.resolve('JIRA.JiraPaste.Plugin', XWiki.EntityType.DOCUMENT)).getURL('jsx'));
+    ckeditor.plugins.addExternal('xwiki-jira-paste', new XWiki.Document(XWiki.Model.resolve('JIRA.Code.PastePlugin.Plugin', XWiki.EntityType.DOCUMENT)).getURL('jsx'));
   });
 });</code>
     </property>

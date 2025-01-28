@@ -20,8 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="JIRA.JiraPaste.Plugin" locale="">
-  <web>JIRA.JiraPaste</web>
+<xwikidoc version="1.5" reference="JIRA.Code.PastePlugin.Plugin" locale="">
+  <web>JIRA.Code.PastePlugin</web>
   <name>Plugin</name>
   <language/>
   <defaultLanguage/>
@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>JIRA.JiraPaste.Plugin</name>
+    <name>JIRA.Code.PastePlugin.Plugin</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>47fff226-8afc-434f-84d1-05c7414bb248</guid>
@@ -131,7 +131,7 @@
   CKEDITOR.plugins.add('xwiki-jira-paste', {
     init: function (editor) {
       let docUrl =
-        new XWiki.Document(XWiki.Model.resolve('JIRA.JiraPaste.GetConfiguredUrls', XWiki.EntityType.DOCUMENT))
+        new XWiki.Document(XWiki.Model.resolve('JIRA.Code.PastePlugin.GetConfiguredUrls', XWiki.EntityType.DOCUMENT))
         .getURL('get', 'outputSyntax=plain');
       $.getJSON(docUrl)
         .done(function (response) {
