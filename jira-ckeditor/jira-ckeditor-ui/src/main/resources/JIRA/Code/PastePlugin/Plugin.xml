@@ -127,19 +127,19 @@
     <property>
       <code>(function () {
   'use strict';
-  var $ = jQuery;
+  const $ = jQuery;
   CKEDITOR.plugins.add('xwiki-jira-paste', {
     init: function (editor) {
-      let docUrl =
+      let docURL =
         new XWiki.Document(XWiki.Model.resolve('JIRA.Code.PastePlugin.GetConfiguredUrls', XWiki.EntityType.DOCUMENT))
-        .getURL('get', 'outputSyntax=plain');
-      $.getJSON(docUrl)
+        .getURL('get');
+      $.getJSON(docURL)
         .done(function (response) {
           if (response.length &lt;= 0) {
             return;
           }
-          editor.config.jiraInstances = editor.config.jiraInstance || [];
-          Array.prototype.push.apply(editor.config.jiraInstances, response);
+          editor.config.jiraInstances = editor.config.jiraInstances || [];
+          editor.config.jiraInstances.push(...response);
           var beforePasteCount = 0;
           editor.on('beforePaste', function (event) {
             // Could not find another way of detecting whether "ctrl shift v" was pressed or not. When pasting without
@@ -172,14 +172,8 @@
               }
               pastedURL = new URL(pastedElement.attributes['href']);
             }
-            let matchingInstance;
-            for (var i = 0; i &lt; editor.config.jiraInstances.length; i++) {
-              let instance = editor.config.jiraInstances[i];
-              if (instance.url &amp;&amp; pastedURL.origin.startsWith(instance.url)) {
-                matchingInstance = instance;
-                break;
-              }
-            }
+            const matchingInstance =
+              editor.config.jiraInstances.find(instance => pastedURL.origin.startsWith(instance.url));
             if (!matchingInstance) {
               return;
             }

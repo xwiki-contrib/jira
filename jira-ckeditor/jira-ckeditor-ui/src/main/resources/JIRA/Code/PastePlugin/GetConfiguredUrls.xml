@@ -56,8 +56,7 @@
       #set ($discard = $instancesDetails.add($instanceDetails))
     #end
   #end
-  #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize($instancesDetails)
+  #jsonResponse($instancesDetails)
 #end
 {{/velocity}}</content>
 </xwikidoc>
