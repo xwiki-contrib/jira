@@ -86,6 +86,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
       <version>${platform.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
