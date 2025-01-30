@@ -1,7 +1,7 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test the "enum" style.
+.# Test the "enum" style when used as a standalone macro.
 .#-----------------------------------------------------
 {{jira url="http://localhost:8889" style="enum"}}
 XWIKI-1000
