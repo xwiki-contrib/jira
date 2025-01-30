@@ -13,7 +13,6 @@ XWIKI-1001
 beginDocument
 beginMacroMarkerStandalone [jira] [url=http://localhost:8889|style=list] [XWIKI-1000
 XWIKI-1001]
-beginGroup
 beginList [BULLETED]
 beginListItem
 onImage [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/images/icons/status_closed.gif]] [false] [[alt]=[Closed][data-xwiki-lightbox]=[false][title]=[Closed]]
@@ -36,7 +35,6 @@ onSpace
 onVerbatim [On jetty, non-default skins are not usable] [true]
 endListItem
 endList [BULLETED]
-endGroup
 endMacroMarkerStandalone [jira] [url=http://localhost:8889|style=list] [XWIKI-1000
 XWIKI-1001]
 endDocument

@@ -13,7 +13,6 @@ XWIKI-1001
 beginDocument
 beginMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=key, note] [XWIKI-1000|Note
 XWIKI-1001]
-beginGroup
 beginTable
 beginTableRow
 beginTableHeadCell
@@ -45,7 +44,6 @@ beginTableCell
 endTableCell
 endTableRow
 endTable
-endGroup
 endMacroMarkerStandalone [jira] [url=http://localhost:8889|fields=key, note] [XWIKI-1000|Note
 XWIKI-1001]
 endDocument
