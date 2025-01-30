@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Verify the functionality of the CKEditor paste plugin.
  *
  * @version $Id$
- * @since 10.0
+ * @since 10.1
  */
 @UITest
 public class PastePluginIT
