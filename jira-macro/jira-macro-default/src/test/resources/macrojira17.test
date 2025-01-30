@@ -1,19 +1,17 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test the "enum" style.
+.# Test the "enum" style when inline.
 .#-----------------------------------------------------
-{{jira url="http://localhost:8889" style="enum"}}
-XWIKI-1000
-XWIKI-1001
-{{/jira}}
+Inline {{jira url="http://localhost:8889" style="enum"}}XWIKI-1000{{/jira}} macro.
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [jira] [url=http://localhost:8889|style=enum] [XWIKI-1000
-XWIKI-1001]
 beginParagraph
+onWord [Inline]
+onSpace
+beginMacroMarkerInline [jira] [url=http://localhost:8889|style=enum] [XWIKI-1000]
 onImage [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/images/icons/status_closed.gif]] [false] [[alt]=[Closed][data-xwiki-lightbox]=[false][title]=[Closed]]
 onSpace
 beginLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-1000]] [true]
@@ -21,13 +19,9 @@ beginFormat [STRIKEDOUT]
 onVerbatim [XWIKI-1000] [true]
 endFormat [STRIKEDOUT]
 endLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-1000]] [true]
+endMacroMarkerInline [jira] [url=http://localhost:8889|style=enum] [XWIKI-1000]
 onSpace
-onImage [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/images/icons/status_open.gif]] [false] [[alt]=[Open][data-xwiki-lightbox]=[false][title]=[Open]]
-onSpace
-beginLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-1001]] [true]
-onVerbatim [XWIKI-1001] [true]
-endLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-1001]] [true]
+onWord [macro]
+onSpecialSymbol [.]
 endParagraph
-endMacroMarkerStandalone [jira] [url=http://localhost:8889|style=enum] [XWIKI-1000
-XWIKI-1001]
 endDocument
