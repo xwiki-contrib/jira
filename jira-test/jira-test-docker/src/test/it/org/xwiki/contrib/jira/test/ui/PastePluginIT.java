@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 10.1
  */
 @UITest
-public class PastePluginIT
+class PastePluginIT
 {
     private static final String ADMIN_CONFIG_JIRA_ID = "testId";
 
@@ -117,9 +117,8 @@ public class PastePluginIT
         ViewPage vp = setup.gotoPage(TEST_PAGE_REFERENCE);
 
         String content = pasteClipboardInCKEditorAndEditWiki(vp, setup, true);
-        assertEquals(
-            "[[https:~~/~~/jira.unconfigured.test/browse/TICKET-134>>https://jira.unconfigured.test/browse/TICKET-134]]",
-            content);
+        assertEquals("[[https:~~/~~/jira.unconfigured.test/browse/TICKET-134>>"
+            + "https://jira.unconfigured.test/browse/TICKET-134]]", content);
     }
 
     @Test
@@ -147,13 +146,11 @@ public class PastePluginIT
         ckEditor.getRichTextArea().sendKeys(paste);
 
         setup.getDriver().waitUntilCondition(
-            webDriver -> ckEditor.getRichTextArea().getText().equals("XWIKI-1000 Improve PDF Output"));
+            webDriver -> ckEditor.getRichTextArea().getText().equals(" XWIKI-1000 Improve PDF Output"));
 
         String content = saveAndGetContent(editPage);
-        assertEquals(
-            "{{jira id=\"testId\" url=\"\" style=\"enum\" fields=\"type,key,summary,status\" source=\"list\" maxCount=\"20\"}}\n"
-                + "XWIKI-1000\n"
-                + "{{/jira}}", content);
+        assertEquals("{{jira id=\"testId\" url=\"\" style=\"enum\" fields=\"type,key,summary,status\" source=\"list\" "
+            + "maxCount=\"20\"}}\nXWIKI-1000\n{{/jira}}", content);
     }
 
     @Test
@@ -174,10 +171,8 @@ public class PastePluginIT
                 + "XWIKI-1000 Improve PDF Output"));
 
         String content = saveAndGetContent(editPage);
-        assertEquals(
-            "{{jira id=\"testId\" url=\"\" style=\"table\" fields=\"type,key,summary,status\" source=\"jql\" maxCount=\"20\"}}\n"
-                + "issuekey in (XWIKI-1000, XWIKI-1001)\n"
-                + "{{/jira}}", content);
+        assertEquals("{{jira id=\"testId\" url=\"\" style=\"table\" fields=\"type,key,summary,status\" source=\"jql\" "
+            + "maxCount=\"20\"}}\nissuekey in (XWIKI-1000, XWIKI-1001)\n{{/jira}}", content);
     }
 
     private String saveAndGetContent(WYSIWYGEditPage editPage)
