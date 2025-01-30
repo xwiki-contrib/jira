@@ -147,7 +147,7 @@ public class PastePluginIT
         ckEditor.getRichTextArea().sendKeys(paste);
 
         setup.getDriver().waitUntilCondition(
-            webDriver -> ckEditor.getRichTextArea().getText().equals("XWIKI-1000 Improve PDF Output"));
+            webDriver -> ckEditor.getRichTextArea().getText().equals(" XWIKI-1000 Improve PDF Output"));
 
         String content = saveAndGetContent(editPage);
         assertEquals(
