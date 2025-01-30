@@ -50,16 +50,16 @@ public interface JIRADisplayer
 
     /**
      * Displays the passed JIRA issues based on the macro context.
-     * @param issue the issues to display
+     * @param issues the issues to display
      * @param parameters the macro parameters specified by the user; can be used to specify displayer-specific
      *            configuration data (for example displayers allows the user to specify the list of JIRA issue fields to
      *            display
      * @param context the transformation context of the macro.
      * @return a list of blocks representing what to display
      */
-    default List<Block> display(Collection<Element> issue, JIRAMacroParameters parameters,
+    default List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters,
         MacroTransformationContext context)
     {
-        return display(issue, parameters);
+        return display(issues, parameters);
     }
 }
