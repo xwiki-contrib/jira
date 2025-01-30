@@ -22,6 +22,7 @@ package org.xwiki.contrib.jira.macro.internal.displayer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,9 +33,11 @@ import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAFields;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Displays JIRA issues next to each other (like an enumeration) in inline mode.
@@ -77,6 +80,14 @@ public class EnumJIRADisplayer extends AbstractJIRADisplayer
             }
         }
         return blocks;
+    }
+
+    @Override
+    public List<Block> display(Collection<Element> issue, JIRAMacroParameters parameters,
+        MacroTransformationContext context)
+    {
+        List<Block> result = display(issue, parameters);
+        return context.isInline() ? result : Collections.singletonList(new ParagraphBlock(result));
     }
 
     @Override

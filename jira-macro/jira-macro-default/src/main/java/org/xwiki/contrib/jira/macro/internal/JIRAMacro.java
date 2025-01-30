@@ -29,13 +29,13 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.contrib.jira.macro.JIRADataSource;
+import org.xwiki.contrib.jira.macro.JIRADisplayer;
+import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.contrib.jira.macro.JIRADataSource;
-import org.xwiki.contrib.jira.macro.JIRADisplayer;
-import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -85,7 +85,8 @@ public class JIRAMacro extends AbstractMacro<JIRAMacroParameters>
     public List<Block> execute(JIRAMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return getDisplayer(parameters).display(getDataSource(parameters).getData(content, parameters), parameters);
+        return getDisplayer(parameters).display(getDataSource(parameters).getData(content, parameters), parameters,
+            context);
     }
 
     /**

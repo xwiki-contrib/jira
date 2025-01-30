@@ -25,6 +25,8 @@ import java.util.List;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.stability.Unstable;
 
 /**
  * A JIRA Displayer is used to display the JIRA issues visually. Example of Displayers: Table displayer which displays
@@ -43,7 +45,25 @@ public interface JIRADisplayer
      * @param parameters the macro parameters specified by the user; can be used to specify displayer-specific
      *            configuration data (for example displayers allows the user to specify the list of JIRA issue fields to
      *            display
-     * @return the list of Blocks rerpesenting what to display
+     * @return the list of Blocks representing what to display
      */
     List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters);
+
+    /**
+     * Displays the passed JIRA issues based on the macro context.
+     *
+     * @param issues the issues to display
+     * @param parameters the macro parameters specified by the user; can be used to specify displayer-specific
+     *            configuration data (for example displayers allows the user to specify the list of JIRA issue fields to
+     *            display
+     * @param context the transformation context of the macro.
+     * @return a list of blocks representing what to display
+     * @since 10.1
+     */
+    @Unstable
+    default List<Block> display(Collection<Element> issues, JIRAMacroParameters parameters,
+        MacroTransformationContext context)
+    {
+        return display(issues, parameters);
+    }
 }
