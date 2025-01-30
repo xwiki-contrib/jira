@@ -27,11 +27,13 @@
     <artifactId>jira-ckeditor</artifactId>
     <version>10.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>jira-ckeditor-ui</artifactId>
-  <name>JIRA - CKEditor Plugins</name>
+  <name>JIRA - CKEditor Integration - Plugin</name>
   <packaging>xar</packaging>
-  <description>CKEditor plugins that allow smoother integration between JIRA and XWiki.</description>
+  <description>
+    CKEditor plugins that allow smoother integration between JIRA and XWiki (e.g. pasting a JIRA link results in
+    inserting automatically the JIRA macro).
+  </description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib.jira</groupId>

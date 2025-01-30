@@ -27,11 +27,10 @@
     <artifactId>jira</artifactId>
     <version>10.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>jira-ckeditor</artifactId>
-  <name>JIRA - CKEditor Plugins - Parent POM</name>
+  <name>JIRA - CKEditor Integration - Parent POM</name>
   <packaging>pom</packaging>
-  <description>The parent POM of the JIRA CKEditor plugins.</description>
+  <description>The parent POM of the JIRA CKEditor integration.</description>
   <modules>
     <module>jira-ckeditor-ui</module>
   </modules>
