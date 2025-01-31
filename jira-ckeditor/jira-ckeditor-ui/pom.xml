@@ -34,6 +34,12 @@
     CKEditor plugins that allow smoother integration between JIRA and XWiki (e.g. pasting a JIRA link results in
     inserting automatically the JIRA macro).
   </description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>JIRA CKEditor Integration</xwiki.extension.name>
+    <!-- The extension's category -->
+    <xwiki.extension.category>application</xwiki.extension.category>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib.jira</groupId>
