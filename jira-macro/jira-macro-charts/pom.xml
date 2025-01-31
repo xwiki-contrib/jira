@@ -30,13 +30,19 @@
   <artifactId>jira-macro-charts</artifactId>
   <name>JIRA - Macro - Charts</name>
   <packaging>jar</packaging>
-  <description>Allow to display charts reusing JIRA statistics.</description>
+  <description>Display charts reusing JIRA statistics</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.15</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>JIRA Charts Macro</xwiki.extension.name>
+    <xwiki.extension.name>JIRA Charts Macros</xwiki.extension.name>
     <!-- The extension's category -->
     <xwiki.extension.category>macro</xwiki.extension.category>
+    <!-- Components -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/jiraBiDimensionalGridChart
+      org.xwiki.rendering.macro.Macro/jiraCreatedVsResolvedChart
+      org.xwiki.rendering.macro.Macro/jiraPieChart
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>
