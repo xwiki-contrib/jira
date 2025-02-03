@@ -30,10 +30,7 @@
   <artifactId>jira-ckeditor-ui</artifactId>
   <name>JIRA - CKEditor Integration - Plugin</name>
   <packaging>xar</packaging>
-  <description>
-    CKEditor plugins that allow smoother integration between JIRA and XWiki (e.g. pasting a JIRA link results in
-    inserting automatically the JIRA macro).
-  </description>
+  <description>CKEditor plugins that allow smoother integration between JIRA and XWiki (e.g. pasting a JIRA link results in inserting automatically the JIRA macro).</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JIRA CKEditor Integration</xwiki.extension.name>
