@@ -71,4 +71,10 @@ public class JIRACreatedVsResolvedDataFetcher
         }
         return result;
     }
+
+    @Override
+    public NameValuePair handleFilterIdParameter(String filterIdValue)
+    {
+        return new BasicNameValuePair("jql", String.format("filter=%s", computeFilterIdFormat(filterIdValue, false)));
+    }
 }

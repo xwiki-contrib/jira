@@ -63,4 +63,10 @@ public class JIRABiDimensionalGridChartDataFetcher
         result.add(new BasicNameValuePair("numberToShow", String.valueOf(parameters.getNumberOfResults())));
         return result;
     }
+
+    @Override
+    public NameValuePair handleFilterIdParameter(String filterIdValue)
+    {
+        return new BasicNameValuePair("filterId", computeFilterIdFormat(filterIdValue, true));
+    }
 }

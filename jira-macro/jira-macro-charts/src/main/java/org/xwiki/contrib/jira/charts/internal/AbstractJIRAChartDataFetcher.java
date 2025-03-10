@@ -47,6 +47,8 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroParameters,
     U extends AbstractJIRADataSource> implements JIRAChartDataFetcher<T, U>
 {
+    private static final String FILTER_ID_PREFIX = "filter-";
+
     @Inject
     private JIRAURLHelper urlHelper;
 
@@ -59,11 +61,10 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     @Override
     public U fetch(T parameters, Class<U> expectedType) throws MacroExecutionException
     {
-        List<NameValuePair> parametersList = new ArrayList<NameValuePair>();
+        List<NameValuePair> parametersList = new ArrayList<>();
 
-        // TODO: check format of filterId
         if (!StringUtils.isEmpty(parameters.getFilterId())) {
-            parametersList.add(new BasicNameValuePair("filterId", parameters.getFilterId()));
+            parametersList.add(handleFilterIdParameter(parameters.getFilterId()));
         } else {
             parametersList.add(new BasicNameValuePair("jql", parameters.getQuery()));
         }
@@ -77,6 +78,36 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
             throw new MacroExecutionException(
                 String.format("Error when trying to get data for pie chart from URL [%s].", chartURL), e);
         }
+    }
+
+    /**
+     * Define the format of  the filter ID value to be given to JIRA REST API. It accepts sometimes {@code filter
+     * -XXX} and sometimes only {@code XXX}.
+     *
+     * @param providedFilterId the provided value
+     * @param shoudUsePrefix {@code true} if {@code filter-} prefix is needed and should be added if missing, {@code
+     * false} to remove that prefix if provided
+     * @return the filter value to use in calls.
+     */
+    public String computeFilterIdFormat(String providedFilterId, boolean shoudUsePrefix)
+    {
+        if (shoudUsePrefix && !providedFilterId.startsWith(FILTER_ID_PREFIX)) {
+            return FILTER_ID_PREFIX + providedFilterId;
+        } else if (!shoudUsePrefix && providedFilterId.startsWith(FILTER_ID_PREFIX)) {
+            return providedFilterId.substring(FILTER_ID_PREFIX.length());
+        } else {
+            return providedFilterId;
+        }
+    }
+
+    /**
+     * Define how to handle the filterId value.
+     * @param filterIdValue the value given by the user
+     * @return the {@link NameValuePair} used to perform the REST call.
+     */
+    public NameValuePair handleFilterIdParameter(String filterIdValue)
+    {
+        return new BasicNameValuePair("filterId", computeFilterIdFormat(filterIdValue, false));
     }
 
     /**
