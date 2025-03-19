@@ -66,7 +66,7 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
         if (!StringUtils.isEmpty(parameters.getFilterId())) {
             parametersList.add(handleFilterIdParameter(parameters.getFilterId()));
         } else {
-            parametersList.add(new BasicNameValuePair("jql", parameters.getQuery()));
+            parametersList.add(handleQueryParameter(parameters.getQuery()));
         }
         parametersList.addAll(getCustomQueryParameters(parameters));
 
@@ -108,6 +108,16 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     public NameValuePair handleFilterIdParameter(String filterIdValue)
     {
         return new BasicNameValuePair("filterId", computeFilterIdFormat(filterIdValue, false));
+    }
+
+    /**
+     * Define how to handle the query parameter.
+     * @param queryValue the value given by the user
+     * @return the {@link NameValuePair} used to perform the REST call.
+     */
+    public NameValuePair handleQueryParameter(String queryValue)
+    {
+        return new BasicNameValuePair("jql", queryValue);
     }
 
     /**

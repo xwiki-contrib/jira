@@ -44,6 +44,8 @@ public class JIRABiDimensionalGridChartDataFetcher
     extends AbstractJIRAChartDataFetcher<JIRABiDimensionalGridChartMacroParameter,
     JIRABiDimensionalGridChartJIRADataSource>
 {
+    private static final String FILTER_ID = "filterId";
+
     @Override
     public JIRAURLHelper.GadgetType getGadgetType()
     {
@@ -67,6 +69,12 @@ public class JIRABiDimensionalGridChartDataFetcher
     @Override
     public NameValuePair handleFilterIdParameter(String filterIdValue)
     {
-        return new BasicNameValuePair("filterId", computeFilterIdFormat(filterIdValue, true));
+        return new BasicNameValuePair(FILTER_ID, computeFilterIdFormat(filterIdValue, true));
+    }
+
+    @Override
+    public NameValuePair handleQueryParameter(String queryValue)
+    {
+        return new BasicNameValuePair(FILTER_ID, "jql-" + queryValue);
     }
 }
