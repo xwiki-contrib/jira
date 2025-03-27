@@ -113,6 +113,7 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             this.asyncContext.useEntity(this.sourceReference);
         }
         try {
+            this.context.setInline(this.inline);
             resultBlocks = this.macro.executeCodeMacro(this.parameters, this.content, this.context);
         } catch (MacroExecutionException e) {
             // Display the error in the result
