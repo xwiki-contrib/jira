@@ -104,5 +104,26 @@ class JIRAMacroIT
             + "XWIKI-1000 Improve PDF Output 19-Mar-2007\n"
             + "XWIKI-1001 On jetty, non-default skins are not usable 19-Mar-2007\n"
             + "com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClient\\E");
+
+        // Verify XXE protection.
+
+        // Simulate a JIRA response containing a DOCTYPE declaration with a DTD to verify that we don't parse it, to
+        // avoid an XXE attack. The returned XML will try to display the content of the /etc/passwd file into the
+        // "summary" jira field of an issue, to try to have it displayed by the jira macro.
+        this.wireMockServer.stubFor(get(urlMatching(
+            "\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "text/xml")
+                .withBodyFile("xxe.xml")));
+
+        // Refresh the created page and verify an error is now displayed
+        setup.getDriver().navigate().refresh();
+
+        // Since the macro is Async, wait for the expected content to be available
+        // Verify that the XXE protection has prevented expanding the &xxe; entity into the summary field.
+        vp.waitUntilContent("\\QType Key Summary Status Created Date\n"
+            + "XWIKI-1001 19-Mar-2007\n"
+            + "com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClient\\E");
     }
 }

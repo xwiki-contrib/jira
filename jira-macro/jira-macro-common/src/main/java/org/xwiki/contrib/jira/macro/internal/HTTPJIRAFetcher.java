@@ -173,9 +173,12 @@ public class HTTPJIRAFetcher
     {
         // Note: SAXBuilder is not thread-safe which is why we're instantiating a new one every time.
         SAXBuilder builder = new SAXBuilder();
-        // Note: Prevent XXE attacks by disabling completely DTDs. This is possible since JIRA returns an XML content
-        // that doesn't use a DTD.
-        builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+        // Note: Prevent XXE attacks
+        builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        builder.setExpandEntities(false);
+
         return builder;
     }
 }
