@@ -71,8 +71,8 @@ class JIRABiDimensionalGridChartDataFetcherTest
         JIRABiDimensionalGridChartMacroParameter parameters = new JIRABiDimensionalGridChartMacroParameter();
         parameters.setId("myjira");
         parameters.setFilterId("43434");
-        parameters.setxAxisField(JIRAField.STATUS);
-        parameters.setyAxisField(JIRAField.ASSIGNEE);
+        parameters.setxAxisField("statuses");
+        parameters.setyAxisField("assignees");
         parameters.setSortNatural(true);
         parameters.setNumberOfResults(21);
         parameters.setSortAscending(false);

@@ -27,7 +27,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
-import org.xwiki.contrib.jira.charts.piechart.StatisticType;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
@@ -46,9 +45,7 @@ public class JIRAPieChartDataFetcher
     @Override
     public List<NameValuePair> getCustomQueryParameters(JIRAPieChartMacroParameters parameters)
     {
-        StatisticType type = parameters.getType();
-        String statType = type.getQueryName();
-        return List.of(new BasicNameValuePair("statType", statType));
+        return List.of(new BasicNameValuePair("statType", parameters.getType()));
     }
 
     @Override

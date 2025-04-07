@@ -56,8 +56,8 @@ public class JIRABiDimensionalGridChartDataFetcher
     public List<NameValuePair> getCustomQueryParameters(JIRABiDimensionalGridChartMacroParameter parameters)
     {
         List<NameValuePair> result = new ArrayList<>();
-        result.add(new BasicNameValuePair("xstattype", parameters.getxAxisField().getQueryName()));
-        result.add(new BasicNameValuePair("ystattype", parameters.getyAxisField().getQueryName()));
+        result.add(new BasicNameValuePair("xstattype", parameters.getxAxisField()));
+        result.add(new BasicNameValuePair("ystattype", parameters.getyAxisField()));
         String sortDirection = (parameters.isSortAscending()) ? "asc" : "desc";
         result.add(new BasicNameValuePair("sortDirection", sortDirection));
         String sortBy = (parameters.isSortNatural()) ? "natural" : "total";
