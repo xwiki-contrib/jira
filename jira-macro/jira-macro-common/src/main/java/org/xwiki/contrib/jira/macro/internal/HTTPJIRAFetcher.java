@@ -23,10 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -74,9 +76,13 @@ public class HTTPJIRAFetcher
     {
         return performRequest(urlString, jiraServer, is -> {
             try {
-                return createSAXBuilder().build(is);
+                Document document = createSAXBuilder().build(is);
+                return document;
             } catch (JDOMException | IOException e) {
-                throw new RuntimeException(e);
+                // The XML has failed to be parsed, read it as plain text ans return it, for debugging purpose.
+                String message = String.format("Failed to parse JIRA XML content [%s]", getRawJIRAResponse(urlString));
+                // FIXME: this is ugly
+                throw new RuntimeException(message, e);
             }
         });
     }
@@ -91,7 +97,7 @@ public class HTTPJIRAFetcher
 
     /**
      * Fetch and parse a JSON based on the given information.
-     * @param url the full JIRA URL to call
+     * @param urlString the full JIRA URL to call
      * @param jiraServer the jira server data containing optional credentials (used to setup preemptive basic
      * authentication
      * @param type the actual type to obtain when parsing the JSON
@@ -99,16 +105,29 @@ public class HTTPJIRAFetcher
      * @param <T> the expected type
      * @throws Exception in case of problem when performing the request
      */
-    public <T> T fetchJSON(String url, JIRAServer jiraServer, Class<T> type) throws Exception
+    public <T> T fetchJSON(String urlString, JIRAServer jiraServer, Class<T> type) throws Exception
     {
-        return performRequest(url, jiraServer, is -> {
+        return performRequest(urlString, jiraServer, is -> {
             try {
                 return getObjectMapper().readValue(is, type);
             } catch (IOException e) {
+                // The JSON has failed to be parsed, read it as plain text and return it, for debugging purpose.
+                String message = String.format("Failed to parse JIRA JSON content [%s]", getRawJIRAResponse(urlString));
                 // FIXME: this is ugly
-                throw new RuntimeException(e);
+                throw new RuntimeException(message, e);
             }
         });
+    }
+
+    private String getRawJIRAResponse(String urlString)
+    {
+        String message;
+        try {
+            message = IOUtils.toString(new URL(urlString), StandardCharsets.UTF_8);
+        } catch (IOException ee) {
+            message = String.format("Failed to get JIRA content for [%s]", urlString);
+        }
+        return message;
     }
 
     private <T> T performRequest(String url, JIRAServer jiraServer, Function<InputStream, T> callback) throws Exception
