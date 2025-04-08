@@ -21,6 +21,7 @@ package org.xwiki.contrib.jira.macro.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +44,7 @@ public class ErrorMessageExtractor
     String extract(InputStream contentStream) throws IOException
     {
         String result;
-        String content = IOUtils.toString(contentStream, "UTF-8");
+        String content = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
         Matcher matcher = PATTERN.matcher(content);
         if (matcher.find()) {
             result = matcher.group(1);

@@ -28,6 +28,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAField;
@@ -83,7 +84,7 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         try {
             String urlString = this.urlHelper.getSearchURL(jiraServer, jqlQuery, maxCount);
             document = this.jiraFetcher.fetch(urlString, jiraServer);
-        } catch (Exception e) {
+        } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]",
                 jiraServer.getURL(), jqlQuery), e);
         }
@@ -92,7 +93,7 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
 
     /**
      * @param parameters the macro's parameters
-     * @return the url to the JIRA instance (eg "http://jira.xwiki.org")
+     * @return the url to the JIRA instance (e.g. {@code http://jira.xwiki.org"})
      * @throws MacroExecutionException if no URL has been specified (either in the macro parameter or configuration)
      */
     protected JIRAServer getJIRAServer(JIRAMacroParameters parameters) throws MacroExecutionException

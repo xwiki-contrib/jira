@@ -78,7 +78,7 @@ class HTTPJIRAFetcherTest
                 .withHeader("Content-Type", "text/xml")
                 .withBodyFile("input.xml")));
 
-        Throwable exception = assertThrows(RuntimeException.class, () -> {
+        Throwable exception = assertThrows(JIRAConnectionException.class, () -> {
             this.jiraFetcher.fetch("http://localhost:8889/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=whatever", new JIRAServer("http://localhost:8889", "user", "pass"));
         });
         assertEquals("Failed to parse JIRA XML content [<!--\n"

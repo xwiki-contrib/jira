@@ -19,17 +19,16 @@
  */
 package org.xwiki.contrib.jira.macro.internal;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Function;
 
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -44,7 +43,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
@@ -70,21 +68,18 @@ public class HTTPJIRAFetcher
      * @param jiraServer the jira server data containing optional credentials (used to setup preemptive basic
      * authentication
      * @return the {@link Document} object containing the XML data
-     * @throws Exception if an error happened during the fetch or if the passed URL is malformed
+     * @throws JIRAConnectionException if an error happened during the fetch or if the passed URL is malformed
      */
-    public Document fetch(String urlString, JIRAServer jiraServer) throws Exception
+    public Document fetch(String urlString, JIRAServer jiraServer) throws JIRAConnectionException
     {
-        return performRequest(urlString, jiraServer, is -> {
-            try {
-                Document document = createSAXBuilder().build(is);
-                return document;
-            } catch (JDOMException | IOException e) {
-                // The XML has failed to be parsed, read it as plain text ans return it, for debugging purpose.
-                String message = String.format("Failed to parse JIRA XML content [%s]", getRawJIRAResponse(urlString));
-                // FIXME: this is ugly
-                throw new RuntimeException(message, e);
-            }
-        });
+        try {
+            return performRequest(urlString, jiraServer, is -> createSAXBuilder().build(is));
+        } catch (Exception e) {
+            // The XML has failed to be parsed, read it as plain text and return it, for debugging purpose.
+            String message = String.format("Failed to parse JIRA XML content [%s]",
+                getRawJIRAResponse(urlString, jiraServer));
+            throw new JIRAConnectionException(message, e);
+        }
     }
 
     private ObjectMapper getObjectMapper()
@@ -103,34 +98,33 @@ public class HTTPJIRAFetcher
      * @param type the actual type to obtain when parsing the JSON
      * @return an instance of the POJO corresponding to the JSON answer
      * @param <T> the expected type
-     * @throws Exception in case of problem when performing the request
+     * @throws JIRAConnectionException in case of problem when performing the request
      */
-    public <T> T fetchJSON(String urlString, JIRAServer jiraServer, Class<T> type) throws Exception
+    public <T> T fetchJSON(String urlString, JIRAServer jiraServer, Class<T> type) throws JIRAConnectionException
     {
-        return performRequest(urlString, jiraServer, is -> {
-            try {
-                return getObjectMapper().readValue(is, type);
-            } catch (IOException e) {
-                // The JSON has failed to be parsed, read it as plain text and return it, for debugging purpose.
-                String message = String.format("Failed to parse JIRA JSON content [%s]", getRawJIRAResponse(urlString));
-                // FIXME: this is ugly
-                throw new RuntimeException(message, e);
-            }
-        });
+        try {
+            return performRequest(urlString, jiraServer, is -> getObjectMapper().readValue(is, type));
+        } catch (Exception e) {
+            // The JSON has failed to be parsed, read it as plain text and return it, for debugging purpose.
+            String message = String.format("Failed to parse JIRA JSON content [%s]",
+                getRawJIRAResponse(urlString, jiraServer));
+            throw new JIRAConnectionException(message, e);
+        }
     }
 
-    private String getRawJIRAResponse(String urlString)
+    private String getRawJIRAResponse(String urlString, JIRAServer jiraServer)
     {
         String message;
         try {
-            message = IOUtils.toString(new URL(urlString), StandardCharsets.UTF_8);
-        } catch (IOException ee) {
+            message = performRequest(urlString, jiraServer, is -> IOUtils.toString(is, StandardCharsets.UTF_8));
+        } catch (Exception e) {
             message = String.format("Failed to get JIRA content for [%s]", urlString);
         }
         return message;
     }
 
-    private <T> T performRequest(String url, JIRAServer jiraServer, Function<InputStream, T> callback) throws Exception
+    private <T> T performRequest(String url, JIRAServer jiraServer,
+        FailableFunction<InputStream, T, Exception> callback) throws Exception
     {
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpClient httpClient = createHttpClientBuilder().build();
@@ -145,7 +139,7 @@ public class HTTPJIRAFetcher
             } else {
                 // The error message is in the HTML. We extract it to perform some good error-reporting, by extracting
                 // it from the <h1> tag.
-                throw new Exception(String.format("Error = [%s]. URL = [%s]",
+                throw new JIRAConnectionException(String.format("Error = [%s]. URL = [%s]",
                     EXTRACTOR.extract(response.getEntity().getContent()), httpGet.getURI().toString()));
             }
         }
