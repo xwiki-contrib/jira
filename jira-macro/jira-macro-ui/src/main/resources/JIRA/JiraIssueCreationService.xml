@@ -1,0 +1,124 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.6" reference="JiraCode.JiraIssueCreationService" locale="">
+  <web>JiraCode</web>
+  <name>JiraIssueCreationService</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>JiraIssueCreationService</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{groovy output="false"}}
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+
+import org.xwiki.contrib.jira.config.JIRAConfiguration;
+
+xcontext.put('objectMapper', new ObjectMapper());
+xcontext.objectMapper.registerModule(new JodaModule());
+
+xcontext.put('jiraConfiguration', services.component.getInstance(JIRAConfiguration.class))
+{{/groovy}}
+{{velocity output="false"}}
+## Request action parameter:
+##   * suggestInstance
+##   * suggestProject (getAllProjects)
+##   * suggestIssueType (getCreateIssueMetaProjectIssueTypes)
+##   * getFieldsMetadata
+##   * createIssue (TODO)
+#macro (suggestInstance)
+  #set ($data = [])
+  #foreach ($instance in $xcontext.jiraConfiguration.getJIRAServers().entrySet())
+    #set ($discard = $data.add({'label': "$instance.key", 'value': "$instance.key", 'hint': "$instance.value.URL"}))
+  #end
+#end
+
+#macro (getAllProjects)
+  #set ($data = $jiraRestClient.getProjectClient.getAllProjects().claim())
+#end
+#macro (suggestProject $text)
+  #getAllProjects()
+  #set($projects = $data)
+  #set($data = [])
+  #foreach ($project in $projects)
+    #if ( $data.size() &gt; 20 )
+        #break
+    #end
+    #if ($project.key.toLowerCase().contains($text.toLowerCase()) || $project.name.toLowerCase().contains($text.toLowerCase()))
+      #set ($discard = $data.add({'label': "$project.name ($project.key)", 'value': $project.key, 'icon': {'url': "$jiraInstance.URL/secure/projectavatar?pid=$project.id"}}))
+    #end
+  #end
+#end
+
+#macro (getCreateIssueMetaProjectIssueTypes $project)
+  #set ($data = $jiraRestClient.getIssueClient().getCreateIssueMetaProjectIssueTypes($project, $request.startAt, $request.maxResults).claim().getValues())
+#end
+#macro (suggestIssueType $project $text)
+  #getCreateIssueMetaProjectIssueTypes($project)
+  #set ($issueTypes = $data)
+  #set ($data = [])
+  #foreach ($issueType in $issueTypes)
+    #set ($discard = $data.add({'label': "$issueType.name", 'value': "$issueType.id", 'hint': "$issueType.description", 'icon': {'url': "$issueType.iconUri"}}))
+  #end
+  ##set ($data = $issueTypes)
+#end
+#macro (getFieldsMetadata $project $issueType)
+  #set ($data = $jiraRestClient.getIssueClient().getCreateIssueMetaFields($project, $issueType, $request.startAt, $request.maxResults).claim().getValues())
+#end
+{{/velocity}}
+{{velocity wiki="false"}}
+#set ($text = "")
+#if ($request.text)
+  #set ($text = $request.text)
+#end
+#if ($request.action == 'suggestInstance')
+  #suggestInstance($text)
+#else
+  #set ($jiraInstance = $xcontext.jiraConfiguration.getJIRAServers().get($request.instanceId))
+  #set ($jiraRestClient = $services.jira.getJiraRestClient($request.instanceId))
+#end
+#if ($request.action == 'suggestProject')
+  #suggestProject($text)
+#end
+#if ($request.action == 'suggestIssueType')
+  #suggestIssueType($request.project $text)
+#end
+#if ($request.action == 'getFieldsMetadata')
+  #getFieldsMetadata($request.project $request.issueType)
+#end
+#if ($data)
+  #set ($discard = $response.setContentType('application/json'))
+  $xcontext.objectMapper.writeValueAsString($data)
+#end
+#set ($discard = $jiraRestClient.close())
+{{/velocity}}</content>
+</xwikidoc>

@@ -2,6 +2,9 @@
 target
 target-eclipse
 
+# Maven
+*.versionsBackup
+
 # IDEA
 *.iml
 *.ipr

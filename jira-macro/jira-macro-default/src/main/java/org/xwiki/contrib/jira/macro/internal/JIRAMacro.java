@@ -31,6 +31,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRADisplayer;
+import org.xwiki.contrib.jira.macro.JIRAIssuesList;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -71,7 +72,8 @@ public class JIRAMacro extends AbstractMacro<JIRAMacroParameters>
      */
     public JIRAMacro()
     {
-        super("JIRA", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), JIRAMacroParameters.class);
+        super("JIRA", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, true, JIRAIssuesList.class),
+            JIRAMacroParameters.class);
         setDefaultCategories(Collections.singleton(DEFAULT_CATEGORY_CONTENT));
     }
 

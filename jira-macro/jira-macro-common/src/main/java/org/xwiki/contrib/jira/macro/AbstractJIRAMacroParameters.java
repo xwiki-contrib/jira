@@ -19,7 +19,9 @@
  */
 package org.xwiki.contrib.jira.macro;
 
+import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyGroup;
 import org.xwiki.stability.Unstable;
 
@@ -65,6 +67,7 @@ public abstract class AbstractJIRAMacroParameters
      */
     @PropertyDescription("the configuration id of the JIRA Server URL to use")
     @PropertyGroup("instance")
+    @PropertyDisplayType(JIRAServer.class)
     public void setId(String id)
     {
         this.id = id;
