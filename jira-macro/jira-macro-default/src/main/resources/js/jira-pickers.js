@@ -163,7 +163,7 @@ define('xwiki-jira-suggests', ['xwiki-jira-suggestInstance', 'xwiki-jira-suggest
 });
 
 require(['jquery', 'xwiki-jira-suggests'], function($) {
-  const createIssueCreationForm = function(textarea, tab) {
+  const createIssueCreationForm = function(textarea, container, callback) {
     // Remove existing form if it already exists
     $('#issueCreationForm').remove();
 
@@ -172,14 +172,14 @@ require(['jquery', 'xwiki-jira-suggests'], function($) {
 
           <div class="form-group">
             <label for="instance">Instance</label>
-            <select class="suggest-jira-instance">
-              <option value="" id="instance">Select the instance</option>
+            <select class="suggest-jira-instance" id="instanceId">
+              <option value="">Select the instance</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="projectName">Project</label>
-            <select class="suggest-jira-project" id="projectName">
+            <label for="projectKey">Project</label>
+            <select class="suggest-jira-project" id="projectKey">
               <option value="">Select the project</option>
             </select>
           </div>
@@ -207,18 +207,73 @@ require(['jquery', 'xwiki-jira-suggests'], function($) {
       ;
 
     // Append form to Tab.
-    tab.append(formTemplate);
+    container.append(formTemplate);
 
     // Handle create button click
     $('#createIssueBtn').on('click', function () {
-        let projectName = $('#projectName').val().trim();
-        let issueSummary = $('#issueSummary').val().trim();
-        let issueDescription = $('#issueDescription').val().trim();
+        const instanceId = $('#instanceId').val().trim();
+        const projectKey = $('#projectKey').val().trim();
+        const issueType = $('#issueType').val().trim();
+        const issueSummary = $('#issueSummary').val().trim();
+        const issueDescription = $('#issueDescription').val().trim();
 
-        if (projectName && issueSummary && issueDescription) {
-            console.log('Issue Created:', { projectName:projectName, issueSummary:issueSummary, issueDescription:issueDescription });
-            new XWiki.widgets.Notification('Created issue HEL-24: ' + issueSummary, 'done');
-            textarea.value = "HEL-24\n" + textarea.value;
+        if (instanceId && projectKey && issueType && issueSummary) {
+            const jiraService = new XWiki.Document("JiraIssueCreationService", "JiraCode");
+
+            const jiraFieldsMetadataParameters = {
+              outputSyntax: "plain",
+              instanceId,
+              action: "getFieldsMetadata",
+              project: projectKey,
+              issueType
+            }
+
+            $.getJSON(jiraService.getURL('get', $.param($.extend({}, jiraFieldsMetadataParameters)))).done((data) => {
+              const jiraParameters = {
+                outputSyntax: "plain",
+                instanceId,
+                action: "createIssue",
+              };
+
+              const createIssueData = {
+                fields: [
+                  {id: "issuetype",
+                  value: {id: issueType}},
+                  {id: "project",
+                  value: {key: projectKey}},
+                  {id: "summary",
+                  value: issueSummary},
+                ],
+                reporter: data.any((el) => el.name?.toLowerCase() == "reporter")
+              };
+              if (issueDescription) {
+                createIssueData.fields.push({id: "description", value: issueDescription});
+              }
+
+              $.ajax({
+                url: jiraService.getURL('get', $.param($.extend({}, jiraParameters))),
+                type: "POST",
+                data: JSON.stringify(createIssueData),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: (data) => {
+                console.log(data)
+                if (data.key) {
+                  textarea.value = data.key + "\n" + textarea.value;
+                  new XWiki.widgets.Notification('Created issue: ' + data.key);
+                } else {
+                  console.log(xhr.responseText);
+                  new XWiki.widgets.Notification('Failed to create issue.', "error")
+                }
+                callback();
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr.responseText);
+                    new XWiki.widgets.Notification('Failed to create issue.', "error")
+                }
+              });
+              console.log('Issue Created:', { projectKey:projectKey, issueSummary:issueSummary, issueDescription:issueDescription });
+            });
         } else {
             alert('All fields are required.');
         }
@@ -266,10 +321,14 @@ require(['jquery', 'xwiki-jira-suggests'], function($) {
       field.find(".macro-content-pane").append(oldContent);
 
       const tab = field.find('#content-tab-new')
-      const textarea = field.find('textarea[name="$content"]');
+      const textarea = field.find('textarea[name="$content"]')[0];
       console.log(textarea);
-      createIssueCreationForm(textarea, tab);
-    })
+      const callback = function() {
+        field.find('.nav-tabs a[href="#content-tab-list"]').tab('show');
+        createIssueCreationForm(textarea, tab, callback);
+      };
+      callback()
+    });
   }
 
   $(document).on('xwiki:dom:updated', attachContentPicker);

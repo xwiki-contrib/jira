@@ -37,16 +37,59 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{groovy output="false"}}
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.atlassian.jira.rest.client.api.domain.input.FieldInput;
+import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
+import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue;
+import com.atlassian.jira.rest.client.api.JiraRestClient;
 
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
+
+class CreateIssuesandFields
+{
+  public FieldInput createFieldInput(String fieldId, Object value)
+  {
+    return new FieldInput(fieldId, value);
+  }
+
+  public IssueInput createIssueInput(List&lt;FieldInput&gt; fields)
+  {
+    return IssueInput.createWithFields(fields.toArray(new FieldInput[0]));
+  }
+
+  public ComplexIssueInputFieldValue createComplexIssueInputFieldValue(String key, Object value)
+  {
+    return ComplexIssueInputFieldValue.with(key, value);
+  }
+
+    public ComplexIssueInputFieldValue createComplexIssueInputFieldValue(Map&lt;String, Object&gt; value)
+  {
+    return new ComplexIssueInputFieldValue(value);
+  }
+
+  public boolean userExists(JiraRestClient jiraRestClient, String username)
+  {
+    try {
+      jiraRestClient.getUserClient().getUser(username).claim();
+      return true;
+    } catch (RuntimeException e) {
+      return false;
+    }
+  }
+}
 
 xcontext.put('objectMapper', new ObjectMapper());
 xcontext.objectMapper.registerModule(new JodaModule());
 
 xcontext.put('jiraConfiguration', services.component.getInstance(JIRAConfiguration.class))
+
+xcontext.put('createIssuesandFields', new CreateIssuesandFields());
+
+def reader = new BufferedReader(new InputStreamReader(request.getInputStream()))
+def postData = new StringBuilder()
+reader.eachLine { postData.append(it) }
+xcontext.put('postData', postData)
 {{/groovy}}
 {{velocity output="false"}}
 ## Request action parameter:
@@ -54,7 +97,9 @@ xcontext.put('jiraConfiguration', services.component.getInstance(JIRAConfigurati
 ##   * suggestProject (getAllProjects)
 ##   * suggestIssueType (getCreateIssueMetaProjectIssueTypes)
 ##   * getFieldsMetadata
-##   * createIssue (TODO)
+##   * createIssue
+##   * getSession
+##   * getUser
 #macro (suggestInstance)
   #set ($data = [])
   #foreach ($instance in $xcontext.jiraConfiguration.getJIRAServers().entrySet())
@@ -94,6 +139,40 @@ xcontext.put('jiraConfiguration', services.component.getInstance(JIRAConfigurati
 #macro (getFieldsMetadata $project $issueType)
   #set ($data = $jiraRestClient.getIssueClient().getCreateIssueMetaFields($project, $issueType, $request.startAt, $request.maxResults).claim().getValues())
 #end
+#macro (createIssue $inputData)
+  #set ($json = $jsontool.parse($xcontext.postData))
+  #set ($data = $json)
+  #set ($fields = [])
+  #set ($reporter = $xwiki.getUser().user.userReference.name)
+  #set ($reporterExists = $xcontext.createIssuesandFields.userExists($jiraRestClient, $reporter))
+  #if ($json.reporter)
+    #if ($reporterExists)
+      #set ($fieldValue = $xcontext.createIssuesandFields.createComplexIssueInputFieldValue({"name":$reporter}))
+      #set ($discard = $fields.add($xcontext.createIssuesandFields.createFieldInput("reporter", $fieldValue)))
+    #end
+  #end
+  #foreach ($field in $json.fields)
+    #if (!$field.value.toString().equals($field.value))
+      #set ($fieldValue = $xcontext.createIssuesandFields.createComplexIssueInputFieldValue($field.value))
+    #else
+      #set ($fieldValue = $field.value.toString())
+    #end
+    #set ($discard = $fields.add($xcontext.createIssuesandFields.createFieldInput($field.id, $fieldValue)))
+  #end
+  #set ($issueInput = $xcontext.createIssuesandFields.createIssueInput($fields))
+  #set ($data = $issueInput)
+  #if ($reporterExists || !$json.reporter)
+    #set ($data = $jiraRestClient.getIssueClient().createIssue($issueInput).claim())
+  #else
+    Could not find user $reporter in Jira.
+  #end
+#end
+#macro (getSession)
+  #set ($data = $jiraRestClient.getSessionClient().getCurrentSession().claim())
+#end
+#macro (getUser $username)
+  #set ($data = $jiraRestClient.getUserClient().getUser($username).claim())
+#end
 {{/velocity}}
 {{velocity wiki="false"}}
 #set ($text = "")
@@ -114,6 +193,15 @@ xcontext.put('jiraConfiguration', services.component.getInstance(JIRAConfigurati
 #end
 #if ($request.action == 'getFieldsMetadata')
   #getFieldsMetadata($request.project $request.issueType)
+#end
+#if ($request.action == 'createIssue')
+  #createIssue($request.data)
+#end
+#if ($request.action == 'getSession')
+  #getSession()
+#end
+#if ($request.action == 'getUser')
+  #getUser($request.name)
 #end
 #if ($data)
   #set ($discard = $response.setContentType('application/json'))
