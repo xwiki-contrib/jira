@@ -169,6 +169,48 @@
                   <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setURL(java.lang.String) @ org.xwiki.contrib.jira.macro.JIRAMacroParameters</new>
                   <annotation>@org.xwiki.properties.annotation.PropertyGroup({"instance"})</annotation>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String)</old>
+                  <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.contrib.jira.config.JIRAServer.class})</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.macro.JIRAMacroParameters</old>
+                  <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.macro.JIRAMacroParameters</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.contrib.jira.config.JIRAServer.class})</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.charts.AbstractChartMacroParameters</old>
+                  <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.charts.AbstractChartMacroParameters</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.contrib.jira.config.JIRAServer.class})</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRABiDimensionalGridChartMacroParameter</old>
+                  <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRABiDimensionalGridChartMacroParameter</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.contrib.jira.config.JIRAServer.class})</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters</old>
+                  <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.contrib.jira.config.JIRAServer.class})</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters</old>
+                  <new>method void org.xwiki.contrib.jira.macro.AbstractJIRAMacroParameters::setId(java.lang.String) @ org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.contrib.jira.config.JIRAServer.class})</annotation>
+                </item>
               </differences>
             </revapi.differences>
             <revapi.differences>
