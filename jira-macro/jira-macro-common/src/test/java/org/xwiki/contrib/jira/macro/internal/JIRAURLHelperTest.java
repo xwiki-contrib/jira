@@ -56,5 +56,15 @@ class JIRAURLHelperTest
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
                 + "jqlQuery=query&tempMax=5",
             this.jiraURLHelper.getSearchURL(jiraServer, "query", 5));
+
+        // Rest search - No credentials passed
+        jiraServer = new JIRAServer("http://localhost/jira");
+        assertEquals("http://localhost/jira/rest/api/2/search?maxResults=0&jql=query",
+            this.jiraURLHelper.getRestSearchURL(jiraServer, "query"));
+
+        // Rest search - Just username defined but no password (or empty password)
+        jiraServer = new JIRAServer("http://localhost/jira", "username", "");
+        assertEquals("http://localhost/jira/rest/api/2/search?maxResults=0&jql=query",
+            this.jiraURLHelper.getRestSearchURL(jiraServer, "query"));
     }
 }

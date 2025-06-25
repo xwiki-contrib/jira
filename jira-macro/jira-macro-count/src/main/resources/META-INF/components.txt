@@ -1,0 +1,1 @@
+org.xwiki.contrib.jira.count.internal.JIRACountMacro
