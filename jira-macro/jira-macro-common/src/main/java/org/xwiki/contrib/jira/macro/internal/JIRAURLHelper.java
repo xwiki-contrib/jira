@@ -54,6 +54,8 @@ public class JIRAURLHelper
     private static final String JQL_SEARCH_URL_PREFIX =
         "/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=";
 
+    private static final String JQL_REST_SEARCH_URL_PREFIX = "/rest/api/2/search?maxResults=0&jql=";
+
 
     @Inject
     private Logger logger;
@@ -115,6 +117,20 @@ public class JIRAURLHelper
             additionalQueryString);
         this.logger.debug("Computed JIRA URL [{}]", fullURL);
 
+        return fullURL;
+    }
+
+    /**
+     * @param server the actual JIRA server to request
+     * @param jqlQuery the query to perform in the search
+     * @return the URL to perform the search.
+     */
+    public String getRestSearchURL(JIRAServer server, String jqlQuery)
+    {
+        // Note: we encode using UTF8 since it's the W3C recommendation.
+        // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
+        String fullURL = String.format("%s%s%s", server.getURL(), JQL_REST_SEARCH_URL_PREFIX, encode(jqlQuery));
+        this.logger.debug("Computed JIRA REST SEARCH URL [{}]", fullURL);
         return fullURL;
     }
 

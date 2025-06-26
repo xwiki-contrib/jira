@@ -1,0 +1,21 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test macro when inline.
+.#-----------------------------------------------------
+Inline {{jiraCount url="http://localhost:8889"}}issueKey in (XWIKI-1000,XWIKI-1001){{/jiraCount}} macro.
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [Inline]
+onSpace
+beginMacroMarkerInline [jiraCount] [url=http://localhost:8889] [issueKey in (XWIKI-1000,XWIKI-1001)]
+onWord [2]
+endMacroMarkerInline [jiraCount] [url=http://localhost:8889] [issueKey in (XWIKI-1000,XWIKI-1001)]
+onSpace
+onWord [macro]
+onSpecialSymbol [.]
+endParagraph
+endDocument
