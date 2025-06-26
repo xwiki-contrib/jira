@@ -109,10 +109,6 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
             throw new MacroExecutionException(String.format(FAILED_TO_RETRIEVE_JIRA_DATA,
                 jiraServer.getURL(), content), e);
         }
-        if (searchResult == null) {
-            throw new MacroExecutionException(String.format(FAILED_TO_RETRIEVE_JIRA_DATA,
-                jiraServer.getURL(), content));
-        }
         List<Block> result = List.of(new WordBlock(Integer.toString(searchResult.getTotal())));
         if (!context.isInline()) {
             result = Collections.singletonList(new ParagraphBlock(result));
