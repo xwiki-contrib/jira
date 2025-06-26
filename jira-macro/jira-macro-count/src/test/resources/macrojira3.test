@@ -3,7 +3,6 @@
 .input|xwiki/2.0
 .# Test macro with emtpy macro content
 .#-----------------------------------------------------
-
 {{jiraCount url="http://localhost:8889"}}
 {{/jiraCount}}
 .#-----------------------------------------------------
