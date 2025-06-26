@@ -30,7 +30,7 @@
   <artifactId>jira-macro-count</artifactId>
   <name>JIRA - Macro - Count</name>
   <packaging>jar</packaging>
-  <description>Display number of result of a JQL query</description>
+  <description>Display the number of results of a JQL query</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.43</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->

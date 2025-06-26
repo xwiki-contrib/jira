@@ -43,7 +43,7 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * Get the number of result of a JQL from a JIRA server and display it.
+ * Get the number of results of a JQL from a JIRA server and display it.
  *
  * @version $Id$
  * @since 10.2.0
