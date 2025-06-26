@@ -1,18 +1,18 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test the "count" style when used as a standalone macro.
+.# Test macro when used as a standalone macro.
 .#-----------------------------------------------------
-{{jiraCount url="http://localhost:8889" style="count" source="jql"}}
+{{jiraCount url="http://localhost:8889"}}
 issueKey in (XWIKI-1000,XWIKI-1001)
 {{/jiraCount}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [jiraCount] [url=http://localhost:8889|style=count|source=jql] [issueKey in (XWIKI-1000,XWIKI-1001)]
+beginMacroMarkerStandalone [jiraCount] [url=http://localhost:8889] [issueKey in (XWIKI-1000,XWIKI-1001)]
 beginParagraph
 onWord [2]
 endParagraph
-endMacroMarkerStandalone [jiraCount] [url=http://localhost:8889|style=count|source=jql] [issueKey in (XWIKI-1000,XWIKI-1001)]
+endMacroMarkerStandalone [jiraCount] [url=http://localhost:8889] [issueKey in (XWIKI-1000,XWIKI-1001)]
 endDocument
