@@ -29,19 +29,13 @@ import javax.inject.Singleton;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableFunction;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.ContextBuilder;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpHost;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
@@ -66,7 +60,7 @@ public class HTTPJIRAFetcher
     /**
      * @param urlString the full JIRA URL to call
      * @param jiraServer the jira server data containing optional credentials (used to setup preemptive basic
-     * authentication
+     *     authentication
      * @return the {@link Document} object containing the XML data
      * @throws JIRAConnectionException if an error happened during the fetch or if the passed URL is malformed
      */
@@ -92,12 +86,13 @@ public class HTTPJIRAFetcher
 
     /**
      * Fetch and parse a JSON based on the given information.
+     *
      * @param urlString the full JIRA URL to call
      * @param jiraServer the jira server data containing optional credentials (used to setup preemptive basic
-     * authentication
+     *     authentication
      * @param type the actual type to obtain when parsing the JSON
-     * @return an instance of the POJO corresponding to the JSON answer
      * @param <T> the expected type
+     * @return an instance of the POJO corresponding to the JSON answer
      * @throws JIRAConnectionException in case of problem when performing the request
      */
     public <T> T fetchJSON(String urlString, JIRAServer jiraServer, Class<T> type) throws JIRAConnectionException
@@ -127,49 +122,39 @@ public class HTTPJIRAFetcher
         FailableFunction<InputStream, T, Exception> callback) throws Exception
     {
         HttpGet httpGet = new HttpGet(url);
-        CloseableHttpClient httpClient = createHttpClientBuilder().build();
-
-        HttpHost targetHost = createHttpHost(jiraServer);
-        HttpClientContext context = HttpClientContext.create();
-        setPreemptiveBasicAuthentication(context, jiraServer, targetHost);
-        try (CloseableHttpResponse response = httpClient.execute(targetHost, httpGet, context)) {
-            // Only parse the content if there was no error.
-            if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() < 300) {
-                return callback.apply(response.getEntity().getContent());
-            } else {
-                // The error message is in the HTML. We extract it to perform some good error-reporting, by extracting
-                // it from the <h1> tag.
-                throw new JIRAConnectionException(String.format("Error = [%s]. URL = [%s]",
-                    EXTRACTOR.extract(response.getEntity().getContent()), httpGet.getURI().toString()));
+        try (CloseableHttpClient httpClient = createHttpClientBuilder().build()) {
+            HttpHost targetHost = createHttpHost(jiraServer);
+            ContextBuilder context = ContextBuilder.create();
+            setPreemptiveBasicAuthentication(context, jiraServer, targetHost);
+            try (CloseableHttpResponse response = httpClient.execute(targetHost, httpGet, context.build())) {
+                // Only parse the content if there was no error.
+                if (response.getCode() >= 200 && response.getCode() < 300) {
+                    return callback.apply(response.getEntity().getContent());
+                } else {
+                    // The error message is in the HTML. We extract it to perform some good error-reporting,
+                    // by extracting it from the <h1> tag.
+                    throw new JIRAConnectionException(String.format("Error = [%s]. URL = [%s]",
+                        EXTRACTOR.extract(response.getEntity().getContent()), httpGet.getUri().toString()));
+                }
             }
         }
     }
 
-    private void setPreemptiveBasicAuthentication(HttpClientContext context, JIRAServer jiraServer, HttpHost targetHost)
+    private void setPreemptiveBasicAuthentication(ContextBuilder context, JIRAServer jiraServer, HttpHost targetHost)
     {
         // Connect to JIRA using basic authentication if username and password are defined
         // Note: Set up preemptive basic authentication since JIRA can accept both unauthenticated and authenticated
         // requests. See https://developer.atlassian.com/server/jira/platform/basic-authentication/
         if (StringUtils.isNotBlank(jiraServer.getUsername()) && StringUtils.isNotBlank(jiraServer.getPassword())) {
-            CredentialsProvider provider = new BasicCredentialsProvider();
-            provider.setCredentials(
-                new AuthScope(targetHost.getHostName(), targetHost.getPort()),
-                new UsernamePasswordCredentials(jiraServer.getUsername(), jiraServer.getPassword()));
-            // Create AuthCache instance
-            AuthCache authCache = new BasicAuthCache();
-            // Generate BASIC scheme object and add it to the local auth cache
-            BasicScheme basicAuth = new BasicScheme();
-            authCache.put(targetHost, basicAuth);
-            // Add AuthCache to the execution context
-            context.setCredentialsProvider(provider);
-            context.setAuthCache(authCache);
+            context.preemptiveBasicAuth(targetHost,
+                new UsernamePasswordCredentials(jiraServer.getUsername(), jiraServer.getPassword().toCharArray()));
         }
     }
 
     private HttpHost createHttpHost(JIRAServer server) throws MalformedURLException
     {
         URL jiraURL = new URL(server.getURL());
-        return new HttpHost(jiraURL.getHost(), jiraURL.getPort(), jiraURL.getProtocol());
+        return new HttpHost(jiraURL.getProtocol(), jiraURL.getHost(), jiraURL.getPort());
     }
 
     private HttpClientBuilder createHttpClientBuilder()

@@ -23,8 +23,8 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.piechart.StatisticType;

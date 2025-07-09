@@ -21,8 +21,8 @@ package org.xwiki.contrib.jira.charts.internal.createdvsresolved;
 
 import java.util.List;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.contrib.jira.charts.createdvsresolved.ChartPeriod;
