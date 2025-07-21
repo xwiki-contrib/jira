@@ -24,11 +24,14 @@ import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.contrib.jira.config.JIRAAuthenticator;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link DefaultJIRAConfiguration}.
@@ -57,11 +60,14 @@ public class DefaultJIRAConfigurationTest
         DefaultJIRAConfiguration configuration = this.mocker.getComponentUnderTest();
 
         assertTrue(configuration.getJIRAServers().isEmpty());
-        configuration.setJIRAServers(Collections.singletonMap("key", new JIRAServer("url", "username", "password")));
+        JIRAAuthenticator jiraAuthenticator = new BasicAuthJIRAAuthenticator("username", "password");
+        JIRAServer jiraServer = new JIRAServer("url", "id", jiraAuthenticator);
+        configuration.setJIRAServers(Collections.singletonMap("key", jiraServer));
         assertEquals(1, configuration.getJIRAServers().size());
         assertEquals("url", configuration.getJIRAServers().get("key").getURL());
-        assertEquals("username", configuration.getJIRAServers().get("key").getUsername());
-        assertEquals("password", configuration.getJIRAServers().get("key").getPassword());
+        assertTrue(
+            configuration.getJIRAServers().get("key").getJiraAuthenticator().orElseThrow().isAuthenticatingRequest());
+        assertEquals(jiraAuthenticator, configuration.getJIRAServers().get("key").getJiraAuthenticator().orElseThrow());
 
         assertFalse(configuration.isAsync());
         configuration.setAsync(true);

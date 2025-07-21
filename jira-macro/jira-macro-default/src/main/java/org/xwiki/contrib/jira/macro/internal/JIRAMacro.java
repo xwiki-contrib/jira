@@ -32,6 +32,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRADisplayer;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -66,6 +67,12 @@ public class JIRAMacro extends AbstractMacro<JIRAMacroParameters>
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private JIRAMacroTransformationManager jiraMacroTransformationManager;
+
+    @Inject
+    private JIRAServerResolver jiraServerResolver;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -85,8 +92,11 @@ public class JIRAMacro extends AbstractMacro<JIRAMacroParameters>
     public List<Block> execute(JIRAMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return getDisplayer(parameters).display(getDataSource(parameters).getData(content, parameters), parameters,
-            context);
+        List<Block> result =
+            getDisplayer(parameters).display(getDataSource(parameters).getData(content, parameters), parameters,
+                context);
+        return jiraMacroTransformationManager.transform(result, parameters, context,
+            jiraServerResolver.resolve(parameters), "jiraCount");
     }
 
     /**

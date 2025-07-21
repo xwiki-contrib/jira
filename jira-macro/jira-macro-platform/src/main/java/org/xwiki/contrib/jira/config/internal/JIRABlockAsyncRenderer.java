@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.config.JIRAAuthenticator;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
@@ -163,11 +164,11 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
         // Note: make sure we don't cache if a different jira url is used or if a different user is used for the same
         // jira url since different users can have different permissions on jira.
         String jiraURL;
-        String username = null;
+        String authenticatorPart = null;
         try {
             JIRAServer jiraServer = this.jiraServerResolver.resolve(this.parameters);
             jiraURL = jiraServer.getURL();
-            username = jiraServer.getUsername();
+            authenticatorPart = jiraServer.getJiraAuthenticator().map(JIRAAuthenticator::getId).orElse(null);
         } catch (MacroExecutionException e) {
             // The jira url is not set nor an id set (or the id points to a not-defined JIRA URL), so we cannot get the
             // value. The macro will fail to display. We cache the result based on the id if it's defined. Otherwise,
@@ -175,7 +176,7 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             jiraURL = this.parameters.getId();
         }
 
-        return createId("rendering", "macro", "jira", source, index, jiraURL, username);
+        return createId("rendering", "macro", "jira", source, index, jiraURL, authenticatorPart);
     }
 
     private String getCurrentSource(MacroTransformationContext context)

@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
@@ -36,7 +35,6 @@ import com.atlassian.jira.rest.client.api.AuthenticationHandler;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
 import com.atlassian.jira.rest.client.auth.AnonymousAuthenticationHandler;
-import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 
 /**
@@ -71,13 +69,11 @@ public class JiraScriptService implements ScriptService
 
     private AuthenticationHandler getAuthenticationHandler(JIRAServer jiraServer)
     {
-        AuthenticationHandler handler;
-        if (StringUtils.isBlank(jiraServer.getUsername()) || StringUtils.isBlank(jiraServer.getPassword())) {
-            handler = new AnonymousAuthenticationHandler();
+        if (jiraServer.getJiraAuthenticator().isPresent()) {
+            return jiraServer.getJiraAuthenticator().get().getRestClientAuthenticationHandler();
         } else {
-            handler = new BasicHttpAuthenticationHandler(jiraServer.getUsername(), jiraServer.getPassword());
+            return new AnonymousAuthenticationHandler();
         }
-        return handler;
     }
 
     /**

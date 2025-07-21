@@ -47,7 +47,7 @@ class JiraScriptServiceTest
     @Test
     void getJiraRestClient() throws Exception
     {
-        JIRAServer server = new JIRAServer("https://jira.xwiki.org");
+        JIRAServer server = new JIRAServer("https://jira.xwiki.org", "id");
         JiraRestClient client = this.jiraScriptService.getJiraRestClient(server);
         Promise<SearchResult> promise = client.getSearchClient().searchJql("category = 10000 AND issuetype = Task  AND "
             + "component = \"Dependency Upgrades\"  and fixVersion in (16.2.0, 16.2.0-rc-1)");

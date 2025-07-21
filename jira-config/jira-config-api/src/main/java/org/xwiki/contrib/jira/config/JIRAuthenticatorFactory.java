@@ -17,28 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.config.internal;
+package org.xwiki.contrib.jira.config;
 
-import org.junit.jupiter.api.Test;
-import org.xwiki.contrib.jira.config.JIRAAuthenticator;
-import org.xwiki.contrib.jira.config.JIRAServer;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Unit tests for {@link org.xwiki.contrib.jira.config.JIRAServer}.
+ * Factor for {@link JIRAAuthenticator}. The implementation is expected to be named with the corresponding
+ * authentication type.
  *
  * @version $Id$
+ * @since 11.3.0
  */
-class JIRAServerTest
+@Role
+public interface JIRAuthenticatorFactory
 {
-    @Test
-    void verifyToString()
-    {
-        JIRAServer server =
-            new JIRAServer("https://jira.xwiki.org", "id", new BasicAuthJIRAAuthenticator("username", "password"));
-        assertEquals(
-            "URL = [https://jira.xwiki.org], authenticator = [class org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator]",
-            server.toString());
-    }
+    /**
+     * Build a {@link JIRAAuthenticator} object based on the content of the XObject JIRA.JIRAConfigClass.
+     *
+     * @param serverId the serverId.
+     * @return the JIRAServer object configured
+     */
+    JIRAAuthenticator get(String serverId);
 }

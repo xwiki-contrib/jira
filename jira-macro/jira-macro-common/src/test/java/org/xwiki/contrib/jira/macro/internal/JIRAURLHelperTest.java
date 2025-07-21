@@ -21,6 +21,7 @@ package org.xwiki.contrib.jira.macro.internal;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
@@ -42,28 +43,28 @@ class JIRAURLHelperTest
     void computeFullURL()
     {
         // No credentials passed
-        JIRAServer jiraServer = new JIRAServer("http://localhost/jira");
+        JIRAServer jiraServer = new JIRAServer("http://localhost/jira", "id");
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
             this.jiraURLHelper.getSearchURL(jiraServer, "query", -1));
 
         // Just username defined but no password (or empty password)
-        jiraServer = new JIRAServer("http://localhost/jira", "username", "");
+        jiraServer = new JIRAServer("http://localhost/jira", "id", new BasicAuthJIRAAuthenticator("username", ""));
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=query",
             this.jiraURLHelper.getSearchURL(jiraServer, "query", -1));
 
         // With Max Count and no credentials
-        jiraServer = new JIRAServer("http://localhost/jira");
+        jiraServer = new JIRAServer("http://localhost/jira", "id");
         assertEquals("http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?"
                 + "jqlQuery=query&tempMax=5",
             this.jiraURLHelper.getSearchURL(jiraServer, "query", 5));
 
         // Rest search - No credentials passed
-        jiraServer = new JIRAServer("http://localhost/jira");
+        jiraServer = new JIRAServer("http://localhost/jira", "id");
         assertEquals("http://localhost/jira/rest/api/2/search?maxResults=0&jql=query",
             this.jiraURLHelper.getRestSearchURL(jiraServer, "query"));
 
         // Rest search - Just username defined but no password (or empty password)
-        jiraServer = new JIRAServer("http://localhost/jira", "username", "");
+        jiraServer = new JIRAServer("http://localhost/jira", "id", new BasicAuthJIRAAuthenticator("username", ""));
         assertEquals("http://localhost/jira/rest/api/2/search?maxResults=0&jql=query",
             this.jiraURLHelper.getRestSearchURL(jiraServer, "query"));
     }

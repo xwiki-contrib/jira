@@ -24,13 +24,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.hc.client5.http.ContextBuilder;
-import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -39,6 +40,7 @@ import org.apache.hc.core5.http.HttpHost;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.config.JIRAServer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,6 +58,10 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 public class HTTPJIRAFetcher
 {
     private static final ErrorMessageExtractor EXTRACTOR = new ErrorMessageExtractor();
+
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * @param urlString the full JIRA URL to call
@@ -125,7 +131,10 @@ public class HTTPJIRAFetcher
         try (CloseableHttpClient httpClient = createHttpClientBuilder().build()) {
             HttpHost targetHost = createHttpHost(jiraServer);
             ContextBuilder context = ContextBuilder.create();
-            setPreemptiveBasicAuthentication(context, jiraServer, targetHost);
+            if (jiraServer.getJiraAuthenticator().isPresent()) {
+                jiraServer.getJiraAuthenticator().get()
+                    .authenticateInHttpClient(context, httpGet, targetHost);
+            }
             try (CloseableHttpResponse response = httpClient.execute(targetHost, httpGet, context.build())) {
                 // Only parse the content if there was no error.
                 if (response.getCode() >= 200 && response.getCode() < 300) {
@@ -137,17 +146,6 @@ public class HTTPJIRAFetcher
                         EXTRACTOR.extract(response.getEntity().getContent()), httpGet.getUri().toString()));
                 }
             }
-        }
-    }
-
-    private void setPreemptiveBasicAuthentication(ContextBuilder context, JIRAServer jiraServer, HttpHost targetHost)
-    {
-        // Connect to JIRA using basic authentication if username and password are defined
-        // Note: Set up preemptive basic authentication since JIRA can accept both unauthenticated and authenticated
-        // requests. See https://developer.atlassian.com/server/jira/platform/basic-authentication/
-        if (StringUtils.isNotBlank(jiraServer.getUsername()) && StringUtils.isNotBlank(jiraServer.getPassword())) {
-            context.preemptiveBasicAuth(targetHost,
-                new UsernamePasswordCredentials(jiraServer.getUsername(), jiraServer.getPassword().toCharArray()));
         }
     }
 

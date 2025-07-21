@@ -32,6 +32,7 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.count.JIRACountMacroParameters;
 import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
 import org.xwiki.contrib.jira.macro.internal.JIRAConnectionException;
+import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.block.Block;
@@ -76,6 +77,9 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
     @Inject
     private JIRAURLHelper urlHelper;
 
+    @Inject
+    private JIRAMacroTransformationManager jiraMacroTransformationManager;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -113,6 +117,6 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
         if (!context.isInline()) {
             result = Collections.singletonList(new ParagraphBlock(result));
         }
-        return result;
+        return jiraMacroTransformationManager.transform(result, parameters, context, jiraServer, "jiraCount");
     }
 }

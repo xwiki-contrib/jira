@@ -27,6 +27,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -92,9 +93,10 @@ public class IntegrationTests
         // - one without authentication
         JIRAConfiguration configuration = componentManager.registerMockComponent(JIRAConfiguration.class);
         Map<String, JIRAServer> servers = new HashMap<>();
-        JIRAServer server1 = new JIRAServer("http://localhost:8889");
+        JIRAServer server1 = new JIRAServer("http://localhost:8889", "id");
         servers.put("jira-noauth", server1);
-        JIRAServer server2 = new JIRAServer("http://localhost:8889/auth", "username", "password");
+        JIRAServer server2 =
+            new JIRAServer("http://localhost:8889/auth", "id", new BasicAuthJIRAAuthenticator("username", "password"));
         servers.put("jira-auth", server2);
         when(configuration.getJIRAServers()).thenReturn(servers);
     }

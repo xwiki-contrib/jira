@@ -185,6 +185,41 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <criticality>allowed</criticality>
+              <justification>The authentication system was refactored to be able to extends it. The authentication information was moved in the Authentication class.</justification>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.contrib.jira.config.JIRAServer::&lt;init&gt;(java.lang.String, java.lang.String, java.lang.String)</old>
+                  <new>method void org.xwiki.contrib.jira.config.JIRAServer::&lt;init&gt;(java.lang.String, org.xwiki.contrib.jira.config.JIRAAuthenticator)</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String org.xwiki.contrib.jira.config.JIRAServer::getPassword()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String org.xwiki.contrib.jira.config.JIRAServer::getUsername()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.contrib.jira.config.JIRAServer::&lt;init&gt;(java.lang.String)</old>
+                  <new>method void org.xwiki.contrib.jira.config.JIRAServer::&lt;init&gt;(java.lang.String, java.lang.String)</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter void org.xwiki.contrib.jira.config.JIRAServer::&lt;init&gt;(java.lang.String, java.lang.String, ===java.lang.String===)</old>
+                  <new>parameter void org.xwiki.contrib.jira.config.JIRAServer::&lt;init&gt;(java.lang.String, java.lang.String, ===org.xwiki.contrib.jira.config.JIRAAuthenticator===)</new>
+                  <parameterIndex>2</parameterIndex>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

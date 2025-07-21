@@ -34,6 +34,8 @@ import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.JIRADataChartJSDataConverter;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
+import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
+import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -66,6 +68,12 @@ public class JIRACreatedVsResolvedMacro
     private JIRADataChartJSDataConverter<JIRACreatedVsResolvedDataSource, JIRACreatedVsResolvedMacroParameters>
         converter;
 
+    @Inject
+    private JIRAMacroTransformationManager jiraMacroTransformationManager;
+
+    @Inject
+    private JIRAServerResolver jiraServerResolver;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -86,7 +94,8 @@ public class JIRACreatedVsResolvedMacro
 
         MacroBlock macroBlock = new MacroBlock("chartjs", chartJSParameterMap, json, false);
 
-        return List.of(macroBlock);
+        return jiraMacroTransformationManager.transform(List.of(macroBlock), parameters, context,
+            jiraServerResolver.resolve(parameters), JIRACreatedVsResolvedMacro.MACRO_NAME);
     }
 
     @Override
