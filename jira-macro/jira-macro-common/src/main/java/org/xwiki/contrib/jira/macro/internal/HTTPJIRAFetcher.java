@@ -131,10 +131,8 @@ public class HTTPJIRAFetcher
         try (CloseableHttpClient httpClient = createHttpClientBuilder().build()) {
             HttpHost targetHost = createHttpHost(jiraServer);
             ContextBuilder context = ContextBuilder.create();
-            if (jiraServer.getJiraAuthenticator().isPresent()) {
-                jiraServer.getJiraAuthenticator().get()
-                    .authenticateInHttpClient(context, httpGet, targetHost);
-            }
+            jiraServer.getJiraAuthenticator().ifPresent(a ->
+                a.authenticateInHttpClient(context, httpGet, targetHost));
             try (CloseableHttpResponse response = httpClient.execute(targetHost, httpGet, context.build())) {
                 // Only parse the content if there was no error.
                 if (response.getCode() >= 200 && response.getCode() < 300) {

@@ -93,8 +93,8 @@ public class JIRAServer
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
         builder = builder.append("URL", getURL());
-        if (getJiraAuthenticator().isPresent()) {
-            builder = builder.append("authenticator", getJiraAuthenticator().get().getClass());
+        if (jiraAuthenticator != null) {
+            builder = builder.append("authenticator", jiraAuthenticator.getClass());
         }
         return builder.toString();
     }

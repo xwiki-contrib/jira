@@ -21,6 +21,7 @@ package org.xwiki.contrib.jira.script;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.config.JIRAAuthenticator;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.script.service.ScriptService;
 
@@ -69,8 +71,9 @@ public class JiraScriptService implements ScriptService
 
     private AuthenticationHandler getAuthenticationHandler(JIRAServer jiraServer)
     {
-        if (jiraServer.getJiraAuthenticator().isPresent()) {
-            return jiraServer.getJiraAuthenticator().get().getRestClientAuthenticationHandler();
+        Optional<JIRAAuthenticator> authenticator = jiraServer.getJiraAuthenticator();
+        if (authenticator.isPresent()) {
+            return authenticator.get().getRestClientAuthenticationHandler();
         } else {
             return new AnonymousAuthenticationHandler();
         }

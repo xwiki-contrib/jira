@@ -29,11 +29,14 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.document.DocumentUserReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -126,14 +129,32 @@ public class JIRAConfigurationMigrator
                         basicAuthObj.setStringValue(PROPERTY_PASSWORD, password);
                     }
                 }
-                // TODO set correct user for save...
                 xwiki.saveDocument(basicAuthDoc, DOC_SAVE_MESSAGE, context);
                 xwiki.saveDocument(jiraServerDoc, DOC_SAVE_MESSAGE, context);
+
                 // Juste create a single document to save the fact that we run the migration
-                xwiki.saveDocument(xwiki.getDocument(migrationDocumentRef, context).clone(), context);
+                createMigrationStateDocument();
             }
         } catch (XWikiException e) {
             logger.error("Can't handle migration of JIRA server configuration", e);
         }
+    }
+
+    private void createMigrationStateDocument()
+        throws XWikiException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+        DocumentReference migrationDocumentRef =
+            new DocumentReference(MIGRATION_STATUS_DOCUMENT_REFERENCE, new WikiReference(context.getWikiId()));
+
+        XWikiDocument migrationStateDoc = xwiki.getDocument(migrationDocumentRef, context).clone();
+        UserReference userRef = new DocumentUserReference(
+            new DocumentReference("xwiki", "XWiki", "superadmin"), true);
+        DocumentAuthors authors = migrationStateDoc.getAuthors();
+        authors.setContentAuthor(userRef);
+        authors.setEffectiveMetadataAuthor(userRef);
+        authors.setOriginalMetadataAuthor(userRef);
+        xwiki.saveDocument(migrationStateDoc, context);
     }
 }

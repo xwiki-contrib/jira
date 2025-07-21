@@ -20,7 +20,6 @@
 package org.xwiki.contrib.jira.config.internal;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.contrib.jira.config.JIRAAuthenticator;
 import org.xwiki.contrib.jira.config.JIRAServer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
