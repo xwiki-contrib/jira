@@ -30,25 +30,25 @@ import com.atlassian.jira.rest.client.api.AuthenticationHandler;
  * JIRA authenticator, to send authenticated request to the target JIRA server.
  *
  * @version $Id$
- * @since 11.3.0
+ * @since 10.3.0
  */
 @Role
 public interface JIRAAuthenticator
 {
     /**
-     * @return the JiraRestClient instance configured by the provider.
+     * @return the Authentication handler instance configured by the authenticator.
      */
     AuthenticationHandler getRestClientAuthenticationHandler();
 
     /**
-     * Authenticate in HttpClient.
+     * Add the authentication in the HttpClient request if needed. Depending on the authenticator implementation
+     * this might for instance add an Authorization header.
      *
      * @param context the HTTP request context.
      * @param request the HTTP request.
      * @param targetHost the HTTP request target host.
      */
-    void authenticateInHttpClient(ContextBuilder context, HttpUriRequest request,
-        HttpHost targetHost);
+    void authenticateInHttpClient(ContextBuilder context, HttpUriRequest request, HttpHost targetHost);
 
     /**
      * Provide the information if the {@link JIRAAuthenticator} will authenticate the request or leave the request as it

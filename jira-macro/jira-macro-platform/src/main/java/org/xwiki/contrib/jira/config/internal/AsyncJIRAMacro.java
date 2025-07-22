@@ -80,6 +80,8 @@ public class AsyncJIRAMacro extends JIRAMacro
 
         // Take into account the current wiki since the jira config document can be located in each wiki (without this
         // all config document will be taken from the main wiki).
+        // we need the PROP_USER and PROP_REQUEST_URL to provide a more correct context when calling
+        // the JIRAMacroTransformation implementation.
         configuration.setContextEntries(Set.of(
             XWikiContextContextStore.PROP_WIKI,
             XWikiContextContextStore.PROP_USER,

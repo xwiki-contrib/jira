@@ -22,11 +22,11 @@ package org.xwiki.contrib.jira.config;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Factor for {@link JIRAAuthenticator}. The implementation is expected to be named with the corresponding
+ * Factory for {@link JIRAAuthenticator}. The implementation is expected to be named with the corresponding
  * authentication type.
  *
  * @version $Id$
- * @since 11.3.0
+ * @since 10.3.0
  */
 @Role
 public interface JIRAuthenticatorFactory

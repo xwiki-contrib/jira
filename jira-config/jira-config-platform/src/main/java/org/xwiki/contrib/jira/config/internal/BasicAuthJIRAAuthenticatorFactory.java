@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Factory for {@link BasicAuthJIRAAuthenticator}.
  *
  * @version $Id$
- * @since 11.3.0
+ * @since 10.3.0
  */
 @Component
 @Singleton

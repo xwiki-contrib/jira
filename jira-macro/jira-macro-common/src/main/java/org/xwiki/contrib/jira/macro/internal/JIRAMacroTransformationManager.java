@@ -40,7 +40,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * Tools for handling macro transformation after macro execution.
  *
  * @version $Id$
- * @since 11.3.0
+ * @since 10.3.0
  */
 @Component(roles = { JIRAMacroTransformationManager.class })
 @Singleton
