@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -49,6 +50,9 @@ public class JIRAMacroTransformationManager
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    private Logger logger;
 
     /**
      * Apply a transformation on a {@link List<Block>}.
@@ -74,7 +78,9 @@ public class JIRAMacroTransformationManager
                 resultingBlocks = transformation.transform(resultingBlocks, parameters, context, jiraServer, macroName);
             }
         } catch (ComponentLookupException e) {
-            throw new RuntimeException(e);
+            // Avoid to crash the full macro execution if the transformation fail and just show the macro without
+            // the transformation.
+            logger.error("Can't get components of Role JIRAMacroTransformation", e);
         }
         return resultingBlocks;
     }

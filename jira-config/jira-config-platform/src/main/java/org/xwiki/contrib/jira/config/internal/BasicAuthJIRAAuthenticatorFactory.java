@@ -76,24 +76,24 @@ public class BasicAuthJIRAAuthenticatorFactory implements JIRAuthenticatorFactor
     private Provider<XWikiContext> contextProvider;
 
     @Override
-    public JIRAAuthenticator get(String serverId)
+    public JIRAAuthenticator get(String serverId) throws JIRAAuthenticatorException
     {
         XWikiContext context = contextProvider.get();
+        XWikiDocument doc;
         try {
-            XWikiDocument doc = context.getWiki()
-                .getDocument(BASIC_AUTH_CONFIG_REFERENCE, context);
-            Optional<BaseObject> authObj = doc.getXObjects(BASIC_AUTH_DATA_CLASS_REFERENCE)
-                .stream().filter(x -> StringUtils.equals(serverId, (x.getStringValue(CONFIG_ID_FIELD))))
-                .findFirst();
-            if (authObj.isPresent()) {
-                String username = authObj.get().getStringValue("username");
-                String password = authObj.get().getStringValue("password");
-                return new BasicAuthJIRAAuthenticator(username, password);
-            } else {
-                throw new RuntimeException("Can't find Basic auth config for server ID: " + serverId);
-            }
+            doc = context.getWiki().getDocument(BASIC_AUTH_CONFIG_REFERENCE, context);
         } catch (XWikiException e) {
-            throw new RuntimeException("Can't get JIRA Basic auth configuration", e);
+            throw new JIRAAuthenticatorException("Can't get JIRA Basic auth configuration document", e);
+        }
+        Optional<BaseObject> authObj = doc.getXObjects(BASIC_AUTH_DATA_CLASS_REFERENCE)
+            .stream().filter(x -> StringUtils.equals(serverId, (x.getStringValue(CONFIG_ID_FIELD))))
+            .findFirst();
+        if (authObj.isPresent()) {
+            String username = authObj.get().getStringValue("username");
+            String password = authObj.get().getStringValue("password");
+            return new BasicAuthJIRAAuthenticator(username, password);
+        } else {
+            throw new JIRAAuthenticatorException("Can't find Basic auth config for server ID: " + serverId);
         }
     }
 }

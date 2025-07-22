@@ -173,7 +173,7 @@
               pastedURL = new URL(pastedElement.attributes['href']);
             }
             const matchingInstance =
-              editor.config.jiraInstances.find(instance =&gt; pastedURL.origin.startsWith(instance.url));
+              editor.config.jiraInstances.find(instance => pastedURL.origin.startsWith(instance.url));
             if (!matchingInstance) {
               return;
             }

@@ -121,18 +121,10 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
             StringProperty urlProperty = (StringProperty) baseObject.getField("url");
             if (!isPropertyEmpty(idProperty) && !isPropertyEmpty(urlProperty)) {
                 String authType = baseObject.getStringValue("authenticationType");
-                if (StringUtils.isEmpty(authType) || "noAuth".equals(authType)) {
-                    jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue());
-                } else {
-                    try {
-                        JIRAuthenticatorFactory jirAuthenticatorFactory = componentManagerProvider.get()
-                            .getInstance(JIRAuthenticatorFactory.class, authType);
-                        jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue(),
-                            jirAuthenticatorFactory.get(idProperty.getValue()));
-                    } catch (ComponentLookupException e) {
-                        logger.error("Can't find JIRAuthenticatorFactory with name [{}]", authType, e);
-                        continue;
-                    }
+
+                jiraServer = getJiraServer(authType, urlProperty, idProperty);
+                if (jiraServer == null) {
+                    continue;
                 }
                 jiraServers.put(idProperty.getValue(), jiraServer);
             }
@@ -141,6 +133,36 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
             jiraServers = null;
         }
         return jiraServers;
+    }
+
+    private JIRAServer getJiraServer(String authType, StringProperty urlProperty, StringProperty idProperty)
+    {
+        ComponentManager componentManager = componentManagerProvider.get();
+
+        JIRAServer jiraServer;
+        if (StringUtils.isEmpty(authType) || "noAuth".equals(authType)) {
+            jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue());
+        } else {
+            if (!componentManager.hasComponent(JIRAuthenticatorFactory.class, authType)) {
+                logger.error("Can't find JIRAuthenticatorFactory with name [{}]", authType);
+                jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue());
+            } else {
+                try {
+                    JIRAuthenticatorFactory jirAuthenticatorFactory = componentManagerProvider.get()
+                        .getInstance(JIRAuthenticatorFactory.class, authType);
+                    jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue(),
+                        jirAuthenticatorFactory.get(idProperty.getValue()));
+                } catch (ComponentLookupException e) {
+                    logger.error("Can't create JIRAuthenticatorFactory for authentication type [{}]", authType,
+                        e);
+                    return null;
+                } catch (JIRAAuthenticatorException e) {
+                    logger.error("Can't create JIRAAuthenticator", e);
+                    return null;
+                }
+            }
+        }
+        return jiraServer;
     }
 
     private boolean isPropertyEmpty(BaseProperty property)

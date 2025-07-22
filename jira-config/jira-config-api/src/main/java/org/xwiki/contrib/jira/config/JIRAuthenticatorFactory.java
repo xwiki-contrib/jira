@@ -20,6 +20,7 @@
 package org.xwiki.contrib.jira.config;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.contrib.jira.config.internal.JIRAAuthenticatorException;
 
 /**
  * Factory for {@link JIRAAuthenticator}. The implementation is expected to be named with the corresponding
@@ -37,5 +38,5 @@ public interface JIRAuthenticatorFactory
      * @param serverId the serverId.
      * @return the JIRAServer object configured
      */
-    JIRAAuthenticator get(String serverId);
+    JIRAAuthenticator get(String serverId) throws JIRAAuthenticatorException;
 }
