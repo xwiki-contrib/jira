@@ -31,7 +31,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @param <P> the type of Macro parameter.
  *
  * @version $Id$
- * @since 10.3.0
+ * @since 11.0.0
  */
 @Role
 public interface JIRAMacroTransformation<P>

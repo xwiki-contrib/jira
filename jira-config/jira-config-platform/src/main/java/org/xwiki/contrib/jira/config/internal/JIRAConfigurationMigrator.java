@@ -48,7 +48,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Listener to handle migration of authentication in JIRA configuration.
  *
  * @version $Id$
- * @since 10.3.0
+ * @since 11.0.0
  */
 @Singleton
 @Component(roles = { JIRAConfigurationMigrator.class })

@@ -32,7 +32,7 @@ import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
  * JIRA authenticator for Basic Auth.
  *
  * @version $Id$
- * @since 10.3.0
+ * @since 11.0.0
  */
 public class BasicAuthJIRAAuthenticator implements JIRAAuthenticator
 {

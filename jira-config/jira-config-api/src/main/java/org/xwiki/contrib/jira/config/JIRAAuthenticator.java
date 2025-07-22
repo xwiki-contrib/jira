@@ -30,7 +30,7 @@ import com.atlassian.jira.rest.client.api.AuthenticationHandler;
  * JIRA authenticator, to send authenticated request to the target JIRA server.
  *
  * @version $Id$
- * @since 10.3.0
+ * @since 11.0.0
  */
 @Role
 public interface JIRAAuthenticator

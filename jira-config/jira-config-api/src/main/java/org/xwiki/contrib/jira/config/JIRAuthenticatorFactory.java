@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Role;
  * authentication type.
  *
  * @version $Id$
- * @since 10.3.0
+ * @since 11.0.0
  */
 @Role
 public interface JIRAuthenticatorFactory

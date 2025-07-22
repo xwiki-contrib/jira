@@ -22,6 +22,7 @@ package org.xwiki.contrib.jira.config;
 import java.util.Optional;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -51,7 +52,22 @@ public class JIRAServer
     }
 
     /**
+     * Credential-protected JIRA server.
+     * @deprecated since 11.0.0. Use {@link #JIRAServer(String, String, JIRAAuthenticator)} instead.
+     *
+     * @param url see {@link #getURL()}
+     * @param username basic username.
+     * @param password basic password.
+     */
+    @Deprecated
+    public JIRAServer(String url, String username, String password)
+    {
+        this(url, "", new BasicAuthJIRAAuthenticator(username, password));
+    }
+
+    /**
      * Constructor for JIRA server which will send the requests with authentication.
+     * @since 11.0.0
      *
      * @param url see {@link #getURL()}
      * @param id see {@link #getId()}
