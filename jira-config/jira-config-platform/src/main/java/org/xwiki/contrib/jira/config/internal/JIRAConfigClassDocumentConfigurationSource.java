@@ -72,9 +72,6 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
-    @Inject
-    private JIRAConfigurationMigrator configurationMigrator;
-
     @Override
     protected String getCacheId()
     {
@@ -172,7 +169,6 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
 
     private List<BaseObject> getJIRAServerBaseObjects() throws XWikiException
     {
-        configurationMigrator.migrate();
         List<BaseObject> jiraServerObjects = new ArrayList<>();
 
         DocumentReference documentReference = getFailsafeDocumentReference();

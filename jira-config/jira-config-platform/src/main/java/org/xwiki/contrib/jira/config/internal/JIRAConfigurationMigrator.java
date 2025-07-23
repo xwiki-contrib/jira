@@ -28,12 +28,16 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;
@@ -51,9 +55,15 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 11.0.0
  */
 @Singleton
-@Component(roles = { JIRAConfigurationMigrator.class })
-public class JIRAConfigurationMigrator
+@Component
+@Named(JIRAConfigurationMigrator.HINT)
+public class JIRAConfigurationMigrator extends AbstractEventListener
 {
+    /**
+     * Main name of the listener.
+     */
+    public static final String HINT = "JIRAConfigMigrationListener";
+
     private static final String JIRA = "JIRA";
 
     private static final String PROPERTY_USERNAME = "username";
@@ -81,6 +91,20 @@ public class JIRAConfigurationMigrator
 
     @Inject
     private Logger logger;
+
+    /**
+     * Public constructor.
+     */
+    public JIRAConfigurationMigrator()
+    {
+        super(HINT, List.of(new ApplicationReadyEvent(), new JobFinishedEvent("install")));
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        migrate();
+    }
 
     /**
      * Run the data migration for JIRA server config.

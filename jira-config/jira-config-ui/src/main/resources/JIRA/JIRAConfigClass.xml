@@ -54,7 +54,7 @@
       <number>5</number>
       <picker>1</picker>
       <prettyName>authenticationType</prettyName>
-      <size>30</size>
+      <size>10</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
