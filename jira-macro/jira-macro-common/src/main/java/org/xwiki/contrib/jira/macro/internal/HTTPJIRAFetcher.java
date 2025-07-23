@@ -24,9 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
@@ -40,7 +37,6 @@ import org.apache.hc.core5.http.HttpHost;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.config.JIRAServer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,10 +54,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 public class HTTPJIRAFetcher
 {
     private static final ErrorMessageExtractor EXTRACTOR = new ErrorMessageExtractor();
-
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * @param urlString the full JIRA URL to call

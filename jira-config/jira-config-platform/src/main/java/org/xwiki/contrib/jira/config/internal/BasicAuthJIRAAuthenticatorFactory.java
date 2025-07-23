@@ -86,7 +86,8 @@ public class BasicAuthJIRAAuthenticatorFactory implements JIRAAuthenticatorFacto
             throw new JIRAAuthenticatorException("Can't get JIRA Basic auth configuration document", e);
         }
         Optional<BaseObject> authObj = doc.getXObjects(BASIC_AUTH_DATA_CLASS_REFERENCE)
-            .stream().filter(x -> StringUtils.equals(serverId, (x.getStringValue(CONFIG_ID_FIELD))))
+            .stream().filter(x -> x != null
+                && StringUtils.equals(serverId, (x.getStringValue(CONFIG_ID_FIELD))))
             .findFirst();
         if (authObj.isPresent()) {
             String username = authObj.get().getStringValue("username");

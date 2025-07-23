@@ -86,8 +86,6 @@ public abstract class AbstractJIRAChartMacro<T extends AbstractChartMacroParamet
     /**
      * Fetch the data, convert them, and serialize them to JSON to be used in ChartJS macro.
      *
-     * @since 11.0.0
-     *
      * @param parameters the parameters of the macro.
      * @param dataSourceClass the actual class for the data source.
      * @return a serialized JSON string to be used in ChartJS.
@@ -107,6 +105,8 @@ public abstract class AbstractJIRAChartMacro<T extends AbstractChartMacroParamet
 
     /**
      * Apply macro transformation on the macro result.
+     *
+     * @since 11.0.0
      *
      * @param parameters the macro parameter, depending on the type of the parameter.
      * @param context the macro execution context.
