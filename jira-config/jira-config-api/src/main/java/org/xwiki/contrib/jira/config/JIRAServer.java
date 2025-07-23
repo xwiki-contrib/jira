@@ -19,7 +19,10 @@
  */
 package org.xwiki.contrib.jira.config;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -30,34 +33,62 @@ import org.xwiki.text.XWikiToStringBuilder;
  */
 public class JIRAServer
 {
+    private String id;
+
     private String url;
 
-    private String username;
-
-    private String password;
+    private JIRAAuthenticator jiraAuthenticator;
 
     /**
      * Public-access JIRA server.
      *
      * @param url see {@link #getURL()}
+     * @deprecated since 11.0.0. Use {@link #JIRAServer(String, String)} instead.
      */
+    @Deprecated
     public JIRAServer(String url)
     {
+        this(url, "");
+    }
+
+    /**
+     * Public-access JIRA server.
+     *
+     * @param url see {@link #getURL()}
+     * @param id see {@link #getId()}
+     */
+    public JIRAServer(String url, String id)
+    {
         this.url = url;
+        this.id = id;
     }
 
     /**
      * Credential-protected JIRA server.
      *
      * @param url see {@link #getURL()}
-     * @param username see {@link #getUsername()}
-     * @param password see {@link #getPassword()}
+     * @param username basic username.
+     * @param password basic password.
+     * @deprecated since 11.0.0. Use {@link #JIRAServer(String, String, JIRAAuthenticator)} instead.
      */
+    @Deprecated
     public JIRAServer(String url, String username, String password)
     {
-        this(url);
-        this.username = username;
-        this.password = password;
+        this(url, "", new BasicAuthJIRAAuthenticator(username, password));
+    }
+
+    /**
+     * Constructor for JIRA server which will send the requests with authentication.
+     *
+     * @param url see {@link #getURL()}
+     * @param id see {@link #getId()}
+     * @param jiraAuthenticator see {@link #getJiraAuthenticator()}
+     * @since 11.0.0
+     */
+    public JIRAServer(String url, String id, JIRAAuthenticator jiraAuthenticator)
+    {
+        this(url, id);
+        this.jiraAuthenticator = jiraAuthenticator;
     }
 
     /**
@@ -69,19 +100,20 @@ public class JIRAServer
     }
 
     /**
-     * @return the username to log in on that JIRA server
+     * @return the ID of the server configuration.
      */
-    public String getUsername()
+    public String getId()
     {
-        return this.username;
+        return id;
     }
 
     /**
-     * @return the password to log in on that JIRA server
+     * @return the corresponding JIRA authenticator if a authenticator is configured. If no authenticator is set it mean
+     *     that the request is expected to be sent without any authentication with the public rights.
      */
-    public String getPassword()
+    public Optional<JIRAAuthenticator> getJiraAuthenticator()
     {
-        return this.password;
+        return Optional.ofNullable(jiraAuthenticator);
     }
 
     @Override
@@ -89,9 +121,11 @@ public class JIRAServer
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
         builder = builder.append("URL", getURL());
-        // Never display the password for security reasons.
-        if (getUsername() != null) {
-            builder = builder.append("Username", getUsername());
+        if (id != null) {
+            builder = builder.append("id", id);
+        }
+        if (jiraAuthenticator != null) {
+            builder = builder.append("authenticator", jiraAuthenticator.getClass());
         }
         return builder.toString();
     }

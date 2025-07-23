@@ -96,6 +96,6 @@ public class JIRAPieChartMacro extends AbstractJIRAChartMacro<JIRAPieChartMacroP
 
         MacroBlock macroBlock = new MacroBlock("chartjs", chartJSParameterMap, json, false);
 
-        return List.of(macroBlock);
+        return transformMacroResult(parameters, context, macroBlock, JIRAPieChartMacro.MACRO_NAME);
     }
 }

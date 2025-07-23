@@ -30,8 +30,9 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
-import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
+import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -40,8 +41,10 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.xwiki.contrib.jira.macro.JIRAField.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.xwiki.contrib.jira.macro.JIRAField.KEY;
+import static org.xwiki.contrib.jira.macro.JIRAField.NOTE;
+import static org.xwiki.contrib.jira.macro.JIRAField.SUMMARY;
 
 /**
  * Unit tests for {@link ListJIRADataSource} and
@@ -124,7 +127,7 @@ class ListJIRADataSourceTest
             fail("should have thrown an exception");
         } catch (MacroExecutionException expected) {
             assertEquals("No JIRA Server found. You must specify a JIRA server, using the \"url\" macro parameter or "
-                + "using the \"id\" macro parameter to reference a server defined in the JIRA Macro configuration.",
+                    + "using the \"id\" macro parameter to reference a server defined in the JIRA Macro configuration.",
                 expected.getMessage());
         }
     }
@@ -147,7 +150,7 @@ class ListJIRADataSourceTest
     void getJIRAServerWhenIdUsedAndDefined() throws Exception
     {
         when(this.jiraConfiguration.getJIRAServers()).thenReturn(Collections.singletonMap("someid",
-            new JIRAServer("http://localhost")));
+            new JIRAServer("http://localhost", "id")));
 
         JIRAMacroParameters parameters = new JIRAMacroParameters();
         parameters.setId("someid");
@@ -157,13 +160,17 @@ class ListJIRADataSourceTest
     @Test
     void getJIRAServerWhenURLSpecifiedAndMatchingConfigurationExist() throws Exception
     {
+        JIRAServer jiraServer =
+            new JIRAServer("http://localhost", "whatever", new BasicAuthJIRAAuthenticator("username", "password"));
         when(this.jiraConfiguration.getJIRAServers()).thenReturn(Collections.singletonMap("whatever",
-            new JIRAServer("http://localhost", "username", "password")));
+            jiraServer));
 
         JIRAMacroParameters parameters = new JIRAMacroParameters();
         parameters.setURL("http://localhost");
 
         assertEquals("http://localhost", this.jiraDataSource.getJIRAServer(parameters).getURL());
-        assertEquals("username", this.jiraDataSource.getJIRAServer(parameters).getUsername());
+        assertEquals(
+            BasicAuthJIRAAuthenticator.class,
+            this.jiraDataSource.getJIRAServer(parameters).getJiraAuthenticator().orElseThrow().getClass());
     }
 }

@@ -29,9 +29,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartMacro;
 import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
-import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.JIRADataChartJSDataConverter;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
 import org.xwiki.rendering.block.Block;
@@ -86,7 +86,7 @@ public class JIRACreatedVsResolvedMacro
 
         MacroBlock macroBlock = new MacroBlock("chartjs", chartJSParameterMap, json, false);
 
-        return List.of(macroBlock);
+        return transformMacroResult(parameters, context, macroBlock, JIRACreatedVsResolvedMacro.MACRO_NAME);
     }
 
     @Override

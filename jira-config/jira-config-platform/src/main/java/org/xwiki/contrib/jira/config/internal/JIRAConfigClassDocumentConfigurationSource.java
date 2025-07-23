@@ -24,12 +24,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.config.JIRAAuthenticatorFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
@@ -61,6 +67,10 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
      */
     private static final LocalDocumentReference DOC_REFERENCE =
         new LocalDocumentReference(SPACE, "JIRAConfig");
+
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Override
     protected String getCacheId()
@@ -107,13 +117,11 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
             StringProperty idProperty = (StringProperty) baseObject.getField("id");
             StringProperty urlProperty = (StringProperty) baseObject.getField("url");
             if (!isPropertyEmpty(idProperty) && !isPropertyEmpty(urlProperty)) {
-                StringProperty usernameProperty = (StringProperty) baseObject.getField("username");
-                StringProperty passswordProperty = (StringProperty) baseObject.getField("password");
-                if (!isPropertyEmpty(usernameProperty) && !isPropertyEmpty(passswordProperty)) {
-                    jiraServer = new JIRAServer(urlProperty.getValue(),
-                        usernameProperty.getValue(), passswordProperty.getValue());
-                } else {
-                    jiraServer = new JIRAServer(urlProperty.getValue());
+                String authType = baseObject.getStringValue("authenticationType");
+
+                jiraServer = getJiraServer(authType, urlProperty, idProperty);
+                if (jiraServer == null) {
+                    continue;
                 }
                 jiraServers.put(idProperty.getValue(), jiraServer);
             }
@@ -122,6 +130,33 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
             jiraServers = null;
         }
         return jiraServers;
+    }
+
+    private JIRAServer getJiraServer(String authType, StringProperty urlProperty, StringProperty idProperty)
+    {
+        ComponentManager componentManager = componentManagerProvider.get();
+
+        JIRAServer jiraServer = null;
+        if (StringUtils.isEmpty(authType) || "noAuth".equals(authType)) {
+            jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue());
+        } else {
+            if (!componentManager.hasComponent(JIRAAuthenticatorFactory.class, authType)) {
+                logger.error("Can't find JIRAuthenticatorFactory with name [{}]", authType);
+            } else {
+                try {
+                    JIRAAuthenticatorFactory jiraAuthenticatorFactory = componentManagerProvider.get()
+                        .getInstance(JIRAAuthenticatorFactory.class, authType);
+                    jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue(),
+                        jiraAuthenticatorFactory.get(idProperty.getValue()));
+                } catch (ComponentLookupException e) {
+                    logger.error("Can't create JIRAuthenticatorFactory for authentication type [{}]", authType,
+                        e);
+                } catch (JIRAAuthenticatorException e) {
+                    logger.error("Can't create JIRAAuthenticator", e);
+                }
+            }
+        }
+        return jiraServer;
     }
 
     private boolean isPropertyEmpty(BaseProperty property)

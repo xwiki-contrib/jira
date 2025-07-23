@@ -33,6 +33,8 @@ import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRACell;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRADataSource;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRARow;
+import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
+import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.TableBlock;
@@ -73,6 +75,12 @@ public class JIRABiDimensionalGridChartMacro extends AbstractMacro<JIRABiDimensi
     @Named("html")
     private RawBlockFilter rawBlockFilter;
 
+    @Inject
+    private JIRAMacroTransformationManager jiraMacroTransformationManager;
+
+    @Inject
+    private JIRAServerResolver jiraServerResolver;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -107,7 +115,8 @@ public class JIRABiDimensionalGridChartMacro extends AbstractMacro<JIRABiDimensi
         }
 
         TableBlock tableBlock = new TableBlock(tableRows);
-        return List.of(tableBlock);
+        return jiraMacroTransformationManager.transform(List.of(tableBlock), parameters, context,
+            jiraServerResolver.resolve(parameters), JIRABiDimensionalGridChartMacro.MACRO_NAME);
     }
 
     private TableRowBlock getTableRow(JIRABiDimensionalGridChartJIRARow rowData,

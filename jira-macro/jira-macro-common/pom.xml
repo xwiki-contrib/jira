@@ -33,7 +33,7 @@
   <description>Common abstractions and utilities of all JIRA macros.</description>
   <properties>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
-    <xwiki.jacoco.instructionRatio>0.51</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.55</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -41,8 +41,8 @@
       <artifactId>jdom2</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib.jira</groupId>

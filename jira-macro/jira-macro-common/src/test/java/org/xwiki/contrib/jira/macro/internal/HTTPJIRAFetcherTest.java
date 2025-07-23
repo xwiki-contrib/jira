@@ -22,25 +22,18 @@ package org.xwiki.contrib.jira.macro.internal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.slf4j.LoggerFactory;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.test.LogLevel;
-import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link HTTPJIRAFetcher}.
@@ -77,9 +70,12 @@ class HTTPJIRAFetcherTest
                 .withStatus(200)
                 .withHeader("Content-Type", "text/xml")
                 .withBodyFile("input.xml")));
-
+        JIRAServer jiraServer =
+            new JIRAServer("http://localhost:8889", "id", new BasicAuthJIRAAuthenticator("user", "pass"));
         Throwable exception = assertThrows(JIRAConnectionException.class, () -> {
-            this.jiraFetcher.fetch("http://localhost:8889/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=whatever", new JIRAServer("http://localhost:8889", "user", "pass"));
+            this.jiraFetcher.fetch(
+                "http://localhost:8889/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=whatever",
+                jiraServer);
         });
         assertEquals("Failed to parse JIRA XML content [<!--\n"
             + " * See the NOTICE file distributed with this work for additional\n"
@@ -105,6 +101,7 @@ class HTTPJIRAFetcherTest
             + "    <title>XWiki.org JIRA &invalid;</title>\n"
             + "  </channel>\n"
             + "</rss>]", exception.getMessage());
-        assertEquals("Error on line 22: The entity \"invalid\" was referenced, but not declared.", exception.getCause().getMessage());
+        assertEquals("Error on line 22: The entity \"invalid\" was referenced, but not declared.",
+            exception.getCause().getMessage());
     }
 }

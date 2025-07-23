@@ -25,8 +25,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;

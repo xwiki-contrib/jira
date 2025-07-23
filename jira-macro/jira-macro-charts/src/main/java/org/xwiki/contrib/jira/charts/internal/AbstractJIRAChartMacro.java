@@ -19,11 +19,21 @@
  */
 package org.xwiki.contrib.jira.charts.internal;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
+import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
+import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,15 +43,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @param <T> the type of parameters
  * @param <U> the type of expected data source
- *
  * @version $Id$
  * @since 10.0
  */
 public abstract class AbstractJIRAChartMacro<T extends AbstractChartMacroParameters, U extends AbstractJIRADataSource>
     extends AbstractMacro<T>
 {
+    @Inject
+    private JIRAServerResolver jiraServerResolver;
+
+    @Inject
+    private JIRAMacroTransformationManager jiraMacroTransformationManager;
+
     /**
      * Default constructor.
+     *
      * @param name the name of the macro
      * @param description the description of the macro
      * @param parametersClass the type of parameters
@@ -69,6 +85,7 @@ public abstract class AbstractJIRAChartMacro<T extends AbstractChartMacroParamet
 
     /**
      * Fetch the data, convert them, and serialize them to JSON to be used in ChartJS macro.
+     *
      * @param parameters the parameters of the macro.
      * @param dataSourceClass the actual class for the data source.
      * @return a serialized JSON string to be used in ChartJS.
@@ -84,5 +101,25 @@ public abstract class AbstractJIRAChartMacro<T extends AbstractChartMacroParamet
         } catch (JsonProcessingException e) {
             throw new MacroExecutionException("Error when transforming data to JSON", e);
         }
+    }
+
+    /**
+     * Apply macro transformation on the macro result.
+     *
+     * @since 11.0.0
+     *
+     * @param parameters the macro parameter, depending on the type of the parameter.
+     * @param context the macro execution context.
+     * @param macroBlock the input macro block to apply the transformation.
+     * @param macroName the macro name which was called.
+     * @return the list of block after the transformation was called.
+     * @throws MacroExecutionException in case there are a {@link JIRAServer} resolution issue
+     */
+    protected List<Block> transformMacroResult(
+        T parameters, MacroTransformationContext context,
+        MacroBlock macroBlock, String macroName) throws MacroExecutionException
+    {
+        return jiraMacroTransformationManager.transform(List.of(macroBlock), parameters, context,
+            jiraServerResolver.resolve(parameters), macroName);
     }
 }

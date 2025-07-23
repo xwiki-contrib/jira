@@ -20,8 +20,8 @@
 package org.xwiki.contrib.jira.config.internal;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,11 +43,11 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import com.xpn.xwiki.internal.context.XWikiContextContextStore;
 
 /**
- * Overrides the {@link JIRAMacro} to make it work asynchronously. This is done so that the JIRA macro can be used
- * in XWiki Rendering (the non-async version) or in XWiki Platform (the async version).
+ * Overrides the {@link JIRAMacro} to make it work asynchronously. This is done so that the JIRA macro can be used in
+ * XWiki Rendering (the non-async version) or in XWiki Platform (the async version).
  *
- * @since 8.6
  * @version $Id$
+ * @since 8.6
  */
 @Component
 @Named("jira")
@@ -80,7 +80,14 @@ public class AsyncJIRAMacro extends JIRAMacro
 
         // Take into account the current wiki since the jira config document can be located in each wiki (without this
         // all config document will be taken from the main wiki).
-        configuration.setContextEntries(Collections.singleton(XWikiContextContextStore.PROP_WIKI));
+        // we need the PROP_USER and PROP_REQUEST_URL to provide a more correct context when calling
+        // the JIRAMacroTransformation implementation. This is mainly needed for the transformation related to
+        // the OAuth Authenticator.
+        configuration.setContextEntries(Set.of(
+            XWikiContextContextStore.PROP_WIKI,
+            XWikiContextContextStore.PROP_USER,
+            XWikiContextContextStore.PROP_REQUEST_URL
+        ));
 
         // Execute the renderer
         Block result;

@@ -76,7 +76,7 @@ public class DefaultJIRAServerResolver implements JIRAServerResolver
                 }
             }
             if (jiraServer == null) {
-                jiraServer = new JIRAServer(url);
+                jiraServer = new JIRAServer(url, "id");
             }
         }
 
