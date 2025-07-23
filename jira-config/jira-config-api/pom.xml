@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>JIRA configuration API and in-memory implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>In-Memory JIRA Configuration</xwiki.extension.name>
     <!-- The extension's category -->

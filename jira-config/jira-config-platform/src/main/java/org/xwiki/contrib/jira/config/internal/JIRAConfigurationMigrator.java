@@ -136,17 +136,14 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
                     String username = obj.getStringValue(PROPERTY_USERNAME);
                     String password = obj.getStringValue(PROPERTY_PASSWORD);
 
-                    BaseObject jiraServerObj = jiraServerObjs.stream()
-                        .filter(o -> o != null && StringUtils.equals(o.getStringValue(PROPERTY_ID), serverId))
-                        .findFirst().orElseThrow();
-                    jiraServerObj.removeField(PROPERTY_USERNAME);
-                    jiraServerObj.removeField(PROPERTY_PASSWORD);
+                    obj.removeField(PROPERTY_USERNAME);
+                    obj.removeField(PROPERTY_PASSWORD);
 
                     if (StringUtils.isEmpty(username)) {
                         // server without authentication
-                        jiraServerObj.setStringValue(PROPERTY_AUTHENTICATION_TYPE, "noAuth");
+                        obj.setStringValue(PROPERTY_AUTHENTICATION_TYPE, "noAuth");
                     } else {
-                        jiraServerObj.setStringValue(PROPERTY_AUTHENTICATION_TYPE,
+                        obj.setStringValue(PROPERTY_AUTHENTICATION_TYPE,
                             BasicAuthJIRAAuthenticatorFactory.HINT);
                         BaseObject basicAuthObj = basicAuthDoc
                             .newXObject(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_DATA_CLASS_REFERENCE, context);

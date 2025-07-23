@@ -35,7 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.config.JIRAuthenticatorFactory;
+import org.xwiki.contrib.jira.config.JIRAAuthenticatorFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
@@ -140,14 +140,14 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
         if (StringUtils.isEmpty(authType) || "noAuth".equals(authType)) {
             jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue());
         } else {
-            if (!componentManager.hasComponent(JIRAuthenticatorFactory.class, authType)) {
+            if (!componentManager.hasComponent(JIRAAuthenticatorFactory.class, authType)) {
                 logger.error("Can't find JIRAuthenticatorFactory with name [{}]", authType);
             } else {
                 try {
-                    JIRAuthenticatorFactory jirAuthenticatorFactory = componentManagerProvider.get()
-                        .getInstance(JIRAuthenticatorFactory.class, authType);
+                    JIRAAuthenticatorFactory jiraAuthenticatorFactory = componentManagerProvider.get()
+                        .getInstance(JIRAAuthenticatorFactory.class, authType);
                     jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue(),
-                        jirAuthenticatorFactory.get(idProperty.getValue()));
+                        jiraAuthenticatorFactory.get(idProperty.getValue()));
                 } catch (ComponentLookupException e) {
                     logger.error("Can't create JIRAuthenticatorFactory for authentication type [{}]", authType,
                         e);

@@ -52,10 +52,5 @@
       <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${platform.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-default</artifactId>
-      <version>${platform.version}</version>
-    </dependency>
   </dependencies>
 </project>

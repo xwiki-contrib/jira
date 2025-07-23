@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAAuthenticator;
-import org.xwiki.contrib.jira.config.JIRAuthenticatorFactory;
+import org.xwiki.contrib.jira.config.JIRAAuthenticatorFactory;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -47,7 +47,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Singleton
 @Named(BasicAuthJIRAAuthenticatorFactory.HINT)
-public class BasicAuthJIRAAuthenticatorFactory implements JIRAuthenticatorFactory
+public class BasicAuthJIRAAuthenticatorFactory implements JIRAAuthenticatorFactory
 {
     /**
      * The authenticator HINT.

@@ -30,7 +30,7 @@ import org.xwiki.contrib.jira.config.internal.JIRAAuthenticatorException;
  * @since 11.0.0
  */
 @Role
-public interface JIRAuthenticatorFactory
+public interface JIRAAuthenticatorFactory
 {
     /**
      * Build a {@link JIRAAuthenticator} object based on the content of the XObject JIRA.JIRAConfigClass.

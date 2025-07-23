@@ -19,10 +19,18 @@
  */
 package org.xwiki.contrib.jira.config.internal;
 
+import org.apache.hc.client5.http.ContextBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.core5.http.HttpHost;
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.jira.config.JIRAServer;
 
+import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link org.xwiki.contrib.jira.config.JIRAServer}.
@@ -37,7 +45,25 @@ class JIRAServerTest
         JIRAServer server =
             new JIRAServer("https://jira.xwiki.org", "id", new BasicAuthJIRAAuthenticator("username", "password"));
         assertEquals(
-            "URL = [https://jira.xwiki.org], authenticator = [class org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator]",
+            "URL = [https://jira.xwiki.org], id = [id], authenticator = [class org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator]",
             server.toString());
+    }
+
+    @Test
+    void verifyAuthenticator()
+    {
+        JIRAServer server =
+            new JIRAServer("https://jira.xwiki.org", "id", new BasicAuthJIRAAuthenticator("username", "password"));
+        assertInstanceOf(BasicAuthJIRAAuthenticator.class, server.getJiraAuthenticator().orElseThrow());
+        assertInstanceOf(BasicHttpAuthenticationHandler.class,
+            server.getJiraAuthenticator().orElseThrow().getRestClientAuthenticationHandler());
+        assertTrue(server.getJiraAuthenticator().orElseThrow().isAuthenticatingRequest());
+        assertEquals("username", server.getJiraAuthenticator().orElseThrow().getId());
+        ContextBuilder context = ContextBuilder.create();
+        HttpGet httpGet = new HttpGet("https://example.com");
+        HttpHost targetHost = new HttpHost("example.com");
+        server.getJiraAuthenticator().get().authenticateInHttpClient(context, httpGet, targetHost);
+        assertInstanceOf(BasicScheme.class,
+            context.build().getAuthExchanges().values().stream().findAny().orElseThrow().getAuthScheme());
     }
 }
