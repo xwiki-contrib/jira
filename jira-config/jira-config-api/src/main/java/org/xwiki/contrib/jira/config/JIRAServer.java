@@ -43,6 +43,18 @@ public class JIRAServer
      * Public-access JIRA server.
      *
      * @param url see {@link #getURL()}
+     * @deprecated since 11.0.0. Use {@link #JIRAServer(String, String)} instead.
+     */
+    @Deprecated
+    public JIRAServer(String url)
+    {
+        this(url, "");
+    }
+
+    /**
+     * Public-access JIRA server.
+     *
+     * @param url see {@link #getURL()}
      * @param id see {@link #getId()}
      */
     public JIRAServer(String url, String id)
@@ -53,11 +65,11 @@ public class JIRAServer
 
     /**
      * Credential-protected JIRA server.
-     * @deprecated since 11.0.0. Use {@link #JIRAServer(String, String, JIRAAuthenticator)} instead.
      *
      * @param url see {@link #getURL()}
      * @param username basic username.
      * @param password basic password.
+     * @deprecated since 11.0.0. Use {@link #JIRAServer(String, String, JIRAAuthenticator)} instead.
      */
     @Deprecated
     public JIRAServer(String url, String username, String password)
@@ -67,11 +79,11 @@ public class JIRAServer
 
     /**
      * Constructor for JIRA server which will send the requests with authentication.
-     * @since 11.0.0
      *
      * @param url see {@link #getURL()}
      * @param id see {@link #getId()}
      * @param jiraAuthenticator see {@link #getJiraAuthenticator()}
+     * @since 11.0.0
      */
     public JIRAServer(String url, String id, JIRAAuthenticator jiraAuthenticator)
     {

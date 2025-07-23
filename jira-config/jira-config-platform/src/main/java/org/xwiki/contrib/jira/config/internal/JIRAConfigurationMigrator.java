@@ -62,7 +62,7 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
     /**
      * Main name of the listener.
      */
-    public static final String HINT = "JIRAConfigMigrationListener";
+    public static final String HINT = "JIRAConfigurationMigrator";
 
     private static final String JIRA = "JIRA";
 
@@ -90,7 +90,7 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
      */
     public JIRAConfigurationMigrator()
     {
-        super(HINT, List.of(new ApplicationReadyEvent(), new WikiReadyEvent(), new JobFinishedEvent("install")));
+        super(HINT, new ApplicationReadyEvent(), new WikiReadyEvent(), new JobFinishedEvent("install"));
     }
 
     @Override

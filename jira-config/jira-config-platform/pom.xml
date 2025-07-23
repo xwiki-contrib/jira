@@ -56,7 +56,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-default</artifactId>
       <version>${platform.version}</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
