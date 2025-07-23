@@ -136,13 +136,12 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     {
         ComponentManager componentManager = componentManagerProvider.get();
 
-        JIRAServer jiraServer;
+        JIRAServer jiraServer = null;
         if (StringUtils.isEmpty(authType) || "noAuth".equals(authType)) {
             jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue());
         } else {
             if (!componentManager.hasComponent(JIRAuthenticatorFactory.class, authType)) {
                 logger.error("Can't find JIRAuthenticatorFactory with name [{}]", authType);
-                jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue());
             } else {
                 try {
                     JIRAuthenticatorFactory jirAuthenticatorFactory = componentManagerProvider.get()
@@ -152,10 +151,8 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
                 } catch (ComponentLookupException e) {
                     logger.error("Can't create JIRAuthenticatorFactory for authentication type [{}]", authType,
                         e);
-                    return null;
                 } catch (JIRAAuthenticatorException e) {
                     logger.error("Can't create JIRAAuthenticator", e);
-                    return null;
                 }
             }
         }

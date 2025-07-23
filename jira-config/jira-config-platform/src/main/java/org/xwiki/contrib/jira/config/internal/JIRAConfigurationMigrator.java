@@ -29,18 +29,18 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.NamespaceUtils;
+import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.query.QueryManager;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.internal.document.DocumentUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -83,13 +83,6 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private Provider<QueryManager> queryManagerProvider;
-
-    @Inject
-    @Named("currentmixed")
-    private DocumentReferenceResolver<String> currentMixedReferenceResolver;
-
-    @Inject
     private Logger logger;
 
     /**
@@ -97,35 +90,44 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
      */
     public JIRAConfigurationMigrator()
     {
-        super(HINT, List.of(new ApplicationReadyEvent(), new JobFinishedEvent("install")));
+        super(HINT, List.of(new ApplicationReadyEvent(), new WikiReadyEvent(), new JobFinishedEvent("install")));
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        migrate();
+        if (source instanceof InstallJob) {
+            // The JobFinishedEvent event are allways called with the context set to the main wiki, so we need to get
+            // the wiki ID in a different way.
+            for (String namespace : ((InstallJob) source).getRequest().getNamespaces()) {
+                String wikiId = NamespaceUtils.toNamespace(namespace).getValue();
+                migrate(wikiId);
+            }
+        } else {
+            XWikiContext context = contextProvider.get();
+            migrate(context.getWikiId());
+        }
     }
 
-    /**
-     * Run the data migration for JIRA server config.
-     */
-    public void migrate()
+    private void migrate(String wikiId)
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
+        WikiReference wikiReference = new WikiReference(wikiId);
         DocumentReference migrationDocumentRef =
-            new DocumentReference(MIGRATION_STATUS_DOCUMENT_REFERENCE, new WikiReference(context.getWikiId()));
+            new DocumentReference(MIGRATION_STATUS_DOCUMENT_REFERENCE, wikiReference);
 
         try {
             if (!xwiki.exists(migrationDocumentRef, context)) {
                 logger.info("Running migration of JIRA configuration");
 
-                XWikiDocument basicAuthDoc =
-                    xwiki.getDocument(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_CONFIG_REFERENCE, context).clone();
+                DocumentReference basicAuthConfigRef =
+                    new DocumentReference(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_CONFIG_REFERENCE, wikiReference);
+                XWikiDocument basicAuthDoc = xwiki.getDocument(basicAuthConfigRef, context).clone();
                 XWikiDocument jiraServerDoc =
-                    xwiki.getDocument(new LocalDocumentReference(JIRA, "JIRAConfig"), context).clone();
+                    xwiki.getDocument(new DocumentReference(wikiId, JIRA, "JIRAConfig"), context).clone();
                 List<BaseObject> jiraServerObjs =
-                    jiraServerDoc.getXObjects(new LocalDocumentReference(JIRA, "JIRAConfigClass"));
+                    jiraServerDoc.getXObjects(new DocumentReference(wikiId, JIRA, "JIRAConfigClass"));
                 for (BaseObject obj : jiraServerObjs) {
                     if (obj == null) {
                         continue;
@@ -172,13 +174,15 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
         DocumentReference migrationDocumentRef =
             new DocumentReference(MIGRATION_STATUS_DOCUMENT_REFERENCE, new WikiReference(context.getWikiId()));
 
-        XWikiDocument migrationStateDoc = xwiki.getDocument(migrationDocumentRef, context).clone();
-        UserReference userRef = new DocumentUserReference(
-            new DocumentReference("xwiki", "XWiki", "superadmin"), true);
+        XWikiDocument migrationStateDoc = xwiki.getDocument(migrationDocumentRef, context);
+        migrationStateDoc.setHidden(true);
+        migrationStateDoc.setContent(
+            "Dummy document to store the fact that the JIRA configuration migration was executed. "
+                + "This document avoid to execute again the migration");
         DocumentAuthors authors = migrationStateDoc.getAuthors();
-        authors.setContentAuthor(userRef);
-        authors.setEffectiveMetadataAuthor(userRef);
-        authors.setOriginalMetadataAuthor(userRef);
+        authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
+        authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
+        authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
         xwiki.saveDocument(migrationStateDoc, context);
     }
 }
