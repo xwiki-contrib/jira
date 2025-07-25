@@ -37,17 +37,17 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($configId = $request.id)
+#set ($basicAuthClass = 'JIRA.JIRAAuth.BasicAuthClass')
 #set ($confDoc = $xwiki.getDocument('JIRA.JIRAAuth.BasicAuthConfiguration'))
-#set ($confObjects = $confDoc.getObjects('JIRA.JIRAAuth.BasicAuthClass'))
+#set ($confObjects = $confDoc.getObjects($basicAuthClass))
 #if ($xcontext.action == 'get')
   #if ($request.getParameter('save') == 'true')
     ## Save the changes
     #if ($services.csrf.isTokenValid($!request.form_token))
       #foreach ($obj in $confObjects)
-        #set ($formIdFieldName = "JIRA.JIRAAuth.BasicAuthClass_${obj.number}_id")
-        #set ($formUsernameFieldName = "JIRA.JIRAAuth.BasicAuthClass_${obj.number}_username")
-        #set ($formPwdFieldName = "JIRA.JIRAAuth.BasicAuthClass_${obj.number}_password")
+        #set ($formIdFieldName = "${basicAuthClass}_${obj.number}_id")
+        #set ($formUsernameFieldName = "${basicAuthClass}_${obj.number}_username")
+        #set ($formPwdFieldName = "${basicAuthClass}_${obj.number}_password")
         #set ($formIdValue = $request.getParameter($formIdFieldName))
         #set ($formUsernameValue = $request.getParameter($formUsernameFieldName))
         #set ($formPwdValue = $request.getParameter($formPwdFieldName))
@@ -64,6 +64,7 @@
     #end
   #else
     ## Show the content
+    #set ($configId = $request.id)
     #set ($confObj = $NULL)
     #foreach ($o in $confObjects)
       #if ($o.getValue('id') == $configId)
@@ -71,7 +72,7 @@
       #end
     #end
     #if ($confObj == $NULL)
-      #set ($confObj = $confDoc.newObject('JIRA.JIRAAuth.BasicAuthClass'))
+      #set ($confObj = $confDoc.newObject($basicAuthClass))
       #set ($discard = $confObj.set('id', $configId))
       #set ($discard = $confDoc.save())
     #end
@@ -80,7 +81,7 @@
     {{html clean="false"}}
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label for="JIRA.JIRAAuth.BasicAuthClass_${confObj.number}_username"&gt;$services.localization.render('jira.config.auth.basicAuth.username', 'html/5.0')&lt;/label&gt;
+        &lt;label for="${basicAuthClass}_${confObj.number}_username"&gt;$services.localization.render('jira.config.auth.basicAuth.username', 'html/5.0')&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         {{/html}}
@@ -90,7 +91,7 @@
         {{html clean="false"}}
       &lt;/dd&gt;
       &lt;dt&gt;
-        &lt;label for="JIRA.JIRAAuth.BasicAuthClass_${confObj.number}_password"&gt;$services.localization.render('jira.config.auth.basicAuth.password', 'html/5.0')&lt;/label&gt;
+        &lt;label for="${basicAuthClass}_${confObj.number}_password"&gt;$services.localization.render('jira.config.auth.basicAuth.password', 'html/5.0')&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         {{/html}}
