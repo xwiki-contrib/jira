@@ -41,12 +41,15 @@ jira.config.label=JIRA Instance Definitions
 jira.config.label.hint=Defines access to JIRA instances and associates an ID to each. This ID can then be used in various JIRA components whenever a JIRA instance is required, such as in a parameter for the JIRA Macro.
 jira.config.id=Id
 jira.config.url=JIRA URL
-jira.config.username=Username
-jira.config.password=Password
 jira.config.delete=Delete
 jira.config.save=Save
 jira.config.add=Add JIRA instance
-</content>
+jira.config.authType=Authentication type
+jira.config.authConfig=Authentication system configuration
+jira.config.auth.noAuth=No authentication
+jira.config.auth.basicAuth=Basic auth
+jira.config.auth.basicAuth.username=Username
+jira.config.auth.basicAuth.password=Password</content>
   <object>
     <name>JIRA.Translations</name>
     <number>0</number>
