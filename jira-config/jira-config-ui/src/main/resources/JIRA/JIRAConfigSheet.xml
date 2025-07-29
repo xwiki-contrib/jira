@@ -50,7 +50,11 @@
 #set($jiraAuthUixByConfigIds = {})
 #set($jiraAuthUixs = $services.uix.getExtensions('org.xwiki.contrib.jira.authconfig'))
 #foreach ($uix in $jiraAuthUixs)
-  #set($jiraAuthUixByConfigIds[$uix.parameters.get('config_id')] = $xwiki.getURL($uix.parameters.get('config_displayer_reference'), 'get'))
+  #set($configDisplayerReference = $uix.parameters.get('config_displayer_reference'))
+  #set($jiraAuthUixByConfigIds[$uix.parameters.get('config_id')] = $xwiki.getURL($configDisplayerReference, 'get'))
+  ## Also load the JSX and SSX, so the authenticator can inject JSX or/and SSX here if needed.
+  #set($discard = $xwiki.jsx.use($configDisplayerReference))
+  #set($discard = $xwiki.ssx.use($configDisplayerReference))
 #end
 {{html clean="false"}}
   &lt;form id="jiraConfig" method="post" action="$configDoc.getURL("save", "xredirect=$escapetool.url(${redirect})")" class="withLock xform" data-auth-displayer-urls="$escapetool.xml($jsontool.serialize($jiraAuthUixByConfigIds))"&gt;
