@@ -61,6 +61,9 @@
         #end
       #end
       #set ($discard = $confDoc.save())
+    #else
+      #set($discard = $response.setStatus(403))
+      #jsonResponse({"error": "Invalid CSRF token"})
     #end
   #else
     ## Show the content

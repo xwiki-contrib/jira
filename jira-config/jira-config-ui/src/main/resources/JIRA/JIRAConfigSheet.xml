@@ -174,82 +174,84 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>const urlMapping = JSON.parse(document.getElementById('jiraConfig').dataset.authDisplayerUrls)
-/**
- * Load or reload the displayer for the authenticator configuration
- * @param {*} element the parent container for the displayer content
- */
-async function updateDisplayer(element) {
-    const id = element.parentElement.getElementsBySelector(".jira-server-id &gt; input")[0].value
-    const authType = element.parentElement.getElementsBySelector("select.jira-config-authentication-type")[0].value
-    const url = urlMapping[authType]
-    let body = ''
-    if (url !== undefined) {
-        try {
-            const response = await fetch(`${url}?id=${id}&amp;authType=${authType}`);
-            if (!response.ok) {
-                console.error("can't get displayer content")
+      <code>require(['jquery'], function($) {
+    const urlMapping = JSON.parse($('#jiraConfig')[0].dataset.authDisplayerUrls)
+    /**
+     * Load or reload the displayer for the authenticator configuration
+     * @param {*} element the parent container for the displayer content
+     */
+    async function updateDisplayer(element) {
+        const id = $(element).parent().find(".jira-server-id &gt; input")[0].value
+        const authType = $(element).parent().find("select.jira-config-authentication-type")[0].value
+        const url = urlMapping[authType]
+        let body = ''
+        if (url !== undefined) {
+            try {
+                const response = await fetch(`${url}?id=${id}&amp;authType=${authType}`);
+                if (!response.ok) {
+                    console.error("can't get displayer content")
+                    return
+                }
+                body = await response.text()
+            } catch (e) {
+                console.error(e);
                 return
             }
-            body = await response.text()
-        } catch (e) {
-            console.error(e);
-            return
         }
+        element.innerHTML = body
     }
-    element.innerHTML = body
-}
 
-// First load of the authenticator displayer
-for (const element of document.getElementsByClassName('jira-auth-configuration')) {
-    new Promise(() =&gt; updateDisplayer(element))
-}
+    // First load of the authenticator displayer
+    for (const element of $('.jira-auth-configuration')) {
+        new Promise(() =&gt; updateDisplayer(element))
+    }
 
-// Reload the authenticator displayer if we change the authenticator
-for (const element of document.getElementsByClassName('jira-config-authentication-type')) {
-    element.addEventListener("change", async (event) =&gt; {
-        const e = element.parentElement.parentElement.getElementsByClassName('jira-auth-configuration')[0]
-        await updateDisplayer(e)
-    })
-}
+    // Reload the authenticator displayer if we change the authenticator
+    for (const element of $('.jira-config-authentication-type')) {
+        $(element).on('change', async (event) =&gt; {
+            const e = $(element).parent().parent().find('td.jira-auth-configuration')[0]
+            await updateDisplayer(e)
+        })
+    }
 
-// Avoid that the on the reload of the page we cancel the async save for the authentication configuration
-// The save of the main configuration will be done after we saved all authenticator configuration
-document.querySelector('#jiraConfig input.button').addEventListener('click', (e) =&gt; {
-    e.preventDefault()
-});
+    // Avoid that the on the reload of the page we cancel the async save for the authentication configuration
+    // The save of the main configuration will be done after we saved all authenticator configuration
+    $('#jiraConfig input.button').on('click', (e) =&gt; {
+        e.preventDefault()
+    });
 
-// Save the authenticator configuration
-document.querySelector('#jiraConfig input.button').addEventListener('click', async (e) =&gt; {
-    const form = document.getElementById('jiraConfig')
-    const formData = new FormData(form);
+    // Save the authenticator configuration
+    $('#jiraConfig input.button').on('click', async (e) =&gt; {
+        const form = $('#jiraConfig')[0]
+        const formData = new FormData(form);
 
-    for (const url of Object.values(urlMapping)) {
-        const fetchUrl = `${url}?save=true`
-        try {
-            const response = await fetch(fetchUrl, {
-                method: "POST",
-                body: formData,
-            });
-            if (!response.ok) {
-                console.error("Can't update JIRA authenticator configuration")
+        for (const url of Object.values(urlMapping)) {
+            const fetchUrl = `${url}?save=true`
+            try {
+                const response = await fetch(fetchUrl, {
+                    method: "POST",
+                    body: formData,
+                });
+                if (!response.ok) {
+                    console.error("Can't update JIRA authenticator configuration")
+                }
+            } catch (e) {
+                console.error(e);
             }
-        } catch (e) {
-            console.error(e);
         }
-    }
-    // run the default action as soon as the other query was sent
-    form.submit();
-});
+        // run the default action as soon as the other query was sent
+        form.submit();
+    });
 
-// Update the ID fields of the authenticator configuration, so we have a consistent server ID matching between the JIRAServer configuration and the authenticator configuration
-document.querySelectorAll('form#jiraConfig .jira-server-id input').forEach((element) =&gt; {
-    element.addEventListener('change', (e) =&gt; {
-        const idHiddenFiled = element.parentElement.parentElement.querySelector('td.jira-auth-configuration input[type="hidden"')
-        if (idHiddenFiled != null) {
-            idHiddenFiled.value = element.value
-        }
-    })
+    // Update the ID fields of the authenticator configuration, so we have a consistent server ID matching between the JIRAServer configuration and the authenticator configuration
+    for (const element of $('form#jiraConfig .jira-server-id input')) {
+        element.on('change', (e) =&gt; {
+            const idHiddenFiled = $(element).parent().parent().find('td.jira-auth-configuration input[type="hidden"]')[0]
+            if (idHiddenFiled != null) {
+                idHiddenFiled.value = element.value
+            }
+        })
+    }
 })</code>
     </property>
     <property>
