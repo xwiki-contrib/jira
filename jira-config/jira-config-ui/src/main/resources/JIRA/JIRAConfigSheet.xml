@@ -178,20 +178,20 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery'], function ($) {
     const urlMapping = JSON.parse($('#jiraConfig')[0].dataset.authDisplayerUrls)
     /**
      * Load or reload the displayer for the authenticator configuration
      * @param {*} element the parent container for the displayer content
      */
     async function updateDisplayer(element) {
-        const id = $(element).parent().find(".jira-server-id &gt; input")[0].value
-        const authType = $(element).parent().find("select.jira-config-authentication-type")[0].value
+        const id = $(element).parent().find(".jira-server-id &gt; input").val()
+        const authType = $(element).parent().find("select.jira-config-authentication-type").val()
         const url = urlMapping[authType]
         let body = ''
         if (url !== undefined) {
             try {
-                const response = await fetch(`${url}?id=${id}&amp;authType=${authType}`);
+                const response = await fetch(`${url}?${new URLSearchParams({ id: id, authType: authType })}`);
                 if (!response.ok) {
                     console.error("can't get displayer content")
                     return
@@ -207,44 +207,45 @@
 
     // First load of the authenticator displayer
     for (const element of $('.jira-auth-configuration')) {
-        new Promise(() =&gt; updateDisplayer(element))
+        updateDisplayer(element)
     }
 
     // Reload the authenticator displayer if we change the authenticator
     for (const element of $('.jira-config-authentication-type')) {
-        $(element).on('change', async (event) =&gt; {
+        $(element).on('change', (event) =&gt; {
             const e = $(element).parent().parent().find('td.jira-auth-configuration')[0]
-            await updateDisplayer(e)
+            updateDisplayer(e)
         })
     }
 
-    // Avoid that the on the reload of the page we cancel the async save for the authentication configuration
-    // The save of the main configuration will be done after we saved all authenticator configuration
+
     $('#jiraConfig input.button').on('click', (e) =&gt; {
+        // Avoid that on the reload of the page we cancel the async save for the authentication configuration
+        // The save of the main configuration will be done after we saved all authenticator configuration
         e.preventDefault()
-    });
 
-    // Save the authenticator configuration
-    $('#jiraConfig input.button').on('click', async (e) =&gt; {
-        const form = $('#jiraConfig')[0]
-        const formData = new FormData(form);
+        // Save the authenticator configuration
+        new Promise(async () =&gt; {
+            const form = $('#jiraConfig')[0]
+            const formData = new FormData(form);
 
-        for (const url of Object.values(urlMapping)) {
-            const fetchUrl = `${url}?save=true`
-            try {
-                const response = await fetch(fetchUrl, {
-                    method: "POST",
-                    body: formData,
-                });
-                if (!response.ok) {
-                    console.error("Can't update JIRA authenticator configuration")
+            for (const url of Object.values(urlMapping)) {
+                const fetchUrl = `${url}?save=true`
+                try {
+                    const response = await fetch(fetchUrl, {
+                        method: "POST",
+                        body: formData,
+                    });
+                    if (!response.ok) {
+                        console.error("Can't update JIRA authenticator configuration")
+                    }
+                } catch (e) {
+                    console.error(e);
                 }
-            } catch (e) {
-                console.error(e);
             }
-        }
-        // run the default action as soon as the other query was sent
-        form.submit();
+            // run the default action as soon as the other query was sent
+            form.submit();
+        })
     });
 
     // Update the ID fields of the authenticator configuration, so we have a consistent server ID matching between the JIRAServer configuration and the authenticator configuration
