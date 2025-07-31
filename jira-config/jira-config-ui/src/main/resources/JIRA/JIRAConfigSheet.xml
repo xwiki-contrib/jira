@@ -191,7 +191,7 @@
         let body = ''
         if (url !== undefined) {
             try {
-                const response = await fetch(`${url}?${new URLSearchParams({ id: id, authType: authType })}`);
+                const response = await fetch(`${url}?${new URLSearchParams({ id, authType })}`);
                 if (!response.ok) {
                     console.error("can't get displayer content")
                     return
