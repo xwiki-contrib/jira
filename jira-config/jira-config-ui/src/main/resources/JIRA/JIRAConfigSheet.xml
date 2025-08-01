@@ -207,6 +207,8 @@
 
     // First load of the authenticator displayer
     for (const element of $('.jira-auth-configuration')) {
+        // event if updateDisplayer(...) is async we don't really need to wait on the result of updateDisplayer(...)
+        // because it already catch itself the errors and each authentication configuration is independent
         updateDisplayer(element)
     }
 
@@ -214,17 +216,23 @@
     for (const element of $('.jira-config-authentication-type')) {
         $(element).on('change', (event) =&gt; {
             const e = $(element).parent().parent().find('td.jira-auth-configuration')[0]
+            // event if updateDisplayer(...) is async we don't really need to wait on the result of updateDisplayer(...)
+            // because it already catch itself the errors and each authentication configuration is independent
             updateDisplayer(e)
         })
     }
 
 
     $('#jiraConfig input.button').on('click', (e) =&gt; {
-        // Avoid that on the reload of the page we cancel the async save for the authentication configuration
+        // Avoid that on the reload of the page we cancel the next async part of code (in the Promise) which save for the authentication configuration
         // The save of the main configuration will be done after we saved all authenticator configuration
+        // This part of code need to be called sychroniously to ensure that it is called not too late.
         e.preventDefault()
 
         // Save the authenticator configuration
+        // Wrap this part of code in a promise so we can have this part of code async to use "fetch(...)"
+        // We need to ensure that all fetch request are done before running "form.submit()"
+        // overise the reload of the page (triggered by form.submit()) will cancel the fetch requests.
         new Promise(async () =&gt; {
             const form = $('#jiraConfig')[0]
             const formData = new FormData(form);
