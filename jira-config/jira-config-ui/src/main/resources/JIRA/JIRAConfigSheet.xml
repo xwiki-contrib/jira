@@ -223,37 +223,33 @@
     }
 
 
-    $('#jiraConfig input.button').on('click', (e) =&gt; {
-        // Avoid that on the reload of the page we cancel the next async part of code (in the Promise) which save for the authentication configuration
+    $('#jiraConfig input.button').on('click', async (e) =&gt; {
+        // Avoid that on the reload of the page we cancel the next async part of code which save for the authentication configuration
         // The save of the main configuration will be done after we saved all authenticator configuration
-        // This part of code need to be called sychroniously to ensure that it is called not too late.
         e.preventDefault()
 
         // Save the authenticator configuration
-        // Wrap this part of code in a promise so we can have this part of code async to use "fetch(...)"
         // We need to ensure that all fetch request are done before running "form.submit()"
         // overise the reload of the page (triggered by form.submit()) will cancel the fetch requests.
-        new Promise(async () =&gt; {
-            const form = $('#jiraConfig')[0]
-            const formData = new FormData(form);
+        const form = $('#jiraConfig')[0]
+        const formData = new FormData(form);
 
-            for (const url of Object.values(urlMapping)) {
-                const fetchUrl = `${url}?save=true`
-                try {
-                    const response = await fetch(fetchUrl, {
-                        method: "POST",
-                        body: formData,
-                    });
-                    if (!response.ok) {
-                        console.error("Can't update JIRA authenticator configuration")
-                    }
-                } catch (e) {
-                    console.error(e);
+        for (const url of Object.values(urlMapping)) {
+            const fetchUrl = `${url}?save=true`
+            try {
+                const response = await fetch(fetchUrl, {
+                    method: "POST",
+                    body: formData,
+                });
+                if (!response.ok) {
+                    console.error("Can't update JIRA authenticator configuration")
                 }
+            } catch (e) {
+                console.error(e);
             }
-            // run the default action as soon as the other query was sent
-            form.submit();
-        })
+        }
+        // run the default action as soon as the other query was sent
+        form.submit();
     });
 
     // Update the ID fields of the authenticator configuration, so we have a consistent server ID matching between the JIRAServer configuration and the authenticator configuration
