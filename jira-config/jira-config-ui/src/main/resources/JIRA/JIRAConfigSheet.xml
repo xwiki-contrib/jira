@@ -234,7 +234,7 @@
         const form = $('#jiraConfig')[0]
         const formData = new FormData(form);
 
-        for (const url of Object.values(urlMapping)) {
+        await Promise.all(Object.values(urlMapping).map(async url =&gt; {
             const fetchUrl = `${url}?save=true`
             try {
                 const response = await fetch(fetchUrl, {
@@ -247,7 +247,7 @@
             } catch (e) {
                 console.error(e);
             }
-        }
+        }))
         // run the default action as soon as the other query was sent
         form.submit();
     });
