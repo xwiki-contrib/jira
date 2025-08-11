@@ -47,7 +47,17 @@
     <nameField/>
     <validationScript/>
     <authenticationType>
-      <customDisplay/>
+      <customDisplay>{{velocity}}
+#set ($id = $escapetool.xml("${prefix}${name}"))
+{{html clean="false"}}
+&lt;select id="$id" name="$id" class="jira-config-authentication-type"&gt;
+&lt;option value="noAuth" #if ($value == 'noAuth') selected #end&gt;$services.localization.render('jira.config.auth.noAuth')&lt;/option&gt;
+#foreach ($u in $services.uix.getExtensions('org.xwiki.contrib.jira.authconfig'))
+  &lt;option value="$u.parameters.config_id" #if ($value == $u.parameters.config_id) selected #end&gt;$services.localization.render($u.parameters.translation_key)&lt;/option&gt;
+#end
+&lt;/select&gt;
+{{/html}}
+{{/velocity}}</customDisplay>
       <disabled>0</disabled>
       <hint/>
       <name>authenticationType</name>
