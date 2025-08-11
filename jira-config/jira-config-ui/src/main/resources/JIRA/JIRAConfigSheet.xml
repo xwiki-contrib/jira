@@ -249,7 +249,7 @@
             }
         }))
         // run the default action as soon as the other query was sent
-        form.submit();
+        e.target.form.submit();
     });
 
     // Update the ID fields of the authenticator configuration, so we have a consistent server ID matching between the JIRAServer configuration and the authenticator configuration
