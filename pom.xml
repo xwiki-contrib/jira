@@ -31,13 +31,13 @@
   <artifactId>jira</artifactId>
   <packaging>pom</packaging>
   <name>JIRA - Parent POM</name>
-  <version>11.0.0-SNAPSHOT</version>
+  <version>11.0.0</version>
   <description>Parent POM for JIRA-related modules</description>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/jira.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/jira.git</developerConnection>
     <url>https://github.com/xwiki-contrib/jira/tree/master</url>
-    <tag>HEAD</tag>
+    <tag>jira-11.0.0</tag>
   </scm>
   <developers>
     <developer>
