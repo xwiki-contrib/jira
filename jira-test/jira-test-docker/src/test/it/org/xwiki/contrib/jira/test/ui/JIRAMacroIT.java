@@ -25,6 +25,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.administration.test.po.AdministrationPage;
@@ -93,6 +97,12 @@ class JIRAMacroIT
         // we need to handle the wait because the save call `preventDefault()`
         // so we need specify to selenium unit what we need to wait
         WebDriverWait wait = new WebDriverWait(setup.getDriver(), Duration.ofSeconds(10));
+        try {
+            // workaround to be sure that on the next wait the page already started to be reloaded so
+            //  document.readyState != complete
+            wait.until(ExpectedConditions.stalenessOf(setup.getDriver().findElement(By.tagName("html"))));
+        } catch (TimeoutException ignored) {
+        }
         wait.until(webDriver -> (((org.openqa.selenium.JavascriptExecutor) webDriver)
             .executeScript("return document.readyState")).equals("complete"));
 
