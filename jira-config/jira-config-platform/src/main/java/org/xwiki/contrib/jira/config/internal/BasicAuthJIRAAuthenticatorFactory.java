@@ -20,14 +20,12 @@
 package org.xwiki.contrib.jira.config.internal;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAAuthenticator;
 import org.xwiki.contrib.jira.config.JIRAAuthenticatorFactory;
@@ -85,13 +83,10 @@ public class BasicAuthJIRAAuthenticatorFactory implements JIRAAuthenticatorFacto
         } catch (XWikiException e) {
             throw new JIRAAuthenticatorException("Can't get JIRA Basic auth configuration document", e);
         }
-        Optional<BaseObject> authObj = doc.getXObjects(BASIC_AUTH_DATA_CLASS_REFERENCE)
-            .stream().filter(x -> x != null
-                && StringUtils.equals(serverId, (x.getStringValue(CONFIG_ID_FIELD))))
-            .findFirst();
-        if (authObj.isPresent()) {
-            String username = authObj.get().getStringValue("username");
-            String password = authObj.get().getStringValue("password");
+        BaseObject authObj = doc.getXObject(BASIC_AUTH_DATA_CLASS_REFERENCE, CONFIG_ID_FIELD, serverId, false);
+        if (authObj != null) {
+            String username = authObj.getStringValue("username");
+            String password = authObj.getStringValue("password");
             return new BasicAuthJIRAAuthenticator(username, password);
         } else {
             throw new JIRAAuthenticatorException("Can't find Basic auth config for server ID: " + serverId);
