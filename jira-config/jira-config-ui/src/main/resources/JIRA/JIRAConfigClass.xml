@@ -62,7 +62,7 @@
       <hint/>
       <name>authenticationType</name>
       <number>5</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>authenticationType</prettyName>
       <size>10</size>
       <unmodifiable>0</unmodifiable>

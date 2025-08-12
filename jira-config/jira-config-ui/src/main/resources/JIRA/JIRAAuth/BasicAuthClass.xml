@@ -52,7 +52,7 @@
       <hint/>
       <name>id</name>
       <number>1</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>id</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
@@ -67,7 +67,7 @@
       <hint/>
       <name>password</name>
       <number>3</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>JIRA Server Password</prettyName>
       <size>30</size>
       <storageType>Clear</storageType>
@@ -82,7 +82,7 @@
       <hint/>
       <name>username</name>
       <number>2</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>JIRA Server Username</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
