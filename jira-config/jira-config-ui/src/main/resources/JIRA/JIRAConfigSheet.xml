@@ -234,27 +234,22 @@
         const form = $('#jiraConfig')[0]
         const formData = new FormData(form);
 
-        // We need to wrap the async code in async function because it's needed to pass the selenium tests.
-        // without this selenium wait infinitely on the default action of the submit button.
-        (async () =&gt; {
-            await Promise.all(Object.values(urlMapping).map(async url =&gt; {
-                const fetchUrl = `${url}?save=true`
-                try {
-                    const response = await fetch(fetchUrl, {
-                        method: "POST",
-                        body: formData,
-                    });
-                    if (!response.ok) {
-                        console.error("Can't update JIRA authenticator configuration")
-                    }
-                } catch (e) {
-                    console.error(e);
+        await Promise.all(Object.values(urlMapping).map(async url =&gt; {
+            const fetchUrl = `${url}?save=true`
+            try {
+                const response = await fetch(fetchUrl, {
+                    method: "POST",
+                    body: formData,
+                });
+                if (!response.ok) {
+                    console.error("Can't update JIRA authenticator configuration")
                 }
-            }))
-
-            // run the default action as soon as the other query was sent
-            e.target.form.submit();
-        })()
+            } catch (e) {
+                console.error(e);
+            }
+        }))
+        // run the default action as soon as the other query was sent
+        form.submit();
     });
 
     // Update the ID fields of the authenticator configuration, so we have a consistent server ID matching between the JIRAServer configuration and the authenticator configuration

@@ -19,10 +19,14 @@
  */
 package org.xwiki.contrib.jira.test.ui;
 
+import java.time.Duration;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.contrib.jira.test.po.JIRAAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.UITest;
@@ -86,6 +90,11 @@ class JIRAMacroIT
         jiraPage.setId(0, "local");
         jiraPage.setURL(0, "http://localhost:8889");
         jiraPage.clickSave();
+        // we need to handle the wait because the save call `preventDefault()`
+        // so we need specify to selenium unit what we need to wait
+        WebDriverWait wait = new WebDriverWait(setup.getDriver(), Duration.ofSeconds(10));
+        wait.until(webDriver -> (((org.openqa.selenium.JavascriptExecutor) webDriver)
+            .executeScript("return document.readyState")).equals("complete"));
 
         // Now create a new page and try using the jira macro in it + verify that the scripting jira api works too
         String velocity = "{{jira id=\"local\"}}\n"
