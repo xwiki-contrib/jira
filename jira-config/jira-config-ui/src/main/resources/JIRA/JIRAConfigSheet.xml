@@ -232,14 +232,17 @@
         // We need to ensure that all fetch request are done before running "form.submit()"
         // overise the reload of the page (triggered by form.submit()) will cancel the fetch requests.
         const form = $('#jiraConfig')[0]
-        const formData = new FormData(form);
+        const urlEncodedData = new URLSearchParams(new FormData(form).entries());
 
         await Promise.all(Object.values(urlMapping).map(async url =&gt; {
             const fetchUrl = `${url}?save=true`
             try {
                 const response = await fetch(fetchUrl, {
                     method: "POST",
-                    body: formData,
+                    headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                    body: urlEncodedData,
                 });
                 if (!response.ok) {
                     console.error("Can't update JIRA authenticator configuration")
