@@ -26,7 +26,7 @@ import java.util.Map;
  * The serialized JSON error from a JIRA requet.
  *
  * @version $Id$
- * @since 11.0.1
+ * @since 11.1.0
  */
 public class JIRAJSONError
 {

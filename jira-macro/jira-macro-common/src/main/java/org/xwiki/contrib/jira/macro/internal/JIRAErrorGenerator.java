@@ -32,7 +32,7 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
  * Generate error block with nice information for users.
  *
  * @version $Id$
- * @since 11.0.1
+ * @since 11.1.0
  */
 @Component(roles = { JIRAErrorGenerator.class })
 @Singleton

@@ -25,6 +25,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
@@ -54,7 +55,8 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 @Singleton
 public class HTTPJIRAFetcher
 {
-    private static final ErrorMessageExtractor EXTRACTOR = new ErrorMessageExtractor();
+    @Inject
+    private ErrorMessageExtractor extractor;
 
     /**
      * @param urlString the full JIRA URL to call
@@ -135,7 +137,7 @@ public class HTTPJIRAFetcher
                 if (response.getCode() >= 200 && response.getCode() < 300) {
                     return callback.apply(response.getEntity().getContent());
                 } else {
-                    List<String> extractedMessages = EXTRACTOR.extract(response.getEntity());
+                    List<String> extractedMessages = extractor.extract(response.getEntity());
                     String exceptionMessage = String.format(
                         "Error code = [%s], Error message = [%s] URL = [%s]",
                         response.getCode(),

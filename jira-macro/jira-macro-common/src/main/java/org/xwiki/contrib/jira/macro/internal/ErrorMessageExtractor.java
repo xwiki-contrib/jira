@@ -24,11 +24,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,16 +45,21 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
  *
  * @version $Id$
  */
+@Singleton
+@Component(roles = { ErrorMessageExtractor.class })
 public class ErrorMessageExtractor
 {
     private static final String UNKNOWN_ERROR = "Unknown error";
+
+    @Inject
+    private Logger logger;
 
     /**
      * @param entity the stream containing the HTML content with the error message
      * @return the extracted error message
      * @throws IOException in case of reading error
      */
-    List<String> extract(HttpEntity entity) throws IOException
+    public List<String> extract(HttpEntity entity) throws IOException
     {
         String contentType = ContentType.parse(entity.getContentType()).getMimeType();
         String content = IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8);
@@ -64,6 +74,7 @@ public class ErrorMessageExtractor
                     }
                 }
             } catch (Exception e) {
+                logger.debug("Can't get message details from JIRA. Full HTML [{}]", content, e);
                 return List.of(UNKNOWN_ERROR);
             }
         } else if ("application/json".equals(contentType)) {
@@ -75,6 +86,7 @@ public class ErrorMessageExtractor
                     .readValue(content, JIRAJSONError.class);
                 return jirajsonError.getErrorMessages();
             } catch (JacksonException e) {
+                logger.debug("Can't decode JSON from JIRA. JSON [{}]", content, e);
                 return List.of(content);
             }
         }

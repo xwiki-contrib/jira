@@ -25,7 +25,7 @@ import java.util.List;
  * Exception thrown when there is an error when accessing the remote JIRA server.
  *
  * @version $Id$
- * @since 11.0.1
+ * @since 11.1.0
  */
 public class JIRABadRequestException extends JIRAConnectionException
 {

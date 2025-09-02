@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
@@ -41,6 +42,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Unit tests for {@link HTTPJIRAFetcher}.
  */
 @ComponentTest
+@ComponentList({
+    ErrorMessageExtractor.class,
+})
 class HTTPJIRAFetcherTest
 {
     @InjectMockComponents

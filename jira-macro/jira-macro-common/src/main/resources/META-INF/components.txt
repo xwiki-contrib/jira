@@ -1,3 +1,4 @@
+org.xwiki.contrib.jira.macro.internal.ErrorMessageExtractor
 org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher
 org.xwiki.contrib.jira.macro.internal.JIRAErrorGenerator
 org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager
