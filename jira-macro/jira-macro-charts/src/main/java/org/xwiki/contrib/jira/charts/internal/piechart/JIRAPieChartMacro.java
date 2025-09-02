@@ -34,6 +34,7 @@ import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.JIRADataChartJSDataConverter;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
+import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -90,12 +91,22 @@ public class JIRAPieChartMacro extends AbstractJIRAChartMacro<JIRAPieChartMacroP
     public List<Block> execute(JIRAPieChartMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        String json = this.getJSONData(parameters, JIRAPieChartDataSource.class);
-        Map<String, String> chartJSParameterMap = new LinkedHashMap<>();
-        chartJSParameterMap.put("type", "pie");
+        String json = null;
+        List<Block> blocks = List.of();
+        try {
+            json = this.getJSONData(parameters, JIRAPieChartDataSource.class);
+        } catch (JIRABadRequestException e) {
+            // We avoid to raise an exception here to give the possibility to the JIRA macro transformation to be
+            // executed even if we have this error.
+            blocks = jiraErrorGenerator.getBadRequestErrorBlock(e, context.isInline());
+        }
 
-        MacroBlock macroBlock = new MacroBlock("chartjs", chartJSParameterMap, json, false);
+        if (json != null) {
+            Map<String, String> chartJSParameterMap = new LinkedHashMap<>();
+            chartJSParameterMap.put("type", "pie");
+            blocks = List.of(new MacroBlock("chartjs", chartJSParameterMap, json, false));
+        }
 
-        return transformMacroResult(parameters, context, macroBlock, JIRAPieChartMacro.MACRO_NAME);
+        return transformMacroResult(parameters, context, blocks, JIRAPieChartMacro.MACRO_NAME);
     }
 }

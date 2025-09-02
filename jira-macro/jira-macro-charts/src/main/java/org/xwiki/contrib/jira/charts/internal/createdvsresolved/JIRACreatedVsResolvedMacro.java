@@ -34,6 +34,7 @@ import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartMacro;
 import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.JIRADataChartJSDataConverter;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
+import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -79,14 +80,25 @@ public class JIRACreatedVsResolvedMacro
     public List<Block> execute(JIRACreatedVsResolvedMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        String json = getJSONData(parameters, JIRACreatedVsResolvedDataSource.class);
-        // TODO: handle displaying the versions
-        Map<String, String> chartJSParameterMap = new LinkedHashMap<>();
-        chartJSParameterMap.put("type", "line");
+        String json = null;
+        List<Block> blocks = List.of();
+        try {
+            json = getJSONData(parameters, JIRACreatedVsResolvedDataSource.class);
+        } catch (JIRABadRequestException e) {
+            // We avoid to raise an exception here to give the possibility to the JIRA macro transformation to be
+            // executed even if we have this error.
+            blocks = jiraErrorGenerator.getBadRequestErrorBlock(e, context.isInline());
+        }
 
-        MacroBlock macroBlock = new MacroBlock("chartjs", chartJSParameterMap, json, false);
+        if (json != null) {
+            // TODO: handle displaying the versions
+            Map<String, String> chartJSParameterMap = new LinkedHashMap<>();
+            chartJSParameterMap.put("type", "line");
 
-        return transformMacroResult(parameters, context, macroBlock, JIRACreatedVsResolvedMacro.MACRO_NAME);
+            blocks = List.of(new MacroBlock("chartjs", chartJSParameterMap, json, false));
+        }
+
+        return transformMacroResult(parameters, context, blocks, JIRACreatedVsResolvedMacro.MACRO_NAME);
     }
 
     @Override

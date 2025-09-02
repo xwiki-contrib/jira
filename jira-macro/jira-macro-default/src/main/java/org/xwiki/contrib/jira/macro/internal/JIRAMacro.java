@@ -73,6 +73,9 @@ public class JIRAMacro extends AbstractMacro<JIRAMacroParameters>
     @Inject
     private JIRAServerResolver jiraServerResolver;
 
+    @Inject
+    private JIRAErrorGenerator jiraErrorGenerator;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -92,11 +95,18 @@ public class JIRAMacro extends AbstractMacro<JIRAMacroParameters>
     public List<Block> execute(JIRAMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        List<Block> result =
-            getDisplayer(parameters).display(getDataSource(parameters).getData(content, parameters), parameters,
-                context);
+        List<Block> result;
+        try {
+            result =
+                getDisplayer(parameters).display(getDataSource(parameters).getData(content, parameters), parameters,
+                    context);
+        } catch (JIRABadRequestException e) {
+            // We avoid to raise an exception here to give the possibility to the JIRA macro transformation to be
+            // executed even if we have this error.
+            result = jiraErrorGenerator.getBadRequestErrorBlock(e, context.isInline());
+        }
         return jiraMacroTransformationManager.transform(result, parameters, context,
-            jiraServerResolver.resolve(parameters), "jiraCount");
+            jiraServerResolver.resolve(parameters), "jira");
     }
 
     /**

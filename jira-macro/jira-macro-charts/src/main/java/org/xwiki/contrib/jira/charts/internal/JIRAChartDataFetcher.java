@@ -22,6 +22,7 @@ package org.xwiki.contrib.jira.charts.internal;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
+import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
@@ -44,5 +45,5 @@ public interface JIRAChartDataFetcher<T extends AbstractChartMacroParameters, U 
      * @return an instance of the data parsed to the expected type.
      * @throws MacroExecutionException in case of problem to perform the query or to parse the data.
      */
-    U fetch(T parameters, Class<U> expectedType) throws MacroExecutionException;
+    U fetch(T parameters, Class<U> expectedType) throws MacroExecutionException, JIRABadRequestException;
 }

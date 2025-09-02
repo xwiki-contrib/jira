@@ -20,12 +20,20 @@
 package org.xwiki.contrib.jira.macro.internal;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * Extracts error messages from JIRA HTML responses.
@@ -34,23 +42,42 @@ import org.apache.commons.io.IOUtils;
  */
 public class ErrorMessageExtractor
 {
-    private static final Pattern PATTERN = Pattern.compile("<h1>(.*)</h1>");
+    private static final String UNKNOWN_ERROR = "Unknown error";
 
     /**
-     * @param contentStream the stream containing the HTML content with the error message
+     * @param entity the stream containing the HTML content with the error message
      * @return the extracted error message
      * @throws IOException in case of reading error
      */
-    String extract(InputStream contentStream) throws IOException
+    List<String> extract(HttpEntity entity) throws IOException
     {
-        String result;
-        String content = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
-        Matcher matcher = PATTERN.matcher(content);
-        if (matcher.find()) {
-            result = matcher.group(1);
-        } else {
-            result = "Unknown error";
+        String contentType = ContentType.parse(entity.getContentType()).getMimeType();
+        String content = IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8);
+        if ("text/html".equals(contentType)) {
+            try {
+                Document d = org.jsoup.Jsoup.parse(content);
+                Element body = d.getElementsByTag("body").first();
+                if (body != null) {
+                    List<Element> paragraphs = new ArrayList<>(body.getElementsByTag("p"));
+                    if (paragraphs.size() > 2) {
+                        return List.of(paragraphs.get(1).ownText());
+                    }
+                }
+            } catch (Exception e) {
+                return List.of(UNKNOWN_ERROR);
+            }
+        } else if ("application/json".equals(contentType)) {
+            try {
+                JIRAJSONError jirajsonError = new ObjectMapper()
+                    // We don't want the parsing to fail on unknown properties: we want to have possibility to ignore
+                    // some values and to avoid issue in case of evolution of the returns
+                    .disable(FAIL_ON_UNKNOWN_PROPERTIES)
+                    .readValue(content, JIRAJSONError.class);
+                return jirajsonError.getErrorMessages();
+            } catch (JacksonException e) {
+                return List.of(content);
+            }
         }
-        return result;
+        return List.of(UNKNOWN_ERROR);
     }
 }

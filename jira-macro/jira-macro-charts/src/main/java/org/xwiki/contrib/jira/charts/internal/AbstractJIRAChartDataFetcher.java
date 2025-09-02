@@ -31,6 +31,7 @@ import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
+import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
 import org.xwiki.contrib.jira.macro.internal.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
@@ -60,7 +61,7 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     private JIRAServerResolver jiraServerResolver;
 
     @Override
-    public U fetch(T parameters, Class<U> expectedType) throws MacroExecutionException
+    public U fetch(T parameters, Class<U> expectedType) throws MacroExecutionException, JIRABadRequestException
     {
         List<NameValuePair> parametersList = new ArrayList<>();
 
@@ -75,6 +76,8 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
         String chartURL = this.urlHelper.getChartURL(server, getGadgetType(), parametersList);
         try {
             return this.httpjiraFetcher.fetchJSON(chartURL, server, expectedType);
+        } catch (JIRABadRequestException e) {
+            throw e;
         } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(
                 String.format("Error when trying to get data for pie chart from URL [%s].", chartURL), e);
