@@ -23,7 +23,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
@@ -38,6 +40,8 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -53,7 +57,8 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 @Singleton
 public class HTTPJIRAFetcher
 {
-    private static final ErrorMessageExtractor EXTRACTOR = new ErrorMessageExtractor();
+    @Inject
+    private ErrorMessageExtractor extractor;
 
     /**
      * @param urlString the full JIRA URL to call
@@ -66,6 +71,8 @@ public class HTTPJIRAFetcher
     {
         try {
             return performRequest(urlString, jiraServer, is -> createSAXBuilder().build(is));
+        } catch (JIRABadRequestException e) {
+            throw e;
         } catch (Exception e) {
             // The XML has failed to be parsed, read it as plain text and return it, for debugging purpose.
             String message = String.format("Failed to parse JIRA XML content [%s]",
@@ -97,6 +104,8 @@ public class HTTPJIRAFetcher
     {
         try {
             return performRequest(urlString, jiraServer, is -> getObjectMapper().readValue(is, type));
+        } catch (JIRABadRequestException e) {
+            throw e;
         } catch (Exception e) {
             // The JSON has failed to be parsed, read it as plain text and return it, for debugging purpose.
             String message = String.format("Failed to parse JIRA JSON content [%s]",
@@ -130,10 +139,25 @@ public class HTTPJIRAFetcher
                 if (response.getCode() >= 200 && response.getCode() < 300) {
                     return callback.apply(response.getEntity().getContent());
                 } else {
-                    // The error message is in the HTML. We extract it to perform some good error-reporting,
-                    // by extracting it from the <h1> tag.
-                    throw new JIRAConnectionException(String.format("Error = [%s]. URL = [%s]",
-                        EXTRACTOR.extract(response.getEntity().getContent()), httpGet.getUri().toString()));
+                    List<String> extractedMessages = extractor.extract(response.getEntity());
+                    String exceptionMessage = String.format(
+                        "Error code = [%s], Error message = [%s] URL = [%s]",
+                        response.getCode(),
+                        String.join(", ", extractedMessages),
+                        httpGet.getUri().toString());
+                    if (response.getCode() == 400) {
+                        // Handle the 400 error in a specific way because it could happen very frequently.
+                        // This could happen because the JQL request is invalid or because just the user don't have the
+                        // rights to see the references issues with the JQL. So in case JIRA return a 400 because of the
+                        // rights it's quite bad to show a generic error which give to the user the feeling that
+                        // something went wrong. So the idea is to show a more detailed error about what happen and also
+                        // mention that it could be just caused by the right issue of the user.
+                        throw new JIRABadRequestException(exceptionMessage, extractedMessages);
+                    } else {
+                        // The error message is in the HTML. We extract it to perform some good error-reporting,
+                        // by extracting it from the <h1> tag.
+                        throw new JIRAConnectionException(exceptionMessage);
+                    }
                 }
             }
         }

@@ -36,6 +36,7 @@ import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 
@@ -66,7 +67,7 @@ public class ListJIRADataSource extends AbstractJIRADataSource
 
     @Override
     public Collection<Element> getData(String macroContent, JIRAMacroParameters parameters)
-        throws MacroExecutionException
+        throws MacroExecutionException, JIRABadRequestException
     {
         JIRAServer jiraServer = getJIRAServer(parameters);
 

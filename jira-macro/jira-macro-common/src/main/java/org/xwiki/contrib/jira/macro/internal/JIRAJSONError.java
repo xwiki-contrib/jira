@@ -19,37 +19,58 @@
  */
 package org.xwiki.contrib.jira.macro.internal;
 
+import java.util.List;
+import java.util.Map;
+
 /**
- * Exception thrown when there is an error when accessing the remote JIRA server.
+ * The serialized JSON error from a JIRA requet.
  *
  * @version $Id$
- * @since 10.1.3
+ * @since 11.1.0
  */
-public class JIRAConnectionException extends Exception
+public class JIRAJSONError
 {
-    private static final long serialVersionUID = -2356790547774480310L;
+    private List<String> errorMessages;
+
+    private Map<Object, Object> errors;
 
     /**
-     * Construct a new {@code MentionsException} with the specified detail message.
+     * Get the return message from JIRA.
      *
-     * @param message the detail message. The detail message is saved for later retrieval by the {@link
-     *     #getMessage()}
+     * @return the error message.
      */
-    public JIRAConnectionException(String message)
+    public List<String> getErrorMessages()
     {
-        super(message);
+        return errorMessages;
     }
 
     /**
-     * Constructs a new {@code MentionsException} with the specified detail message and cause.
+     * Set the error from JIRA.
      *
-     * @param message the detail message. The detail message is saved for later retrieval by the {@link
-     *     #getMessage()}
-     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A null value
-     *     is permitted, and indicates that the cause is nonexistent or unknown.)
+     * @param errorMessages the error message.
      */
-    public JIRAConnectionException(String message, Throwable cause)
+    public void setErrorMessages(List<String> errorMessages)
     {
-        super(message, cause);
+        this.errorMessages = errorMessages;
+    }
+
+    /**
+     * Return the errors details from JIRA.
+     *
+     * @return the errors detail.
+     */
+    public Map<Object, Object> getErrors()
+    {
+        return errors;
+    }
+
+    /**
+     * Set the errors details from JIRA.
+     *
+     * @param errors the errors detail.
+     */
+    public void setErrors(Map<Object, Object> errors)
+    {
+        this.errors = errors;
     }
 }

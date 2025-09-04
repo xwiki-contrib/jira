@@ -33,6 +33,8 @@ import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRACell;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRADataSource;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRARow;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.internal.JIRAErrorGenerator;
 import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.block.Block;
@@ -81,6 +83,9 @@ public class JIRABiDimensionalGridChartMacro extends AbstractMacro<JIRABiDimensi
     @Inject
     private JIRAServerResolver jiraServerResolver;
 
+    @Inject
+    private JIRAErrorGenerator jiraErrorGenerator;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -101,21 +106,31 @@ public class JIRABiDimensionalGridChartMacro extends AbstractMacro<JIRABiDimensi
         MacroTransformationContext context) throws MacroExecutionException
     {
         JIRABiDimensionalGridChartJIRADataSource dataSource =
-            this.dataFetcher.fetch(parameters, JIRABiDimensionalGridChartJIRADataSource.class);
+            null;
+        List<Block> blocks = List.of();
+        try {
+            dataSource = this.dataFetcher.fetch(parameters, JIRABiDimensionalGridChartJIRADataSource.class);
+        } catch (JIRABadRequestException e) {
+            // We avoid to raise an exception here to give the possibility to the JIRA macro transformation to be
+            // executed even if we have this error.
+            blocks = jiraErrorGenerator.getBadRequestErrorBlock(e, context.isInline());
+        }
+        if (dataSource != null) {
+            RawBlockFilterParameters rawBlockFilterParameters = new RawBlockFilterParameters(context);
+            rawBlockFilterParameters.setRestricted(true);
+            rawBlockFilterParameters.setClean(true);
 
-        RawBlockFilterParameters rawBlockFilterParameters = new RawBlockFilterParameters(context);
-        rawBlockFilterParameters.setRestricted(true);
-        rawBlockFilterParameters.setClean(true);
+            List<Block> tableRows = new ArrayList<>();
 
-        List<Block> tableRows = new ArrayList<>();
-
-        tableRows.add(getTableRow(dataSource.getFirstRow(), rawBlockFilterParameters, true, dataSource.getyHeading()));
-        for (JIRABiDimensionalGridChartJIRARow row : dataSource.getRows()) {
-            tableRows.add(getTableRow(row, rawBlockFilterParameters, false, null));
+            tableRows.add(
+                getTableRow(dataSource.getFirstRow(), rawBlockFilterParameters, true, dataSource.getyHeading()));
+            for (JIRABiDimensionalGridChartJIRARow row : dataSource.getRows()) {
+                tableRows.add(getTableRow(row, rawBlockFilterParameters, false, null));
+            }
+            blocks = List.of(new TableBlock(tableRows));
         }
 
-        TableBlock tableBlock = new TableBlock(tableRows);
-        return jiraMacroTransformationManager.transform(List.of(tableBlock), parameters, context,
+        return jiraMacroTransformationManager.transform(blocks, parameters, context,
             jiraServerResolver.resolve(parameters), JIRABiDimensionalGridChartMacro.MACRO_NAME);
     }
 

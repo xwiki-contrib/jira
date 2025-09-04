@@ -27,12 +27,13 @@ import javax.inject.Inject;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
-import org.xwiki.contrib.jira.macro.internal.JIRAConnectionException;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
+import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
@@ -77,13 +78,15 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
      * @throws MacroExecutionException if the JIRA issues cannot be retrieved
      */
     public Document getXMLDocument(JIRAServer jiraServer, String jqlQuery, int maxCount)
-        throws MacroExecutionException
+        throws MacroExecutionException, JIRABadRequestException
     {
         Document document;
 
         try {
             String urlString = this.urlHelper.getSearchURL(jiraServer, jqlQuery, maxCount);
             document = this.jiraFetcher.fetch(urlString, jiraServer);
+        } catch (JIRABadRequestException e) {
+            throw e;
         } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]",
                 jiraServer.getURL(), jqlQuery), e);

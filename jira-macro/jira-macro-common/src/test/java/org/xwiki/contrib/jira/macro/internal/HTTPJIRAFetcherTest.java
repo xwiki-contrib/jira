@@ -19,11 +19,16 @@
  */
 package org.xwiki.contrib.jira.macro.internal;
 
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
@@ -39,6 +44,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Unit tests for {@link HTTPJIRAFetcher}.
  */
 @ComponentTest
+@ComponentList({
+    ErrorMessageExtractor.class,
+})
 class HTTPJIRAFetcherTest
 {
     @InjectMockComponents
@@ -103,5 +111,57 @@ class HTTPJIRAFetcherTest
             + "</rss>]", exception.getMessage());
         assertEquals("Error on line 22: The entity \"invalid\" was referenced, but not declared.",
             exception.getCause().getMessage());
+    }
+
+    @Test
+    void xmlError400()
+    {
+        // Setup Wiremock to simulate a JIRA instance
+        this.wireMockServer.stubFor(get(urlMatching(
+            "\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*"))
+            .willReturn(aResponse()
+                .withStatus(400)
+                .withHeader("Content-Type", "text/html")
+                .withBodyFile("badRequest.html")));
+        JIRAServer jiraServer =
+            new JIRAServer("http://localhost:8889", "id", new BasicAuthJIRAAuthenticator("user", "pass"));
+        JIRABadRequestException exception = assertThrows(JIRABadRequestException.class, () -> {
+            this.jiraFetcher.fetch(
+                "http://localhost:8889/sr/jira.issueviews:searchrequest-xml"
+                    + "/temp/SearchRequest.xml?jqlQuery=project=TEST",
+                jiraServer);
+        });
+        assertEquals(
+            "Error code = [400], Error message = [The value 'TEST' does not exist for the field 'project'.] "
+                + "URL = [http://localhost:8889/sr/jira.issueviews:searchrequest-xml"
+                + "/temp/SearchRequest.xml?jqlQuery=project=TEST]",
+            exception.getMessage());
+        assertEquals(exception.getExtractedMessages(),
+            List.of("The value 'TEST' does not exist for the field 'project'."));
+    }
+
+    @Test
+    void jsonErrors()
+    {
+        // Setup Wiremock to simulate a JIRA instance
+        this.wireMockServer.stubFor(get(urlMatching(
+            "\\/rest\\/api\\/2\\/search\\?maxResults=0&jql=.*"))
+            .willReturn(aResponse()
+                .withStatus(400)
+                .withHeader("Content-Type", "application/json")
+                .withBodyFile("badRequest.json")));
+        JIRAServer jiraServer =
+            new JIRAServer("http://localhost:8889", "id", new BasicAuthJIRAAuthenticator("user", "pass"));
+        JIRABadRequestException exception = assertThrows(JIRABadRequestException.class, () -> {
+            this.jiraFetcher.fetchJSON(
+                "http://localhost:8889/rest/api/2/search?maxResults=0&jql=project=TEST",
+                jiraServer, Object.class);
+        });
+        assertEquals(
+            "Error code = [400], Error message = [The value 'TEST' does not exist for the field 'project'.] "
+                + "URL = [http://localhost:8889/rest/api/2/search?maxResults=0&jql=project=TEST]",
+            exception.getMessage());
+        assertEquals(exception.getExtractedMessages(),
+            List.of("The value 'TEST' does not exist for the field 'project'."));
     }
 }

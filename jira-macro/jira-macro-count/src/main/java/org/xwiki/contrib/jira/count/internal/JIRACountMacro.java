@@ -31,7 +31,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.count.JIRACountMacroParameters;
 import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
-import org.xwiki.contrib.jira.macro.internal.JIRAConnectionException;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
+import org.xwiki.contrib.jira.macro.internal.JIRAErrorGenerator;
 import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
@@ -80,6 +82,9 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
     @Inject
     private JIRAMacroTransformationManager jiraMacroTransformationManager;
 
+    @Inject
+    private JIRAErrorGenerator jiraErrorGenerator;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -105,15 +110,22 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
         if (StringUtils.isBlank(content)) {
             throw new MacroExecutionException("Missing JQL query!");
         }
-        JIRASearchResult searchResult;
+        JIRASearchResult searchResult = null;
+        List<Block> result = List.of();
         try {
             String urlString = this.urlHelper.getRestSearchURL(jiraServer, content);
             searchResult = this.jiraFetcher.fetchJSON(urlString, jiraServer, JIRASearchResult.class);
+        } catch (JIRABadRequestException e) {
+            // We avoid to raise an exception here to give the possibility to the JIRA macro transformation to be
+            // executed even if we have this error.
+            result = jiraErrorGenerator.getBadRequestErrorBlock(e, context.isInline());
         } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(String.format(FAILED_TO_RETRIEVE_JIRA_DATA,
                 jiraServer.getURL(), content), e);
         }
-        List<Block> result = List.of(new WordBlock(Integer.toString(searchResult.getTotal())));
+        if (searchResult != null) {
+            result = List.of(new WordBlock(Integer.toString(searchResult.getTotal())));
+        }
         if (!context.isInline()) {
             result = Collections.singletonList(new ParagraphBlock(result));
         }

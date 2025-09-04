@@ -41,5 +41,5 @@ public interface JIRADataSource
      * @throws MacroExecutionException in case of an error while getting the JIRA data
      */
     Collection<Element> getData(String macroContent, JIRAMacroParameters parameters)
-        throws MacroExecutionException;
+        throws MacroExecutionException, JIRABadRequestException;
 }

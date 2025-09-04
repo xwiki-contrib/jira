@@ -13,10 +13,10 @@ NOTEXISTING
 beginDocument
 beginMacroMarkerStandalone [jira] [url=http://localhost:8889] [NOTEXISTING]
 beginGroup [[class]=[xwikirenderingerror]]
-onWord [Failed to execute the [jira] macro. Cause: [Error = [HTTP Status 400 - An issue with key 'XWIKI-10000000' does not exist for field 'issueKey'.]. URL = [http://localhost:8889/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=issueKey+in+%28NOTEXISTING%29]]. Click on this message for details.]
+onWord [JIRA returned an error of the request. This could be related to the JQL query or a rights limitation in JIRA for the XWiki user. Click on this message for details.]
 endGroup [[class]=[xwikirenderingerror]]
 beginGroup [[class]=[xwikirenderingerrordescription hidden]]
-onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: Failed to retrieve JIRA data from [http://localhost:8889] for JQL [issueKey in (NOTEXISTING)]${{{regex:.*}}}] [false]
+onVerbatim [Here are the error message from JIRA:{0}] [false]
 endGroup [[class]=[xwikirenderingerrordescription hidden]]
 endMacroMarkerStandalone [jira] [url=http://localhost:8889] [NOTEXISTING]
 endDocument

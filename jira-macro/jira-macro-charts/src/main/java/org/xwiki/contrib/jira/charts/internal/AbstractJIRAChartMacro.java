@@ -27,10 +27,11 @@ import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.display.ChartJSDataSource;
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.internal.JIRAErrorGenerator;
 import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -49,6 +50,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class AbstractJIRAChartMacro<T extends AbstractChartMacroParameters, U extends AbstractJIRADataSource>
     extends AbstractMacro<T>
 {
+    @Inject
+    protected JIRAErrorGenerator jiraErrorGenerator;
+
     @Inject
     private JIRAServerResolver jiraServerResolver;
 
@@ -91,7 +95,8 @@ public abstract class AbstractJIRAChartMacro<T extends AbstractChartMacroParamet
      * @return a serialized JSON string to be used in ChartJS.
      * @throws MacroExecutionException in case of problem during serialization of the JSON.
      */
-    protected String getJSONData(T parameters, Class<U> dataSourceClass) throws MacroExecutionException
+    protected String getJSONData(T parameters, Class<U> dataSourceClass)
+        throws MacroExecutionException, JIRABadRequestException
     {
         U dataSource = getDataFetcher().fetch(parameters, dataSourceClass);
 
@@ -106,20 +111,19 @@ public abstract class AbstractJIRAChartMacro<T extends AbstractChartMacroParamet
     /**
      * Apply macro transformation on the macro result.
      *
-     * @since 11.0.0
-     *
      * @param parameters the macro parameter, depending on the type of the parameter.
      * @param context the macro execution context.
-     * @param macroBlock the input macro block to apply the transformation.
+     * @param macroBlocks the input macro block to apply the transformation.
      * @param macroName the macro name which was called.
      * @return the list of block after the transformation was called.
      * @throws MacroExecutionException in case there are a {@link JIRAServer} resolution issue
+     * @since 11.0.0
      */
     protected List<Block> transformMacroResult(
         T parameters, MacroTransformationContext context,
-        MacroBlock macroBlock, String macroName) throws MacroExecutionException
+        List<Block> macroBlocks, String macroName) throws MacroExecutionException
     {
-        return jiraMacroTransformationManager.transform(List.of(macroBlock), parameters, context,
+        return jiraMacroTransformationManager.transform(macroBlocks, parameters, context,
             jiraServerResolver.resolve(parameters), macroName);
     }
 }
