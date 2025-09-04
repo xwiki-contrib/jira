@@ -65,6 +65,25 @@ public class ErrorMessageExtractor
         String content = IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8);
         if ("text/html".equals(contentType)) {
             try {
+                /*
+                When JIRA returns an Error for an HTML or XML content the error returned is the HTML error from tomcat.
+                Ideally we would like to use the REST API which return a more strong structured message instead.
+                But this need a full rewrite of some components to use the REST API result, and we are not sure of the
+                compatibility with JIRA cloud.
+                Fortunately, it seems that from the Atlassian documentation JIRA can only be used with Tomcat we can
+                suppose that the message will have allways the same structure. Generally Tomcat will return something
+                like this:
+                --------------------------
+                Type Status Report
+                Message The value 'TEST' does not exist for the field 'project'.
+                Description The server cannot or will not process the request due to something that is perceived to
+                    be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive
+                    request routing).
+                --------------------------
+                The interesting message from JIRA here is "The value 'TEST' does not exist for the field 'project'.".
+                So we need to get this line from the HTML returned by Tomcat.
+                So for this reason we will try to get the second paragraph from the body.
+                 */
                 Document d = org.jsoup.Jsoup.parse(content);
                 Element body = d.getElementsByTag("body").first();
                 if (body != null) {
