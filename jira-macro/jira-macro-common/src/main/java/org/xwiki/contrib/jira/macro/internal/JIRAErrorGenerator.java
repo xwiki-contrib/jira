@@ -39,6 +39,8 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 @Singleton
 public class JIRAErrorGenerator
 {
+    private static final String LINE_BREAK = "\n";
+
     @Inject
     private ErrorBlockGenerator errorBlockGenerator;
 
@@ -53,7 +55,8 @@ public class JIRAErrorGenerator
     {
         return errorBlockGenerator.generateErrorBlocks(inline, "jira.macro.common.jirabadrequest.errormessage",
             "JIRA returned an error of the request. "
-                + "This could be related to the JQL query or the a rights limitation in JIRA for the XWiki user.",
-            "Here are the error message from JIRA:\n" + String.join("\n", e.getExtractedMessages()));
+                + "This could be related to the JQL query or a rights limitation in JIRA for the XWiki user.",
+            "Here are the error message from JIRA:{0}",
+            LINE_BREAK + String.join(LINE_BREAK, e.getExtractedMessages()));
     }
 }

@@ -13,11 +13,10 @@ NOTEXISTING
 beginDocument
 beginMacroMarkerStandalone [jira] [url=http://localhost:8889] [NOTEXISTING]
 beginGroup [[class]=[xwikirenderingerror]]
-onWord [JIRA returned an error of the request. This could be related to the JQL query or the a rights limitation in JIRA for the XWiki user. Click on this message for details.]
+onWord [JIRA returned an error of the request. This could be related to the JQL query or a rights limitation in JIRA for the XWiki user. Click on this message for details.]
 endGroup [[class]=[xwikirenderingerror]]
 beginGroup [[class]=[xwikirenderingerrordescription hidden]]
-onVerbatim [Here are the error message from JIRA:
-] [false]
+onVerbatim [Here are the error message from JIRA:{0}] [false]
 endGroup [[class]=[xwikirenderingerrordescription hidden]]
 endMacroMarkerStandalone [jira] [url=http://localhost:8889] [NOTEXISTING]
 endDocument
