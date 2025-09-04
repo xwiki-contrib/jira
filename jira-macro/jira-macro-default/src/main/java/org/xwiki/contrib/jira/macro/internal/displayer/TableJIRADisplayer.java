@@ -32,13 +32,14 @@ import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAFields;
+import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.TableCellBlock;
 import org.xwiki.rendering.block.TableHeadCellBlock;
 import org.xwiki.rendering.block.TableRowBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
-import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Displays JIRA issues in a table.
@@ -83,6 +84,16 @@ public class TableJIRADisplayer extends AbstractJIRADisplayer
         }
 
         return Arrays.asList(new TableBlock(rowBlocks));
+    }
+
+    @Override
+    public List<Block> display(Collection<Element> issue, JIRAMacroParameters parameters,
+        MacroTransformationContext context)
+    {
+        if (context.isInline()) {
+            return getInlineNotSupportedError("table");
+        }
+        return display(issue, parameters);
     }
 
     @Override

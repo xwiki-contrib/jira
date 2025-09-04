@@ -27,10 +27,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.macro.JIRADisplayer;
+import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
 import org.xwiki.contrib.jira.macro.JIRAFields;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-import org.xwiki.contrib.jira.macro.JIRAField;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
 
 /**
  * Common issue Displayer that Displayers can extend and that provides common methods.
@@ -51,6 +53,9 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
      */
     @Inject
     protected JIRAFieldDisplayer defaultDisplayer;
+
+    @Inject
+    private ErrorBlockGenerator errorBlockGenerator;
 
     /**
      * @param field the field to display
@@ -76,8 +81,8 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
     }
 
     /**
-     * @param parameters the macro parameters from which to get an optional list of JIRA field names to display (if not
-     *            defined by the user then use default field names)
+     * @param parameters the macro parameters from which to get an optional list of JIRA field names to display (if
+     *     not defined by the user then use default field names)
      * @return the list of JIRA fields to be displayed
      */
     @SuppressWarnings("deprecation")
@@ -122,6 +127,17 @@ public abstract class AbstractJIRADisplayer implements JIRADisplayer
                 }
             }
         }
+    }
+
+    /**
+     * Provide a block to show to the user when the displayer is wrongly used inline.
+     *
+     * @param displayerName the name of the displayer.
+     */
+    protected List<Block> getInlineNotSupportedError(String displayerName)
+    {
+        return errorBlockGenerator.generateErrorBlocks(true, "jira.macro.default.displayer.inlinenotsupported",
+            "The '{}' style for the 'jira' macro can't be used inline", null, displayerName);
     }
 
     /**

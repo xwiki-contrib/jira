@@ -32,11 +32,12 @@ import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAFields;
+import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Displays JIRA issues as a list (ie one under another).
@@ -76,6 +77,16 @@ public class ListJIRADisplayer extends AbstractJIRADisplayer
             listItemBlocks.add(new ListItemBlock(itemBlocks));
         }
         return Arrays.asList(new BulletedListBlock(listItemBlocks));
+    }
+
+    @Override
+    public List<Block> display(Collection<Element> issue, JIRAMacroParameters parameters,
+        MacroTransformationContext context)
+    {
+        if (context.isInline()) {
+            return getInlineNotSupportedError("list");
+        }
+        return display(issue, parameters);
     }
 
     @Override
