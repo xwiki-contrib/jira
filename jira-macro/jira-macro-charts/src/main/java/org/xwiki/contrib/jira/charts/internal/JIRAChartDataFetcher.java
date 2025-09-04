@@ -22,7 +22,7 @@ package org.xwiki.contrib.jira.charts.internal;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
-import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**

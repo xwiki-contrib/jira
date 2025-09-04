@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 

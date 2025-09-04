@@ -34,7 +34,7 @@ import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.JIRADataChartJSDataConverter;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
-import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;

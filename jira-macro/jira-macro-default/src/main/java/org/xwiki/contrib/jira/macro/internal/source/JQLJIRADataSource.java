@@ -29,7 +29,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 

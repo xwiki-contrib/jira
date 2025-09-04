@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**

@@ -33,7 +33,7 @@ import org.xwiki.contrib.jira.charts.internal.JIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRACell;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRADataSource;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRARow;
-import org.xwiki.contrib.jira.macro.internal.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.contrib.jira.macro.internal.JIRAErrorGenerator;
 import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;

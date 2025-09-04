@@ -17,39 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.jira.macro.internal;
+package org.xwiki.contrib.jira.macro;
+
+import java.util.List;
+
+import org.xwiki.contrib.jira.macro.internal.ErrorMessageExtractor;
 
 /**
  * Exception thrown when there is an error when accessing the remote JIRA server.
  *
  * @version $Id$
- * @since 10.1.3
+ * @since 11.1.0
  */
-public class JIRAConnectionException extends Exception
+public class JIRABadRequestException extends JIRAConnectionException
 {
-    private static final long serialVersionUID = -2356790547774480310L;
+    private static final long serialVersionUID = -2356790547774480311L;
+
+    private final List<String> extractedMessages;
 
     /**
-     * Construct a new {@code MentionsException} with the specified detail message.
+     * Construct a new {@code JIRABadRequestException} with the specified detail message.
      *
-     * @param message the detail message. The detail message is saved for later retrieval by the {@link
-     *     #getMessage()}
+     * @param exceptionMessage the detail message. The detail message is saved for later retrieval by the
+     *     {@link #getMessage()}
+     * @param extractedMessages the extracted message from the {@link ErrorMessageExtractor}.
      */
-    public JIRAConnectionException(String message)
+    public JIRABadRequestException(String exceptionMessage, List<String> extractedMessages)
     {
-        super(message);
+        super(exceptionMessage);
+        this.extractedMessages = extractedMessages;
     }
 
     /**
-     * Constructs a new {@code MentionsException} with the specified detail message and cause.
+     * Get the extracted message from the JIRA answer.
      *
-     * @param message the detail message. The detail message is saved for later retrieval by the {@link
-     *     #getMessage()}
-     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A null value
-     *     is permitted, and indicates that the cause is nonexistent or unknown.)
+     * @return the extracted message from the {@link ErrorMessageExtractor}.
      */
-    public JIRAConnectionException(String message, Throwable cause)
+    public List<String> getExtractedMessages()
     {
-        super(message, cause);
+        return extractedMessages;
     }
 }

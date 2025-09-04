@@ -40,6 +40,8 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
