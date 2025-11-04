@@ -91,7 +91,7 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
         this.parameters = parameters;
         this.content = content;
         this.isAsync = isAsync;
-        this.context = context;
+        this.context = context.clone();
 
         this.inline = context.isInline();
         this.targetSyntax = context.getTransformationContext().getTargetSyntax();
