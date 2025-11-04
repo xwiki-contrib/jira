@@ -90,7 +90,7 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
         this.parameters = parameters;
         this.content = content;
         this.isAsync = isAsync;
-        this.context = context;
+        this.context = context.clone();
 
         this.inline = context.isInline();
         this.targetSyntax = context.getTransformationContext().getTargetSyntax();
@@ -113,7 +113,6 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             this.asyncContext.useEntity(this.sourceReference);
         }
         try {
-            this.context.setInline(this.inline);
             resultBlocks = this.macro.executeCodeMacro(this.parameters, this.content, this.context);
         } catch (MacroExecutionException e) {
             // Display the error in the result
