@@ -128,6 +128,9 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
                     xwiki.getDocument(new DocumentReference(wikiId, JIRA, "JIRAConfig"), context).clone();
                 List<BaseObject> jiraServerObjs =
                     jiraServerDoc.getXObjects(new DocumentReference(wikiId, JIRA, "JIRAConfigClass"));
+
+                basicAuthDoc.setHidden(true);
+
                 for (BaseObject obj : jiraServerObjs) {
                     if (obj == null) {
                         continue;
