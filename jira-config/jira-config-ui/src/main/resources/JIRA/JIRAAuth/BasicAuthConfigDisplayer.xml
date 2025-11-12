@@ -39,6 +39,7 @@
   <content>{{velocity}}
 #set ($basicAuthClass = 'JIRA.JIRAAuth.BasicAuthClass')
 #set ($confDoc = $xwiki.getDocument('JIRA.JIRAAuth.BasicAuthConfiguration'))
+#set ($discard = $confDoc.setHidden(true))
 #set ($confObjects = $confDoc.getObjects($basicAuthClass))
 #if ($xcontext.action == 'get')
   #if ($request.getParameter('save') == 'true')
