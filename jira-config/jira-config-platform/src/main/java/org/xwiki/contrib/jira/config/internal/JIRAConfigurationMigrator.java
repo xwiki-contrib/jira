@@ -119,7 +119,7 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
 
         try {
             if (!xwiki.exists(migrationDocumentRef, context)) {
-                logger.info("Running migration of JIRA configuration");
+                logger.info("Running migration of JIRA configuration for wiki ID [{}]", wikiId);
 
                 DocumentReference basicAuthConfigRef =
                     new DocumentReference(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_CONFIG_REFERENCE, wikiReference);
@@ -157,6 +157,7 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
 
                 // Juste create a single document to save the fact that we run the migration
                 createMigrationStateDocument();
+                logger.info("Migration done for wiki ID [{}]", wikiId);
             }
         } catch (XWikiException e) {
             logger.error("Can't handle migration of JIRA server configuration", e);
