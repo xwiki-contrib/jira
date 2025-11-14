@@ -118,6 +118,12 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
             new DocumentReference(MIGRATION_STATUS_DOCUMENT_REFERENCE, wikiReference);
 
         try {
+            checkAndFixRights(wikiReference);
+        } catch (XWikiException e) {
+            logger.error("Can't check or fix rights for JIRA server Basic Auth configuration", e);
+        }
+
+        try {
             if (!xwiki.exists(migrationDocumentRef, context)) {
                 logger.info("Running migration of JIRA configuration for wiki ID [{}]", wikiId);
 
@@ -129,6 +135,34 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
             }
         } catch (XWikiException e) {
             logger.error("Can't handle migration of JIRA server configuration", e);
+        }
+    }
+
+    /**
+     * Check and fix rights if the creator and the author of the document is not superadmin.
+     *
+     * @param wikiReference the wiki reference to check.
+     * @throws XWikiException in case something wrong happen.
+     */
+    private void checkAndFixRights(WikiReference wikiReference) throws XWikiException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+        DocumentReference basicAuthConfigRef =
+            new DocumentReference(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_CONFIG_REFERENCE, wikiReference);
+
+        if (xwiki.exists(basicAuthConfigRef, context)) {
+            XWikiDocument doc = xwiki.getDocument(basicAuthConfigRef, context);
+            DocumentAuthors authors = doc.getAuthors();
+
+            if (!SuperAdminUserReference.INSTANCE.equals(authors.getContentAuthor())) {
+                authors.setCreator(SuperAdminUserReference.INSTANCE);
+                authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
+                authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
+                authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
+
+                xwiki.saveDocument(doc, context);
+            }
         }
     }
 
