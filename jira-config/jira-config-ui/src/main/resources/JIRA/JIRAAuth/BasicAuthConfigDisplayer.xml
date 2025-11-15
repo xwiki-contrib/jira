@@ -83,7 +83,7 @@
     #if ($confObj == $NULL)
       #set ($confObj = $confDoc.newObject($basicAuthClass))
       #set ($discard = $confObj.set('id', $configId))
-      #set ($discard = $confDoc.save())
+      #set ($discard = $confDoc.save("Update basic auth configuration", true))
     #end
     $confObj.display('id', 'hidden')
 
