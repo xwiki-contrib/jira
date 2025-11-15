@@ -118,42 +118,16 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
             new DocumentReference(MIGRATION_STATUS_DOCUMENT_REFERENCE, wikiReference);
 
         try {
+            checkAndFixRights(wikiReference);
+        } catch (XWikiException e) {
+            logger.error("Can't check or fix rights for JIRA server Basic Auth configuration", e);
+        }
+
+        try {
             if (!xwiki.exists(migrationDocumentRef, context)) {
                 logger.info("Running migration of JIRA configuration for wiki ID [{}]", wikiId);
 
-                DocumentReference basicAuthConfigRef =
-                    new DocumentReference(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_CONFIG_REFERENCE, wikiReference);
-                XWikiDocument basicAuthDoc = xwiki.getDocument(basicAuthConfigRef, context).clone();
-                XWikiDocument jiraServerDoc =
-                    xwiki.getDocument(new DocumentReference(wikiId, JIRA, "JIRAConfig"), context).clone();
-                List<BaseObject> jiraServerObjs =
-                    jiraServerDoc.getXObjects(new DocumentReference(wikiId, JIRA, "JIRAConfigClass"));
-                for (BaseObject obj : jiraServerObjs) {
-                    if (obj == null) {
-                        continue;
-                    }
-                    String serverId = obj.getStringValue(PROPERTY_ID);
-                    String username = obj.getStringValue(PROPERTY_USERNAME);
-                    String password = obj.getStringValue(PROPERTY_PASSWORD);
-
-                    obj.removeField(PROPERTY_USERNAME);
-                    obj.removeField(PROPERTY_PASSWORD);
-
-                    if (StringUtils.isEmpty(username)) {
-                        // server without authentication
-                        obj.setStringValue(PROPERTY_AUTHENTICATION_TYPE, "noAuth");
-                    } else {
-                        obj.setStringValue(PROPERTY_AUTHENTICATION_TYPE,
-                            BasicAuthJIRAAuthenticatorFactory.HINT);
-                        BaseObject basicAuthObj = basicAuthDoc
-                            .newXObject(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_DATA_CLASS_REFERENCE, context);
-                        basicAuthObj.setStringValue(PROPERTY_ID, serverId);
-                        basicAuthObj.setStringValue(PROPERTY_USERNAME, username);
-                        basicAuthObj.setStringValue(PROPERTY_PASSWORD, password);
-                    }
-                }
-                xwiki.saveDocument(basicAuthDoc, DOC_SAVE_MESSAGE, context);
-                xwiki.saveDocument(jiraServerDoc, DOC_SAVE_MESSAGE, context);
+                migrate(wikiId, wikiReference);
 
                 // Juste create a single document to save the fact that we run the migration
                 createMigrationStateDocument();
@@ -162,6 +136,84 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
         } catch (XWikiException e) {
             logger.error("Can't handle migration of JIRA server configuration", e);
         }
+    }
+
+    /**
+     * Check and fix rights if the creator and the author of the document is not superadmin.
+     *
+     * @param wikiReference the wiki reference to check.
+     * @throws XWikiException in case something wrong happen.
+     */
+    private void checkAndFixRights(WikiReference wikiReference) throws XWikiException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+        DocumentReference basicAuthConfigRef =
+            new DocumentReference(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_CONFIG_REFERENCE, wikiReference);
+
+        if (xwiki.exists(basicAuthConfigRef, context)) {
+            XWikiDocument doc = xwiki.getDocument(basicAuthConfigRef, context);
+            DocumentAuthors authors = doc.getAuthors();
+
+            if (!SuperAdminUserReference.INSTANCE.equals(authors.getContentAuthor())) {
+                authors.setCreator(SuperAdminUserReference.INSTANCE);
+                authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
+                authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
+                authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
+
+                xwiki.saveDocument(doc, "Set superuser as creator and author", true, context);
+            }
+        }
+    }
+
+    private void migrate(String wikiId, WikiReference wikiReference)
+        throws XWikiException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+        DocumentReference basicAuthConfigRef =
+            new DocumentReference(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_CONFIG_REFERENCE, wikiReference);
+        XWikiDocument basicAuthDoc = xwiki.getDocument(basicAuthConfigRef, context).clone();
+        XWikiDocument jiraServerDoc =
+            xwiki.getDocument(new DocumentReference(wikiId, JIRA, "JIRAConfig"), context).clone();
+        List<BaseObject> jiraServerObjs =
+            jiraServerDoc.getXObjects(new DocumentReference(wikiId, JIRA, "JIRAConfigClass"));
+
+        basicAuthDoc.setHidden(true);
+        DocumentAuthors authors = basicAuthDoc.getAuthors();
+        if (basicAuthDoc.isNew()) {
+            authors.setCreator(SuperAdminUserReference.INSTANCE);
+            authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
+            authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
+            authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
+        }
+
+        for (BaseObject obj : jiraServerObjs) {
+            if (obj == null) {
+                continue;
+            }
+            String serverId = obj.getStringValue(PROPERTY_ID);
+            String username = obj.getStringValue(PROPERTY_USERNAME);
+            String password = obj.getStringValue(PROPERTY_PASSWORD);
+
+            obj.removeField(PROPERTY_USERNAME);
+            obj.removeField(PROPERTY_PASSWORD);
+
+            if (StringUtils.isEmpty(username)) {
+                // server without authentication
+                obj.setStringValue(PROPERTY_AUTHENTICATION_TYPE, "noAuth");
+            } else {
+                obj.setStringValue(PROPERTY_AUTHENTICATION_TYPE,
+                    BasicAuthJIRAAuthenticatorFactory.HINT);
+                BaseObject basicAuthObj = basicAuthDoc
+                    .newXObject(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_DATA_CLASS_REFERENCE, context);
+                basicAuthObj.setStringValue(PROPERTY_ID, serverId);
+                basicAuthObj.setStringValue(PROPERTY_USERNAME, username);
+                basicAuthObj.setStringValue(PROPERTY_PASSWORD, password);
+            }
+        }
+        xwiki.saveDocument(basicAuthDoc, DOC_SAVE_MESSAGE, context);
+        xwiki.saveDocument(jiraServerDoc, DOC_SAVE_MESSAGE, context);
     }
 
     private void createMigrationStateDocument()

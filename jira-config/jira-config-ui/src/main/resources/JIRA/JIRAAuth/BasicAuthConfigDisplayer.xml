@@ -39,6 +39,12 @@
   <content>{{velocity}}
 #set ($basicAuthClass = 'JIRA.JIRAAuth.BasicAuthClass')
 #set ($confDoc = $xwiki.getDocument('JIRA.JIRAAuth.BasicAuthConfiguration'))
+#set ($discard = $confDoc.setHidden(true))
+#set ($authors = $confDoc.document.getAuthors())
+#set ($discard = $authors.setCreator($services.user.superAdminUserReference))
+#set ($discard = $authors.setContentAuthor($services.user.superAdminUserReference))
+#set ($discard = $authors.setEffectiveMetadataAuthor($services.user.superAdminUserReference))
+#set ($discard = $authors.setOriginalMetadataAuthor($services.user.superAdminUserReference))
 #set ($confObjects = $confDoc.getObjects($basicAuthClass))
 #if ($xcontext.action == 'get')
   #if ($request.getParameter('save') == 'true')
@@ -77,7 +83,7 @@
     #if ($confObj == $NULL)
       #set ($confObj = $confDoc.newObject($basicAuthClass))
       #set ($discard = $confObj.set('id', $configId))
-      #set ($discard = $confDoc.save())
+      #set ($discard = $confDoc.save("Update basic auth configuration", true))
     #end
     $confObj.display('id', 'hidden')
 
