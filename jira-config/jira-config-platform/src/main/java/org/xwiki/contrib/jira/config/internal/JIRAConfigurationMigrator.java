@@ -161,7 +161,7 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
                 authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
                 authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
 
-                xwiki.saveDocument(doc, "Set superuser as creator and author", true, context);
+                xwiki.saveDocument(doc, "Set superadmin as creator and author", true, context);
             }
         }
     }
