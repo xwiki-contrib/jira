@@ -74,7 +74,8 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
 
     private static final String PROPERTY_AUTHENTICATION_TYPE = "authenticationType";
 
-    private static final String DOC_SAVE_MESSAGE = "Migrate configration";
+    private static final String DOC_SAVE_MESSAGE =
+        "JIRA basic auth configuration migrated to specific configuration page";
 
     private static final LocalDocumentReference MIGRATION_STATUS_DOCUMENT_REFERENCE =
         new LocalDocumentReference(JIRA, "JIRAConfigAuthMigration");
@@ -97,7 +98,7 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (source instanceof InstallJob) {
-            // The JobFinishedEvent event are allways called with the context set to the main wiki, so we need to get
+            // The JobFinishedEvent event are always called with the context set to the main wiki, so we need to get
             // the wiki ID in a different way.
             for (String namespace : ((InstallJob) source).getRequest().getNamespaces()) {
                 String wikiId = NamespaceUtils.toNamespace(namespace).getValue();
@@ -156,14 +157,19 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
             DocumentAuthors authors = doc.getAuthors();
 
             if (!SuperAdminUserReference.INSTANCE.equals(authors.getContentAuthor())) {
-                authors.setCreator(SuperAdminUserReference.INSTANCE);
-                authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
-                authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
-                authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
+                setAuthorAndCreator(authors);
 
                 xwiki.saveDocument(doc, "Set superadmin as creator and author", true, context);
             }
         }
+    }
+
+    private void setAuthorAndCreator(DocumentAuthors authors)
+    {
+        authors.setCreator(SuperAdminUserReference.INSTANCE);
+        authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
+        authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
+        authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
     }
 
     private void migrate(String wikiId, WikiReference wikiReference)
@@ -180,12 +186,9 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
             jiraServerDoc.getXObjects(new DocumentReference(wikiId, JIRA, "JIRAConfigClass"));
 
         basicAuthDoc.setHidden(true);
-        DocumentAuthors authors = basicAuthDoc.getAuthors();
         if (basicAuthDoc.isNew()) {
-            authors.setCreator(SuperAdminUserReference.INSTANCE);
-            authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
-            authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
-            authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
+            DocumentAuthors authors = basicAuthDoc.getAuthors();
+            setAuthorAndCreator(authors);
         }
 
         for (BaseObject obj : jiraServerObjs) {
