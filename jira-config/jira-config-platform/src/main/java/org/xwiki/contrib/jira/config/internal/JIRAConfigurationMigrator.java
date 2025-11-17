@@ -121,7 +121,8 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
         try {
             checkAndFixRights(wikiReference);
         } catch (XWikiException e) {
-            logger.error("Can't check or fix rights for JIRA server Basic Auth configuration", e);
+            logger.error("Can't check or fix rights for JIRA server Basic Auth configuration for wiki ID [{}]",
+                wikiId, e);
         }
 
         try {
@@ -154,22 +155,24 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
 
         if (xwiki.exists(basicAuthConfigRef, context)) {
             XWikiDocument doc = xwiki.getDocument(basicAuthConfigRef, context);
-            DocumentAuthors authors = doc.getAuthors();
 
-            if (!SuperAdminUserReference.INSTANCE.equals(authors.getContentAuthor())) {
-                setAuthorAndCreator(authors);
-
+            if (setSuperAdminAuthors(doc)) {
                 xwiki.saveDocument(doc, "Set superadmin as creator and author", true, context);
             }
         }
     }
 
-    private void setAuthorAndCreator(DocumentAuthors authors)
+    private boolean setSuperAdminAuthors(XWikiDocument doc)
     {
-        authors.setCreator(SuperAdminUserReference.INSTANCE);
-        authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
-        authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
-        authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
+        DocumentAuthors authors = doc.getAuthors();
+        boolean changeAuthors = !SuperAdminUserReference.INSTANCE.equals(authors.getContentAuthor());
+        if (changeAuthors) {
+            authors.setCreator(SuperAdminUserReference.INSTANCE);
+            authors.setContentAuthor(SuperAdminUserReference.INSTANCE);
+            authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);
+            authors.setOriginalMetadataAuthor(SuperAdminUserReference.INSTANCE);
+        }
+        return changeAuthors;
     }
 
     private void migrate(String wikiId, WikiReference wikiReference)
@@ -186,10 +189,8 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
             jiraServerDoc.getXObjects(new DocumentReference(wikiId, JIRA, "JIRAConfigClass"));
 
         basicAuthDoc.setHidden(true);
-        if (basicAuthDoc.isNew()) {
-            DocumentAuthors authors = basicAuthDoc.getAuthors();
-            setAuthorAndCreator(authors);
-        }
+
+        setSuperAdminAuthors(basicAuthDoc);
 
         for (BaseObject obj : jiraServerObjs) {
             if (obj == null) {
