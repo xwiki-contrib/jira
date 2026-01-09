@@ -104,7 +104,7 @@ public class JIRAServer
      */
     public String getId()
     {
-        return id;
+        return this.id;
     }
 
     /**
@@ -113,7 +113,7 @@ public class JIRAServer
      */
     public Optional<JIRAAuthenticator> getJiraAuthenticator()
     {
-        return Optional.ofNullable(jiraAuthenticator);
+        return Optional.ofNullable(this.jiraAuthenticator);
     }
 
     @Override
@@ -121,11 +121,11 @@ public class JIRAServer
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
         builder = builder.append("URL", getURL());
-        if (id != null) {
-            builder = builder.append("id", id);
+        if (this.id != null) {
+            builder = builder.append("id", this.id);
         }
-        if (jiraAuthenticator != null) {
-            builder = builder.append("authenticator", jiraAuthenticator.getClass());
+        if (this.jiraAuthenticator != null) {
+            builder = builder.append("authenticator", this.jiraAuthenticator.getClass());
         }
         return builder.toString();
     }
