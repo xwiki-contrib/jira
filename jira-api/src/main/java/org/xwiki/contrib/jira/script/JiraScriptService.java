@@ -57,11 +57,13 @@ public class JiraScriptService implements ScriptService
     private Logger logger;
 
     /**
-     * Note that when connecting with credentials the password will be passed in clear over the network to the remote
+     * Note that when connecting with credentials, the password will be passed in clear over the network to the remote
      * JIRA instance. Thus, only use this method when connecting over HTTPS.
      *
      * @param jiraServer the JIRA server definition for the instance to use (url, credentials)
-     * @return the client to interact with the remote JIRA instance
+     * @return the client to interact with the remote JIRA instance. <b>IMPORTANT</b>: after you've finished using the
+     *         client instance, you must close it by calling {@link JiraRestClient#close()} on it. Failing to do so
+     *         will leak resources (threads).
      * @since 8.2
      */
     public JiraRestClient getJiraRestClient(JIRAServer jiraServer)
@@ -82,7 +84,9 @@ public class JiraScriptService implements ScriptService
     /**
      * @param jiraURL the URL to the remote JIRA instance to connect to
      * @param authenticationHandler the authentication to use (anonymous, basic, etc)
-     * @return the client to interact with the remote JIRA instance
+     * @return the client to interact with the remote JIRA instance. <b>IMPORTANT</b>: after you've finished using the
+     *         client instance, you must close it by calling {@link JiraRestClient#close()} on it. Failing to do so
+     *         will leak resources (threads).
      */
     private JiraRestClient getJiraRestClient(String jiraURL, AuthenticationHandler authenticationHandler)
     {
