@@ -53,7 +53,7 @@ public class BasicAuthJIRAAuthenticator implements JIRAAuthenticator
     @Override
     public AuthenticationHandler getRestClientAuthenticationHandler()
     {
-        return new BasicHttpAuthenticationHandler(username, password);
+        return new BasicHttpAuthenticationHandler(this.username, this.password);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class BasicAuthJIRAAuthenticator implements JIRAAuthenticator
         // Note: Set up preemptive basic authentication since JIRA can accept both unauthenticated and authenticated
         // requests. See https://developer.atlassian.com/server/jira/platform/basic-authentication/
         context.preemptiveBasicAuth(targetHost,
-            new UsernamePasswordCredentials(username, password.toCharArray()));
+            new UsernamePasswordCredentials(this.username, this.password.toCharArray()));
     }
 
     @Override
@@ -76,6 +76,6 @@ public class BasicAuthJIRAAuthenticator implements JIRAAuthenticator
     @Override
     public String getId()
     {
-        return username;
+        return this.username;
     }
 }

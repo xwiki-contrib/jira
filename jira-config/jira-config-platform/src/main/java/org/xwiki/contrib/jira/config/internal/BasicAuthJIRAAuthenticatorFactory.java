@@ -76,7 +76,7 @@ public class BasicAuthJIRAAuthenticatorFactory implements JIRAAuthenticatorFacto
     @Override
     public JIRAAuthenticator get(String serverId) throws JIRAAuthenticatorException
     {
-        XWikiContext context = contextProvider.get();
+        XWikiContext context = this.contextProvider.get();
         XWikiDocument doc;
         try {
             doc = context.getWiki().getDocument(BASIC_AUTH_CONFIG_REFERENCE, context);
