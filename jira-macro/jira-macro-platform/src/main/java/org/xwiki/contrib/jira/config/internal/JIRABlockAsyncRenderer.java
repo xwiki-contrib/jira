@@ -189,6 +189,8 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
      * @param values the list of values making up the id path
      * @return the id as a list of non-empty string segments
      */
+    // TODO: Remove this overridden method when https://jira.xwiki.org/browse/XWIKI-23439 is fixed (i.e. when the issue
+    // is fixed in XWiki Platform)
     @Override
     protected List<String> createId(Object... values)
     {
