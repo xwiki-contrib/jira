@@ -19,11 +19,13 @@
  */
 package org.xwiki.contrib.jira.config.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAAuthenticator;
 import org.xwiki.contrib.jira.config.JIRAServer;
@@ -158,11 +160,11 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 
     private List<String> createId(String source, MacroTransformationContext context)
     {
-        // Find index of the macro in the XDOM to create a unique id.
+        // Find the index of the macro in the XDOM to create a unique id.
         long index = context.getXDOM().indexOf(context.getCurrentMacroBlock());
 
-        // Note: make sure we don't cache if a different jira url is used or if a different user is used for the same
-        // jira url since different users can have different permissions on jira.
+        // Note: make sure we don't use the same cache if a different jira url is used or if a different user is used
+        // for the same jira url since different users can have different permissions on jira.
         String jiraURL;
         String authenticatorPart = null;
         try {
@@ -170,7 +172,7 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             jiraURL = jiraServer.getURL();
             authenticatorPart = jiraServer.getJiraAuthenticator().map(JIRAAuthenticator::getId).orElse(null);
         } catch (MacroExecutionException e) {
-            // The jira url is not set nor an id set (or the id points to a not-defined JIRA URL), so we cannot get the
+            // The jira url is not set, nor an id set (or the id points to a not-defined JIRA URL), so we cannot get the
             // value. The macro will fail to display. We cache the result based on the id if it's defined. Otherwise,
             // we don't use the jira url.
             jiraURL = this.parameters.getId();
@@ -178,6 +180,29 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
 
         return createId("rendering", "macro", "jira", source, index, jiraURL, authenticatorPart);
     }
+
+    /**
+     * Override code from {@link AbstractBlockAsyncRenderer#createId(Object...)} to fix an issue when a part of the id
+     * is null, which leads to empty path segments in the URL, causing some problems with some web servers setups
+     * such as Apache.
+     *
+     * @param values the list of values making up the id path
+     * @return the id as a list of non-empty string segments
+     */
+    @Override
+    protected List<String> createId(Object... values)
+    {
+        List<String> computedId = new ArrayList<>(values.length);
+
+        for (Object value : values) {
+            if (value != null && !StringUtils.isEmpty(value.toString())) {
+                computedId.add(value.toString());
+            }
+        }
+
+        return computedId;
+    }
+
 
     private String getCurrentSource(MacroTransformationContext context)
     {
