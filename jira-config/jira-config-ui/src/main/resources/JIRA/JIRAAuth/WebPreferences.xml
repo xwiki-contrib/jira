@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="JIRA.WebPreferences" locale="">
-  <web>JIRA</web>
+<xwikidoc version="1.6" reference="JIRA.JIRAAuth.WebPreferences" locale="">
+  <web>JIRA.JIRAAuth</web>
   <name>WebPreferences</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>JIRA.WebHome</parent>
+  <parent>JIRA.JIRAAuth.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -38,10 +38,10 @@
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>JIRA.WebPreferences</name>
+    <name>JIRA.JIRAAuth.WebPreferences</name>
     <number>0</number>
     <className>XWiki.XWikiGlobalRights</className>
-    <guid>94a01d7d-c989-412b-bd3d-50b655b55ba3</guid>
+    <guid>17fcb0f4-e90b-4d87-b8be-59979d820720</guid>
     <class>
       <name>XWiki.XWikiGlobalRights</name>
       <customClass/>
@@ -114,7 +114,7 @@
       <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
-      <levels>edit</levels>
+      <levels>view,edit</levels>
     </property>
     <property>
       <users/>
