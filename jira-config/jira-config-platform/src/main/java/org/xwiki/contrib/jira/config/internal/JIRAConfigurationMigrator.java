@@ -183,8 +183,12 @@ public class JIRAConfigurationMigrator extends AbstractEventListener
         DocumentReference basicAuthConfigRef =
             new DocumentReference(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_CONFIG_REFERENCE, wikiReference);
         XWikiDocument basicAuthDoc = xwiki.getDocument(basicAuthConfigRef, context).clone();
-        XWikiDocument jiraServerDoc =
-            xwiki.getDocument(new DocumentReference(wikiId, JIRA, "JIRAConfig"), context).clone();
+        DocumentReference jiraConfigReference = new DocumentReference(wikiId, JIRA, "JIRAConfig");
+        if (!xwiki.exists(jiraConfigReference, context)) {
+            // Avoid to create a new config if any config exit
+            return;
+        }
+        XWikiDocument jiraServerDoc = xwiki.getDocument(jiraConfigReference, context).clone();
         List<BaseObject> jiraServerObjs =
             jiraServerDoc.getXObjects(new DocumentReference(wikiId, JIRA, "JIRAConfigClass"));
 
