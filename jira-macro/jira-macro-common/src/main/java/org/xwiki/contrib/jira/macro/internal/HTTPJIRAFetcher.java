@@ -20,6 +20,7 @@
 package org.xwiki.contrib.jira.macro.internal;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -70,11 +71,14 @@ public class HTTPJIRAFetcher
     public Document fetch(String urlString, JIRAServer jiraServer) throws JIRAConnectionException
     {
         try {
-            return performRequest(urlString, jiraServer, is -> createSAXBuilder().build(is));
+            return performRequest(urlString, jiraServer, is -> {
+                try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    return createSAXBuilder().build(reader);
+                }
+            });
         } catch (JIRABadRequestException e) {
             throw e;
         } catch (Exception e) {
-            // The XML has failed to be parsed, read it as plain text and return it, for debugging purpose.
             String message = String.format("Failed to parse JIRA XML content [%s]",
                 getRawJIRAResponse(urlString, jiraServer));
             throw new JIRAConnectionException(message, e);
