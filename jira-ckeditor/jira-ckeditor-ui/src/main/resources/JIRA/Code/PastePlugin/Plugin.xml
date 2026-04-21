@@ -139,6 +139,13 @@
             return;
           }
           editor.config.jiraInstances = editor.config.jiraInstances || [];
+          for (var i = 0; i &lt; response.length; i++) {
+            try {
+              response[i].url = new URL(response[i].url)
+            } catch(error) {
+              console.warn(`Configured JIRA instance [${response[i].id}] does not have a valid URL [${response[i].url}].`)
+            }
+          }
           editor.config.jiraInstances.push(...response);
           var beforePasteCount = 0;
           editor.on('beforePaste', function (event) {
@@ -173,7 +180,7 @@
               pastedURL = new URL(pastedElement.attributes['href']);
             }
             const matchingInstance =
-              editor.config.jiraInstances.find(instance => pastedURL.origin.startsWith(instance.url));
+              editor.config.jiraInstances.find(instance => pastedURL.origin.startsWith(instance.url.origin));
             if (!matchingInstance) {
               return;
             }
