@@ -43,6 +43,7 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 @Singleton
 public class JIRAURLHelper
 {
+
     /**
      * REST endpoint to access directly the statistics for the gadgets.
      */
@@ -55,7 +56,6 @@ public class JIRAURLHelper
         "/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=";
 
     private static final String JQL_REST_SEARCH_URL_PREFIX = "/rest/api/2/search?maxResults=0&jql=";
-
 
     @Inject
     private Logger logger;
@@ -113,7 +113,8 @@ public class JIRAURLHelper
 
         // Note: we encode using UTF8 since it's the W3C recommendation.
         // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-        String fullURL = String.format("%s%s%s%s", server.getURL(), JQL_SEARCH_URL_PREFIX, encode(jqlQuery),
+        String fullURL = String.format("%s%s%s%s", server.getURL(), JQL_SEARCH_URL_PREFIX,
+            encode(jqlQuery),
             additionalQueryString);
         this.logger.debug("Computed JIRA URL [{}]", fullURL);
 
@@ -129,7 +130,9 @@ public class JIRAURLHelper
     {
         // Note: we encode using UTF8 since it's the W3C recommendation.
         // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-        String fullURL = String.format("%s%s%s", server.getURL(), JQL_REST_SEARCH_URL_PREFIX, encode(jqlQuery));
+        String fullURL =
+            String.format("%s%s%s", server.getURL(), JQL_REST_SEARCH_URL_PREFIX,
+                encode(jqlQuery));
         this.logger.debug("Computed JIRA REST SEARCH URL [{}]", fullURL);
         return fullURL;
     }
@@ -143,7 +146,8 @@ public class JIRAURLHelper
     public String getChartURL(JIRAServer server, GadgetType gadgetType, List<NameValuePair> queryParameters)
     {
         String queryString = URLEncodedUtils.format(queryParameters, StandardCharsets.UTF_8);
-        return String.format("%s%s%s?%s", server.getURL(), GADGET_REST_ENDPOINT, gadgetType.getEndpoint(), queryString);
+        return String.format("%s%s%s?%s", server.getURL(), GADGET_REST_ENDPOINT,
+            gadgetType.getEndpoint(), queryString);
     }
 
     private String encode(String content)

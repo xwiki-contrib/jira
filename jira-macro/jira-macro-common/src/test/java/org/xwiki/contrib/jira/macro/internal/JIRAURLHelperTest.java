@@ -67,5 +67,10 @@ class JIRAURLHelperTest
         jiraServer = new JIRAServer("http://localhost/jira", "id", new BasicAuthJIRAAuthenticator("username", ""));
         assertEquals("http://localhost/jira/rest/api/2/search?maxResults=0&jql=query",
             this.jiraURLHelper.getRestSearchURL(jiraServer, "query"));
+
+        // URL with / at the end
+        jiraServer = new JIRAServer("http://localhost/jira/", "id", new BasicAuthJIRAAuthenticator("username", ""));
+        assertEquals("http://localhost/jira/rest/api/2/search?maxResults=0&jql=query",
+            this.jiraURLHelper.getRestSearchURL(jiraServer, "query"));
     }
 }

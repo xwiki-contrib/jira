@@ -50,7 +50,7 @@ public class DefaultJIRAServerResolver implements JIRAServerResolver
         // Check if the user has provided an explicit url in the macro. If so, try to find a matching URL in the
         // configured JIRA Server list in order to find if there are any credentials. If not found, return a public
         // JIRA instance.
-        String url = parameters.getURL();
+        String url = StringUtils.removeEnd(parameters.getURL(), "/");
         if (StringUtils.isBlank(url)) {
             // If not, then check if the user has provided a server id in the macro
             String id = parameters.getId();
