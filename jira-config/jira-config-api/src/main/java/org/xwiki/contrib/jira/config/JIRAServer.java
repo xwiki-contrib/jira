@@ -21,6 +21,7 @@ package org.xwiki.contrib.jira.config;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
 import org.xwiki.text.XWikiToStringBuilder;
@@ -59,7 +60,7 @@ public class JIRAServer
      */
     public JIRAServer(String url, String id)
     {
-        this.url = url;
+        this.url = StringUtils.removeEnd(url, "/");
         this.id = id;
     }
 
@@ -96,7 +97,7 @@ public class JIRAServer
      */
     public String getURL()
     {
-        return this.url;
+        return url;
     }
 
     /**
