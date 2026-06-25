@@ -23,6 +23,7 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -102,18 +103,7 @@ class PastePluginIT
         JIRAAdministrationSectionPage jiraPage = new JIRAAdministrationSectionPage();
         jiraPage.setId(0, ADMIN_CONFIG_JIRA_ID);
         jiraPage.setURL(0, ADMIN_CONFIG_JIRA_URL);
-        jiraPage.clickSave();
-        // we need to handle the wait because the save call `preventDefault()`
-        // so we need specify to selenium unit what we need to wait
-        WebDriverWait wait = new WebDriverWait(setup.getDriver(), Duration.ofSeconds(10));
-        try {
-            // workaround to be sure that on the next wait the page already started to be reloaded so
-            //  document.readyState != complete
-            wait.until(ExpectedConditions.stalenessOf(setup.getDriver().findElement(By.tagName("html"))));
-        } catch (TimeoutException ignored) {
-        }
-        wait.until(webDriver -> (((org.openqa.selenium.JavascriptExecutor) webDriver)
-            .executeScript("return document.readyState")).equals("complete"));
+        saveJiraAdminSection(setup, jiraPage);
 
         wikiAdministrationPage = new AdministrationPage();
         wikiAdministrationPage.waitUntilPageIsReady();
@@ -127,7 +117,24 @@ class PastePluginIT
         saveButton.click();
     }
 
+    private static void saveJiraAdminSection(TestUtils setup, JIRAAdministrationSectionPage jiraPage)
+    {
+        jiraPage.clickSave();
+        // we need to handle the wait because the save call `preventDefault()`
+        // so we need specify to selenium unit what we need to wait
+        WebDriverWait wait = new WebDriverWait(setup.getDriver(), Duration.ofSeconds(10));
+        try {
+            // workaround to be sure that on the next wait the page already started to be reloaded so
+            //  document.readyState != complete
+            wait.until(ExpectedConditions.stalenessOf(setup.getDriver().findElement(By.tagName("html"))));
+        } catch (TimeoutException ignored) {
+        }
+        wait.until(webDriver -> (((org.openqa.selenium.JavascriptExecutor) webDriver)
+            .executeScript("return document.readyState")).equals("complete"));
+    }
+
     @Test
+    @Order(10)
     void pasteLinkFromUnconfiguredJiraInstance(TestUtils setup)
     {
         String linkFromUnconfiguredJiraInstance = "https://jira.unconfigured.test/browse/TICKET-134";
@@ -141,6 +148,7 @@ class PastePluginIT
     }
 
     @Test
+    @Order(20)
     void pasteLinkWithoutFormatting(TestUtils setup)
     {
         copyInClipboard(LINK_JIRA_TICKET, setup);
@@ -153,6 +161,7 @@ class PastePluginIT
     }
 
     @Test
+    @Order(30)
     void pasteLinkWithTicket(TestUtils setup)
     {
         copyInClipboard(LINK_JIRA_TICKET, setup);
@@ -173,6 +182,7 @@ class PastePluginIT
     }
 
     @Test
+    @Order(40)
     void pasteLinkWithJQL(TestUtils setup)
     {
         copyInClipboard(LINK_JIRA_JQL, setup);
@@ -192,6 +202,20 @@ class PastePluginIT
         String content = saveAndGetContent(editPage);
         assertEquals("{{jira id=\"testId\" url=\"\" style=\"table\" fields=\"type,key,summary,status\" source=\"jql\" "
             + "maxCount=\"20\"}}\nissuekey in (XWIKI-1000, XWIKI-1001)\n{{/jira}}", content);
+    }
+
+    @Test
+    @Order(50)
+    void pasteLinkFromInstanceEndingWithSlash(TestUtils setup) {
+        // Edit the existing jira instance url so it ends with slash.
+        AdministrationPage wikiAdministrationPage = AdministrationPage.gotoPage();
+
+        wikiAdministrationPage.clickSection("Other", "JIRA");
+        JIRAAdministrationSectionPage jiraPage = new JIRAAdministrationSectionPage();
+        jiraPage.setURL(0, ADMIN_CONFIG_JIRA_URL + "/");
+        saveJiraAdminSection(setup, jiraPage);
+
+        pasteLinkWithTicket(setup);
     }
 
     private String saveAndGetContent(WYSIWYGEditPage editPage)
