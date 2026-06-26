@@ -83,7 +83,7 @@
       <dependency>
         <groupId>com.atlassian.jira</groupId>
         <artifactId>jira-rest-java-client-app</artifactId>
-        <version>5.2.7</version>
+        <version>5.2.8-platform7-12284590</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
