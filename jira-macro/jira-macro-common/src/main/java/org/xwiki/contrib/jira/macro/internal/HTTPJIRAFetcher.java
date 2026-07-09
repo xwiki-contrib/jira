@@ -145,13 +145,15 @@ public class HTTPJIRAFetcher
                         response.getCode(),
                         String.join(", ", extractedMessages),
                         httpGet.getUri().toString());
-                    if (response.getCode() == 400) {
+                    if (response.getCode() == 400 || response.getCode() == 401) {
                         // Handle the 400 error in a specific way because it could happen very frequently.
                         // This could happen because the JQL request is invalid or because just the user don't have the
                         // rights to see the references issues with the JQL. So in case JIRA return a 400 because of the
                         // rights it's quite bad to show a generic error which give to the user the feeling that
                         // something went wrong. So the idea is to show a more detailed error about what happen and also
                         // mention that it could be just caused by the right issue of the user.
+                        // As the 401 error code could be also returned by JIRA for rights issue and the error code 400
+                        // could be also related to rights, we are handling the 2 error in the same way.
                         throw new JIRABadRequestException(exceptionMessage, extractedMessages);
                     } else {
                         // The error message is in the HTML. We extract it to perform some good error-reporting,
