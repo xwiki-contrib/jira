@@ -3,10 +3,20 @@
 JIRA-related components (Macro, API, Configuration).
 
 * Project Lead: [Vincent Massol](https://www.xwiki.org/xwiki/bin/view/XWiki/VincentMassol)
-* Documentation & Downloads: 
-  * [JIRA Macro](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Macro)
-  * [JIRA Administration](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Administration/)
-  * [JIRA Scripting API](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA+Module)
+* Documentation:
+  * [For users](https://www.xwiki.org/xwiki/bin/view/documentation/extensions/user/jira/) — displaying
+    issues, counts and charts in a page, and inserting a macro by pasting a JIRA URL
+  * [For administrators](https://www.xwiki.org/xwiki/bin/view/documentation/extensions/admin/jira/) —
+    defining JIRA instances, activating the paste plugin, and connection errors
+  * [For developers](https://www.xwiki.org/xwiki/bin/view/documentation/extensions/dev/jira/) — the
+    scripting API, the macro extension points and how to extend authentication
+* Downloads:
+  * [JIRA Macro](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA/JIRA%20Macro/)
+  * [JIRA Charts Macro](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA/JIRA%20Charts%20Macro/)
+  * [JIRA Count Macro](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA/JIRA%20Count%20Macro/)
+  * [JIRA Administration](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA/JIRA%20Administration/)
+  * [JIRA CKEditor Integration](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA/JIRA%20CKEditor%20Integration/)
+  * [JIRA Scripting API](https://extensions.xwiki.org/xwiki/bin/view/Extension/JIRA/JIRA%20Module/)
 * [Issue Tracker](https://jira.xwiki.org/browse/MJIRA)
 * Communication: [Forum](https://forum.xwiki.org), [Chat](https://dev.xwiki.org/xwiki/bin/view/Community/Chat)
 * [Development Practices](https://dev.xwiki.org)
