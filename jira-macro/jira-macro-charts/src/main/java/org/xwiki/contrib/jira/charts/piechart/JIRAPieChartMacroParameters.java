@@ -20,8 +20,10 @@
 package org.xwiki.contrib.jira.charts.piechart;
 
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
+import org.xwiki.contrib.jira.charts.JiraFieldParameterDisplayer;
 import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.stability.Unstable;
 
@@ -34,7 +36,7 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
 {
-    private StatisticType type;
+    private String type;
     private int maxData;
 
     /**
@@ -48,7 +50,7 @@ public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
     /**
      * @return the type of statistics to display in the pie chart.
      */
-    public StatisticType getType()
+    public String getType()
     {
         return type;
     }
@@ -58,7 +60,8 @@ public class JIRAPieChartMacroParameters extends AbstractChartMacroParameters
      */
     @PropertyDescription("The type of statistics to display in the pie chart.")
     @PropertyMandatory
-    public void setType(StatisticType type)
+    @PropertyDisplayType(JiraFieldParameterDisplayer.class)
+    public void setType(String type)
     {
         this.type = type;
     }

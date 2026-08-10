@@ -20,7 +20,9 @@
 package org.xwiki.contrib.jira.charts.bidimensionalgrid;
 
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
+import org.xwiki.contrib.jira.charts.JiraFieldParameterDisplayer;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.stability.Unstable;
 
@@ -33,8 +35,8 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class JIRABiDimensionalGridChartMacroParameter extends AbstractChartMacroParameters
 {
-    private JIRAField xAxisField;
-    private JIRAField yAxisField;
+    private String xAxisField;
+    private String yAxisField;
     private int numberOfResults;
     private boolean isSortAscending;
     private boolean isSortNatural;
@@ -52,7 +54,7 @@ public class JIRABiDimensionalGridChartMacroParameter extends AbstractChartMacro
     /**
      * @return represents the field information to be displayed in each column.
      */
-    public JIRAField getxAxisField()
+    public String getxAxisField()
     {
         return xAxisField;
     }
@@ -62,7 +64,8 @@ public class JIRABiDimensionalGridChartMacroParameter extends AbstractChartMacro
      */
     @PropertyDescription("The field information to be displayed in each column.")
     @PropertyMandatory
-    public void setxAxisField(JIRAField xAxisField)
+    @PropertyDisplayType(JiraFieldParameterDisplayer.class)
+    public void setxAxisField(String xAxisField)
     {
         this.xAxisField = xAxisField;
     }
@@ -70,7 +73,7 @@ public class JIRABiDimensionalGridChartMacroParameter extends AbstractChartMacro
     /**
      * @return represents the field information to be displayed in each row.
      */
-    public JIRAField getyAxisField()
+    public String getyAxisField()
     {
         return yAxisField;
     }
@@ -80,7 +83,7 @@ public class JIRABiDimensionalGridChartMacroParameter extends AbstractChartMacro
      */
     @PropertyDescription("The field information to be displayed in each row.")
     @PropertyMandatory
-    public void setyAxisField(JIRAField yAxisField)
+    public void setyAxisField(String yAxisField)
     {
         this.yAxisField = yAxisField;
     }
