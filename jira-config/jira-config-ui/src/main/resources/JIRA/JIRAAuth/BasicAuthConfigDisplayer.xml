@@ -60,7 +60,10 @@
         #if ($formIdValue != $NULL &amp;&amp; $formUsernameValue != $NULL &amp;&amp; $formPwdValue != $NULL)
           #set ($discard = $obj.set('id', $formIdValue))
           #set ($discard = $obj.set('username', $formUsernameValue))
-          #set ($discard = $obj.set('password', $formPwdValue))
+          ## Don't save the value if it's the placeholder - also if we try to do it, we have a NPE
+          #if ($formPwdValue != '********')
+            #set ($discard = $obj.set('password', $formPwdValue))
+          #end
         #else
           ## Seem that the object is not any more in the form, so drop it
           #set ($discard = $confDoc.removeObject($obj))
