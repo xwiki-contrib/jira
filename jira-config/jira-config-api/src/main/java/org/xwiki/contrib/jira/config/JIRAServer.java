@@ -34,11 +34,20 @@ import org.xwiki.text.XWikiToStringBuilder;
  */
 public class JIRAServer
 {
+    /**
+     * The instance type used when none is configured, i.e. the type handled by this extension itself.
+     *
+     * @since 11.2.0
+     */
+    public static final String DEFAULT_INSTANCE_TYPE = "default";
+
     private String id;
 
     private String url;
 
     private JIRAAuthenticator jiraAuthenticator;
+
+    private String instanceType = DEFAULT_INSTANCE_TYPE;
 
     /**
      * Public-access JIRA server.
@@ -93,6 +102,25 @@ public class JIRAServer
     }
 
     /**
+     * Constructor for a JIRA server of a given instance type (e.g. a type contributed by another extension through the
+     * {@code org.xwiki.contrib.jira.instancetype} UI extension point).
+     *
+     * @param url see {@link #getURL()}
+     * @param id see {@link #getId()}
+     * @param jiraAuthenticator see {@link #getJiraAuthenticator()}, can be {@code null} for a public-access server
+     * @param instanceType see {@link #getInstanceType()}, {@link #DEFAULT_INSTANCE_TYPE} is used when empty
+     * @since 11.2.0
+     */
+    public JIRAServer(String url, String id, JIRAAuthenticator jiraAuthenticator, String instanceType)
+    {
+        this(url, id, jiraAuthenticator);
+
+        if (StringUtils.isNotEmpty(instanceType)) {
+            this.instanceType = instanceType;
+        }
+    }
+
+    /**
      * @return the JIRA server's url prefix (e.g. {@code https://jira.xwiki.org})
      */
     public String getURL()
@@ -117,6 +145,16 @@ public class JIRAServer
         return Optional.ofNullable(this.jiraAuthenticator);
     }
 
+    /**
+     * @return the type of the JIRA instance (e.g. {@link #DEFAULT_INSTANCE_TYPE}), used to find the components and the
+     *     UI handling this kind of instance
+     * @since 11.2.0
+     */
+    public String getInstanceType()
+    {
+        return this.instanceType;
+    }
+
     @Override
     public String toString()
     {
@@ -127,6 +165,9 @@ public class JIRAServer
         }
         if (this.jiraAuthenticator != null) {
             builder = builder.append("authenticator", this.jiraAuthenticator.getClass());
+        }
+        if (!DEFAULT_INSTANCE_TYPE.equals(this.instanceType)) {
+            builder = builder.append("instanceType", this.instanceType);
         }
         return builder.toString();
     }

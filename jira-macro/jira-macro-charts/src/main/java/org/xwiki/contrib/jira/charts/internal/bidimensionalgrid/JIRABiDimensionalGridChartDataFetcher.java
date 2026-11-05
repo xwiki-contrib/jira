@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRABiDimensionalGridChartMacroParameter;
 import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRADataSource;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.JIRAGadgetType;
 
 /**
  * Dedicated data fetcher for the bidimensional table chart specific gadget endpoint.
@@ -47,9 +47,9 @@ public class JIRABiDimensionalGridChartDataFetcher
     private static final String FILTER_ID = "filterId";
 
     @Override
-    public JIRAURLHelper.GadgetType getGadgetType()
+    public JIRAGadgetType getGadgetType()
     {
-        return JIRAURLHelper.GadgetType.BIDIMENSIONAL_CHARTS;
+        return JIRAGadgetType.BIDIMENSIONAL_CHARTS;
     }
 
     @Override

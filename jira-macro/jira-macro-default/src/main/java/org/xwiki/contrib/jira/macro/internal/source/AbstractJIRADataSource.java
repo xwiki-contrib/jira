@@ -30,10 +30,9 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
 import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
@@ -46,13 +45,10 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 public abstract class AbstractJIRADataSource implements JIRADataSource
 {
     @Inject
-    private HTTPJIRAFetcher jiraFetcher;
-
-    @Inject
     private JIRAServerResolver jiraServerResolver;
 
     @Inject
-    private JIRAURLHelper urlHelper;
+    private JIRAConnectorManager connectorManager;
 
     /**
      * @param document the XML document from which to extract JIRA issues
@@ -83,8 +79,8 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         Document document;
 
         try {
-            String urlString = this.urlHelper.getSearchURL(jiraServer, jqlQuery, maxCount);
-            document = this.jiraFetcher.fetch(urlString, jiraServer);
+            document =
+                this.connectorManager.getConnector(jiraServer).searchIssues(jiraServer, jqlQuery, maxCount);
         } catch (JIRABadRequestException e) {
             throw e;
         } catch (JIRAConnectionException e) {

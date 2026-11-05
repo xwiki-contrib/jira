@@ -30,8 +30,9 @@ import org.xwiki.contrib.jira.charts.createdvsresolved.DisplayVersion;
 import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.JIRAConnector;
+import org.xwiki.contrib.jira.macro.JIRAGadgetType;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -40,7 +41,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,16 +55,16 @@ class JIRACreatedVsResolvedDataFetcherTest
     private JIRACreatedVsResolvedDataFetcher dataFetcher;
 
     @MockComponent
-    private JIRAURLHelper urlHelper;
-
-    @MockComponent
-    private HTTPJIRAFetcher httpjiraFetcher;
+    private JIRAConnectorManager connectorManager;
 
     @MockComponent
     private JIRAServerResolver jiraServerResolver;
 
     @Mock
     JIRAServer jiraServer;
+
+    @Mock
+    JIRAConnector connector;
 
     @Test
     void fetch() throws Exception
@@ -90,15 +90,12 @@ class JIRACreatedVsResolvedDataFetcherTest
             new BasicNameValuePair("includeVersions", "true")
         );
 
-        when(this.urlHelper.getChartURL(any(), any(), any())).thenReturn("myurl");
+        when(this.connectorManager.getConnector(this.jiraServer)).thenReturn(this.connector);
 
         JIRACreatedVsResolvedDataSource expectedResult = mock(JIRACreatedVsResolvedDataSource.class);
-        when(this.httpjiraFetcher.fetchJSON("myurl", this.jiraServer, JIRACreatedVsResolvedDataSource.class))
-            .thenReturn(expectedResult);
+        when(this.connector.fetchGadgetData(this.jiraServer, JIRAGadgetType.CREATED_VS_RESOLVED, expectedParameters,
+            JIRACreatedVsResolvedDataSource.class)).thenReturn(expectedResult);
 
         assertSame(expectedResult, this.dataFetcher.fetch(parameters, JIRACreatedVsResolvedDataSource.class));
-        verify(this.urlHelper).getChartURL(jiraServer, JIRAURLHelper.GadgetType.CREATED_VS_RESOLVED,
-            expectedParameters);
-
     }
 }

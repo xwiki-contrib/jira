@@ -32,7 +32,7 @@ import org.xwiki.contrib.jira.charts.createdvsresolved.DisplayVersion;
 import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.JIRAGadgetType;
 
 /**
  * Dedicated data fetcher for the created vs resolved specific gadget endpoint.
@@ -48,9 +48,9 @@ public class JIRACreatedVsResolvedDataFetcher
     private static final String FIELD = "field";
 
     @Override
-    public JIRAURLHelper.GadgetType getGadgetType()
+    public JIRAGadgetType getGadgetType()
     {
-        return JIRAURLHelper.GadgetType.CREATED_VS_RESOLVED;
+        return JIRAGadgetType.CREATED_VS_RESOLVED;
     }
 
     @Override

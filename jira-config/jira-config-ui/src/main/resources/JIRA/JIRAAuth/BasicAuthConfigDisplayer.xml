@@ -46,6 +46,16 @@
 #set ($discard = $authors.setEffectiveMetadataAuthor($services.user.superAdminUserReference))
 #set ($discard = $authors.setOriginalMetadataAuthor($services.user.superAdminUserReference))
 #set ($confObjects = $confDoc.getObjects($basicAuthClass))
+## Render the translation specific to the instance type (i.e. "key.instanceType"), provided by the extension contributing
+## the instance type, falling back on the generic translation. Nothing is rendered if none of them exist.
+#macro (jiraBasicAuthTranslation $key)
+  #set ($instanceTypeKey = "${key}.$!{request.instanceType}")
+  #if ("$!request.instanceType" != '' &amp;&amp; "$!services.localization.get($instanceTypeKey)" != '')
+$services.localization.render($instanceTypeKey, 'html/5.0')##
+  #elseif ("$!services.localization.get($key)" != '')
+$services.localization.render($key, 'html/5.0')##
+  #end
+#end
 #if ($xcontext.action == 'get')
   #if ($request.getParameter('save') == 'true')
     ## Save the changes
@@ -90,7 +100,7 @@
     {{html clean="false"}}
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label for="${basicAuthClass}_${confObj.number}_username"&gt;$services.localization.render('jira.config.auth.basicAuth.username', 'html/5.0')&lt;/label&gt;
+        &lt;label for="${basicAuthClass}_${confObj.number}_username"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.username')&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         {{/html}}
@@ -100,7 +110,7 @@
         {{html clean="false"}}
       &lt;/dd&gt;
       &lt;dt&gt;
-        &lt;label for="${basicAuthClass}_${confObj.number}_password"&gt;$services.localization.render('jira.config.auth.basicAuth.password', 'html/5.0')&lt;/label&gt;
+        &lt;label for="${basicAuthClass}_${confObj.number}_password"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.password')&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         {{/html}}
@@ -220,7 +230,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>td.jira-auth-configuration dl {
+      <code>.jira-auth-configuration dl {
         margin-left: 0px
 }</code>
     </property>

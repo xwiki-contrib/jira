@@ -66,4 +66,20 @@ class JIRAServerTest
         assertInstanceOf(BasicScheme.class,
             context.build().getAuthExchanges().values().stream().findAny().orElseThrow().getAuthScheme());
     }
+
+    @Test
+    void verifyInstanceType()
+    {
+        assertEquals(JIRAServer.DEFAULT_INSTANCE_TYPE,
+            new JIRAServer("https://jira.xwiki.org", "id").getInstanceType());
+        assertEquals(JIRAServer.DEFAULT_INSTANCE_TYPE,
+            new JIRAServer("https://jira.xwiki.org", "id", null, "").getInstanceType());
+        assertEquals(JIRAServer.DEFAULT_INSTANCE_TYPE,
+            new JIRAServer("https://jira.xwiki.org", "id", null, null).getInstanceType());
+
+        JIRAServer server = new JIRAServer("https://example.atlassian.net", "id", null, "cloud");
+        assertEquals("cloud", server.getInstanceType());
+        assertTrue(server.getJiraAuthenticator().isEmpty());
+        assertEquals("URL = [https://example.atlassian.net], id = [id], instanceType = [cloud]", server.toString());
+    }
 }

@@ -29,8 +29,9 @@ import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRABiDimensionalGridChar
 import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRAField;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRADataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.JIRAConnector;
+import org.xwiki.contrib.jira.macro.JIRAGadgetType;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -39,7 +40,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,16 +54,16 @@ class JIRABiDimensionalGridChartDataFetcherTest
     private JIRABiDimensionalGridChartDataFetcher dataFetcher;
 
     @MockComponent
-    private JIRAURLHelper urlHelper;
-
-    @MockComponent
-    private HTTPJIRAFetcher httpjiraFetcher;
+    private JIRAConnectorManager connectorManager;
 
     @MockComponent
     private JIRAServerResolver jiraServerResolver;
 
     @Mock
     JIRAServer jiraServer;
+
+    @Mock
+    JIRAConnector connector;
 
     @Test
     void fetch() throws Exception
@@ -87,15 +87,12 @@ class JIRABiDimensionalGridChartDataFetcherTest
             new BasicNameValuePair("numberToShow", "21")
         );
 
-        when(this.urlHelper.getChartURL(any(), any(), any())).thenReturn("myurl");
+        when(this.connectorManager.getConnector(this.jiraServer)).thenReturn(this.connector);
 
         JIRABiDimensionalGridChartJIRADataSource expectedResult = mock(JIRABiDimensionalGridChartJIRADataSource.class);
-        when(this.httpjiraFetcher.fetchJSON("myurl", this.jiraServer, JIRABiDimensionalGridChartJIRADataSource.class))
-            .thenReturn(expectedResult);
+        when(this.connector.fetchGadgetData(this.jiraServer, JIRAGadgetType.BIDIMENSIONAL_CHARTS, expectedParameters,
+            JIRABiDimensionalGridChartJIRADataSource.class)).thenReturn(expectedResult);
 
         assertSame(expectedResult, this.dataFetcher.fetch(parameters, JIRABiDimensionalGridChartJIRADataSource.class));
-        verify(this.urlHelper).getChartURL(jiraServer, JIRAURLHelper.GadgetType.BIDIMENSIONAL_CHARTS,
-            expectedParameters);
-
     }
 }
