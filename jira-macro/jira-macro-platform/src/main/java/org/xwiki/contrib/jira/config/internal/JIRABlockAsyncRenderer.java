@@ -172,8 +172,8 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             JIRAServer jiraServer = this.jiraServerResolver.resolve(this.parameters);
             jiraURL = jiraServer.getURL();
             authenticatorPart = jiraServer.getJiraAuthenticator().map(JIRAAuthenticator::getId).orElse(null);
-            // Don't reuse the result got with another instance type. The default type is not part of the id, to
-            // keep the ids as they were before the introduction of the instance types.
+            // Don't mix up the results got with different instance types. The default type is left out of the id,
+            // so that the ids of the macros using it don't change.
             if (!JIRAServer.DEFAULT_INSTANCE_TYPE.equals(jiraServer.getInstanceType())) {
                 instanceTypePart = jiraServer.getInstanceType();
             }
@@ -184,7 +184,12 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             jiraURL = this.parameters.getId();
         }
 
-        return createId("rendering", "macro", "jira", source, index, jiraURL, authenticatorPart, instanceTypePart);
+        List<Object> idValues =
+            new ArrayList<>(Arrays.asList("rendering", "macro", "jira", source, index, jiraURL, authenticatorPart));
+        if (instanceTypePart != null) {
+            idValues.add(instanceTypePart);
+        }
+        return createId(idValues.toArray());
     }
 
     /**

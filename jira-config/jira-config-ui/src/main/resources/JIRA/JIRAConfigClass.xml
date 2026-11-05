@@ -86,36 +86,40 @@
     </id>
     <instanceType>
       <customDisplay>{{velocity}}
-#set ($fieldName = $escapetool.xml("${prefix}${name}"))
+#set ($fieldName = "${prefix}${name}")
 #set ($currentValue = "$!value")
-#macro (jiraInstanceTypeOption $optionValue $optionLabel)
-  &lt;option value="$!escapetool.xml($optionValue)"##
-#if ($currentValue == $optionValue) selected="selected"#end&gt;$!escapetool.xml($optionLabel)&lt;/option&gt;
-#end
-{{html clean="false"}}
-&lt;select id="$fieldName" name="$fieldName" class="jira-config-instance-type"&gt;
-#jiraInstanceTypeOption('' $services.localization.render('jira.config.instanceType.default'))
-#set ($foundCurrentValue = $currentValue == '')
+## Labels of the instance types, the default one (empty value) first, then the ones contributed by extensions.
+#set ($instanceTypeLabels = {})
+#set ($discard = $instanceTypeLabels.put('', $services.localization.render('jira.config.instanceType.default')))
 #foreach ($uix in $services.uix.getExtensions('org.xwiki.contrib.jira.instancetype', {'sortByParameter': 'order'}))
   #set ($uixParameters = $uix.parameters)
   #set ($instanceType = "$!uixParameters.instance_type")
-  #if ($instanceType != '')
+  #if ($instanceType != '' &amp;&amp; !$instanceTypeLabels.containsKey($instanceType))
     ## Fallback on the instance type itself when its label is not translated.
     #set ($instanceTypeLabel = $instanceType)
     #if ("$!uixParameters.translation_key" != '' &amp;&amp; "$!services.localization.get($uixParameters.translation_key)" != '')
       #set ($instanceTypeLabel = $services.localization.render($uixParameters.translation_key))
     #end
-    #jiraInstanceTypeOption($instanceType $instanceTypeLabel)
-    #if ($currentValue == $instanceType)
-      #set ($foundCurrentValue = true)
-    #end
+    #set ($discard = $instanceTypeLabels.put($instanceType, $instanceTypeLabel))
   #end
 #end
-## Keep the stored value selectable even when the extension providing it is not installed anymore.
-#if (!$foundCurrentValue)
-  #jiraInstanceTypeOption($currentValue $services.localization.render('jira.config.instanceType.unavailable', [$currentValue]))
+## Keep the stored value displayed and selectable even when the extension providing it is not installed anymore.
+#if (!$instanceTypeLabels.containsKey($currentValue))
+  #set ($discard = $instanceTypeLabels.put($currentValue,
+    $services.localization.render('jira.config.instanceType.unavailable', [$currentValue])))
+#end
+{{html clean="false"}}
+#if ($type == 'edit')
+&lt;select id="$escapetool.xml($fieldName)" name="$escapetool.xml($fieldName)" class="jira-config-instance-type"&gt;
+#foreach ($entry in $instanceTypeLabels.entrySet())
+  &lt;option value="$escapetool.xml($entry.key)"#if ($entry.key == $currentValue) selected="selected"#end&gt;$escapetool.xml($entry.value)&lt;/option&gt;
 #end
 &lt;/select&gt;
+#elseif ($type == 'hidden')
+&lt;input type="hidden" id="$escapetool.xml($fieldName)" name="$escapetool.xml($fieldName)" value="$escapetool.xml($currentValue)"/&gt;
+#else
+$escapetool.xml($instanceTypeLabels.get($currentValue))
+#end
 {{/html}}
 {{/velocity}}</customDisplay>
       <disabled>0</disabled>

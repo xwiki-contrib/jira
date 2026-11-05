@@ -106,10 +106,10 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
         if (StringUtils.isBlank(content)) {
             throw new MacroExecutionException("Missing JQL query!");
         }
-        Integer total = null;
-        List<Block> result = List.of();
+        List<Block> result;
         try {
-            total = this.connectorManager.getConnector(jiraServer).countIssues(jiraServer, content);
+            long total = this.connectorManager.getConnector(jiraServer).countIssues(jiraServer, content);
+            result = List.of(new WordBlock(Long.toString(total)));
         } catch (JIRABadRequestException e) {
             // We avoid to raise an exception here to give the possibility to the JIRA macro transformation to be
             // executed even if we have this error.
@@ -117,9 +117,6 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
         } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(String.format(FAILED_TO_RETRIEVE_JIRA_DATA,
                 jiraServer.getURL(), content), e);
-        }
-        if (total != null) {
-            result = List.of(new WordBlock(Integer.toString(total)));
         }
         if (!context.isInline()) {
             result = Collections.singletonList(new ParagraphBlock(result));

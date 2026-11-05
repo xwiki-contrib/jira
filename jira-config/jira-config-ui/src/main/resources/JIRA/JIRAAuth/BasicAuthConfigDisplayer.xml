@@ -230,7 +230,7 @@ $services.localization.render($key, 'html/5.0')##
       <cache>long</cache>
     </property>
     <property>
-      <code>.jira-auth-configuration dl {
+      <code>td.jira-auth-configuration dl {
         margin-left: 0px
 }</code>
     </property>

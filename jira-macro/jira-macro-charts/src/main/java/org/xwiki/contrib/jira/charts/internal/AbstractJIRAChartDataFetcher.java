@@ -20,7 +20,9 @@
 package org.xwiki.contrib.jira.charts.internal;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -72,7 +74,7 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
         JIRAServer server = this.jiraServerResolver.resolve(parameters);
         try {
             return this.connectorManager.getConnector(server)
-                .fetchGadgetData(server, getGadgetType(), parametersList, expectedType);
+                .fetchGadgetData(server, getGadgetType(), toMap(parametersList), expectedType);
         } catch (JIRABadRequestException e) {
             throw e;
         } catch (JIRAConnectionException e) {
@@ -80,6 +82,16 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
                 String.format("Error when trying to get data for chart [%s] from JIRA server [%s].",
                     getGadgetType(), server.getURL()), e);
         }
+    }
+
+    private Map<String, List<String>> toMap(List<NameValuePair> parameters)
+    {
+        // Keep the order of the parameters and the parameters with several values (e.g. "field").
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        for (NameValuePair parameter : parameters) {
+            map.computeIfAbsent(parameter.getName(), name -> new ArrayList<>()).add(parameter.getValue());
+        }
+        return map;
     }
 
     /**

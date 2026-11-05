@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -77,12 +77,12 @@
           &lt;div id='jiraInstances'&gt;
 {{/html}}
 
-|=$services.localization.render('jira.config.id')#if ($showInstanceType)|=$services.localization.render('jira.config.instanceType')#end|=$services.localization.render('jira.config.url')|=$services.localization.render('jira.config.authType', 'xwiki/2.1')|=$services.localization.render('jira.config.authConfig', 'xwiki/2.1')|=$services.localization.render('jira.config.delete')
+|=$services.localization.render('jira.config.id', 'xwiki/2.1')#if ($showInstanceType)|=$services.localization.render('jira.config.instanceType', 'xwiki/2.1')#end|=$services.localization.render('jira.config.url', 'xwiki/2.1')|=$services.localization.render('jira.config.authType', 'xwiki/2.1')|=$services.localization.render('jira.config.authConfig', 'xwiki/2.1')|=$services.localization.render('jira.config.delete', 'xwiki/2.1')
 ##
 ##
 #foreach($serverObject in $configDoc.getObjects($configClassName))
   #set ($deleteURL = $configDoc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($configClassName)}&amp;classid=${serverObject.number}&amp;xredirect=${escapetool.url($redirect)}"))
-  (% class="jira-instance" %)|(% class="jira-server-id" %)$serverObject.display('id', 'edit')#if ($showInstanceType)|$serverObject.display('instanceType', 'edit')#end|$serverObject.display('url', 'edit')|$serverObject.display('authenticationType', 'edit')|(% class="jira-auth-configuration" %)|=[[image:icon:cross&gt;&gt;path:$deleteURL]]
+  |(% class="jira-server-id" %)$serverObject.display('id', 'edit')#if ($showInstanceType)|$serverObject.display('instanceType', 'edit')#end|$serverObject.display('url', 'edit')|$serverObject.display('authenticationType', 'edit')|(% class="jira-auth-configuration" %)|=[[image:icon:cross&gt;&gt;path:$deleteURL]]
 #end
 
 {{html clean="false"}}

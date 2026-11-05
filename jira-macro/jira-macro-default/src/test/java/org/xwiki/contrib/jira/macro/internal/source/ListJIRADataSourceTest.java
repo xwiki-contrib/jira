@@ -66,6 +66,10 @@ import static org.xwiki.contrib.jira.macro.JIRAField.SUMMARY;
 @ComponentTest
 class ListJIRADataSourceTest
 {
+    private static final JIRAServer JIRA_SERVER = new JIRAServer("http://localhost", "id");
+
+    private static final String JQL = "project = TEST";
+
     @InjectMockComponents
     private ListJIRADataSource jiraDataSource;
 
@@ -113,11 +117,12 @@ class ListJIRADataSourceTest
     void buildIssues() throws Exception
     {
         Document document = new SAXBuilder().build(getClass().getResourceAsStream("/__files/input.xml"));
+        List<Element> items = document.getRootElement().getChild("channel").getChildren("item");
         List<Pair<String, String>> ids = Arrays.asList(
             new ImmutablePair<>("XWIKI-1000", ""),
             new ImmutablePair<>("XWIKI-1001", "Note"));
 
-        List<Element> issues = this.jiraDataSource.buildIssues(document, ids);
+        List<Element> issues = this.jiraDataSource.buildIssues(items, ids);
 
         assertEquals(2, issues.size());
         Element issue1 = issues.get(0);
@@ -185,28 +190,22 @@ class ListJIRADataSourceTest
     }
 
     @Test
-    void getXMLDocument() throws Exception
+    void getIssues() throws Exception
     {
-        JIRAServer jiraServer = new JIRAServer("http://localhost", "id");
-        JIRAConnector connector = mock(JIRAConnector.class);
-        when(this.connectorManager.getConnector(jiraServer)).thenReturn(connector);
-        Document document = new Document();
-        when(connector.searchIssues(jiraServer, "project = TEST", 10)).thenReturn(document);
+        List<Element> issues = List.of(new Element("item"));
+        when(mockConnector().searchIssues(JIRA_SERVER, JQL, 10)).thenReturn(issues);
 
-        assertSame(document, this.jiraDataSource.getXMLDocument(jiraServer, "project = TEST", 10));
+        assertSame(issues, this.jiraDataSource.getIssues(JIRA_SERVER, JQL, 10));
     }
 
     @Test
-    void getXMLDocumentWhenConnectionError() throws Exception
+    void getIssuesWhenConnectionError() throws Exception
     {
-        JIRAServer jiraServer = new JIRAServer("http://localhost", "id");
-        JIRAConnector connector = mock(JIRAConnector.class);
-        when(this.connectorManager.getConnector(jiraServer)).thenReturn(connector);
         JIRAConnectionException cause = new JIRAConnectionException("error");
-        when(connector.searchIssues(jiraServer, "project = TEST", 10)).thenThrow(cause);
+        when(mockConnector().searchIssues(JIRA_SERVER, JQL, 10)).thenThrow(cause);
 
         MacroExecutionException exception = assertThrows(MacroExecutionException.class,
-            () -> this.jiraDataSource.getXMLDocument(jiraServer, "project = TEST", 10));
+            () -> this.jiraDataSource.getIssues(JIRA_SERVER, JQL, 10));
 
         assertEquals("Failed to retrieve JIRA data from [http://localhost] for JQL [project = TEST]",
             exception.getMessage());
@@ -214,16 +213,20 @@ class ListJIRADataSourceTest
     }
 
     @Test
-    void getXMLDocumentWhenBadRequest() throws Exception
+    void getIssuesWhenBadRequest() throws Exception
     {
-        JIRAServer jiraServer = new JIRAServer("http://localhost", "id");
-        JIRAConnector connector = mock(JIRAConnector.class);
-        when(this.connectorManager.getConnector(jiraServer)).thenReturn(connector);
         JIRABadRequestException badRequest = new JIRABadRequestException("error", List.of("message"));
-        when(connector.searchIssues(jiraServer, "project = TEST", 10)).thenThrow(badRequest);
+        when(mockConnector().searchIssues(JIRA_SERVER, JQL, 10)).thenThrow(badRequest);
 
         // Bad requests are not wrapped, since the JIRA macro displays them in a specific way.
         assertSame(badRequest, assertThrows(JIRABadRequestException.class,
-            () -> this.jiraDataSource.getXMLDocument(jiraServer, "project = TEST", 10)));
+            () -> this.jiraDataSource.getIssues(JIRA_SERVER, JQL, 10)));
+    }
+
+    private JIRAConnector mockConnector() throws Exception
+    {
+        JIRAConnector connector = mock(JIRAConnector.class);
+        when(this.connectorManager.getConnector(JIRA_SERVER)).thenReturn(connector);
+        return connector;
     }
 }

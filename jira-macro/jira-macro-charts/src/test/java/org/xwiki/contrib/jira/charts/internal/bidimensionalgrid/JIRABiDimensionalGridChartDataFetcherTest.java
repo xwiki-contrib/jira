@@ -19,11 +19,12 @@
  */
 package org.xwiki.contrib.jira.charts.internal.bidimensionalgrid;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRABiDimensionalGridChartMacroParameter;
 import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRAField;
@@ -37,8 +38,10 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,6 +53,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class JIRABiDimensionalGridChartDataFetcherTest
 {
+    private final JIRAServer jiraServer = new JIRAServer("http://localhost/jira", "myjira");
+
     @InjectMockComponents
     private JIRABiDimensionalGridChartDataFetcher dataFetcher;
 
@@ -60,10 +65,7 @@ class JIRABiDimensionalGridChartDataFetcherTest
     private JIRAServerResolver jiraServerResolver;
 
     @Mock
-    JIRAServer jiraServer;
-
-    @Mock
-    JIRAConnector connector;
+    private JIRAConnector connector;
 
     @Test
     void fetch() throws Exception
@@ -78,21 +80,22 @@ class JIRABiDimensionalGridChartDataFetcherTest
         parameters.setSortAscending(false);
 
         when(this.jiraServerResolver.resolve(any())).thenReturn(this.jiraServer);
-        List<NameValuePair> expectedParameters = List.of(
-            new BasicNameValuePair("filterId", "filter-43434"),
-            new BasicNameValuePair("xstattype", "statuses"),
-            new BasicNameValuePair("ystattype", "assignees"),
-            new BasicNameValuePair("sortDirection", "desc"),
-            new BasicNameValuePair("sortBy", "natural"),
-            new BasicNameValuePair("numberToShow", "21")
-        );
-
         when(this.connectorManager.getConnector(this.jiraServer)).thenReturn(this.connector);
-
         JIRABiDimensionalGridChartJIRADataSource expectedResult = mock(JIRABiDimensionalGridChartJIRADataSource.class);
-        when(this.connector.fetchGadgetData(this.jiraServer, JIRAGadgetType.BIDIMENSIONAL_CHARTS, expectedParameters,
-            JIRABiDimensionalGridChartJIRADataSource.class)).thenReturn(expectedResult);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, List<String>>> parametersCaptor = ArgumentCaptor.forClass(Map.class);
+        when(this.connector.fetchGadgetData(eq(this.jiraServer), eq(JIRAGadgetType.BIDIMENSIONAL_CHARTS),
+            parametersCaptor.capture(), eq(JIRABiDimensionalGridChartJIRADataSource.class))).thenReturn(expectedResult);
 
         assertSame(expectedResult, this.dataFetcher.fetch(parameters, JIRABiDimensionalGridChartJIRADataSource.class));
+
+        assertEquals(List.of(
+            Map.entry("filterId", List.of("filter-43434")),
+            Map.entry("xstattype", List.of("statuses")),
+            Map.entry("ystattype", List.of("assignees")),
+            Map.entry("sortDirection", List.of("desc")),
+            Map.entry("sortBy", List.of("natural")),
+            Map.entry("numberToShow", List.of("21"))
+        ), new ArrayList<>(parametersCaptor.getValue().entrySet()));
     }
 }

@@ -20,9 +20,9 @@
 package org.xwiki.contrib.jira.macro;
 
 import java.util.List;
+import java.util.Map;
 
-import org.apache.hc.core5.http.NameValuePair;
-import org.jdom2.Document;
+import org.jdom2.Element;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.stability.Unstable;
@@ -32,8 +32,47 @@ import org.xwiki.stability.Unstable;
  * type it handles (see {@link JIRAServer#getInstanceType()}), which allows extensions to add the support of other kinds
  * of JIRA instances.
  * <p>
- * Whatever the kind of instance, the data are returned in the formats of JIRA Data Center, which are the ones
- * understood by the macros.
+ * Whatever the kind of instance, the data must be returned in the formats described below, which are the ones read by
+ * the macros (and the same as the ones of JIRA Data Center). Changing these formats is an API change.
+ *
+ * <h2>Issues</h2>
+ * One {@code <item>} element per issue, as in the XML search view of JIRA Data Center, which is also what the
+ * {@code JIRADataSource}, {@code JIRADisplayer} and {@code JIRAFieldDisplayer} components of the {@code jira} macro
+ * exchange. The default displayers read the following children of an item:
+ * <ul>
+ * <li>{@code key}, {@code summary}, {@code link} (the URL of the issue), {@code assignee}, {@code reporter} and
+ * {@code votes}, as text;</li>
+ * <li>{@code type} and {@code status}: the name as text and the URL of the icon in the {@code iconUrl} attribute;</li>
+ * <li>{@code resolution}, required: the name as text and its {@code id} attribute, {@code -1} when the issue is
+ * not resolved (the issue is displayed as resolved otherwise);</li>
+ * <li>{@code created}, {@code updated} and {@code resolved}: dates in the {@code EEE, d MMM yyyy HH:mm:ss Z} format,
+ * as returned by JIRA Data Center (e.g. {@code Fri, 16 Apr 2004 10:57:58 -0700}). They are parsed with the default
+ * locale of the XWiki server, and a date that cannot be parsed is displayed as is;</li>
+ * <li>{@code version}, {@code fixVersion} and {@code component}: one element per value;</li>
+ * <li>{@code labels}: one {@code label} child element per label;</li>
+ * <li>{@code customfields}: one {@code customfield} element per custom field, with the name of the field in
+ * {@code customfieldname} and its values in {@code customfieldvalues/customfieldvalue}. The
+ * {@code customfieldvalues} element is required, and only the text of the first one is displayed.</li>
+ * </ul>
+ * Any other field asked by the user is read as the text of the child element named after the field.
+ *
+ * <h2>Chart data</h2>
+ * The JSON returned by the JIRA Data Center gadget REST resource of the chart (see {@link JIRAGadgetType}). The macros
+ * read the following properties, and ignore the other ones:
+ * <ul>
+ * <li>{@link JIRAGadgetType#PIE_CHART}: {@code filterTitle}, {@code filterUrl}, {@code statType},
+ * {@code issueCount}, and {@code results}, a list of {@code key}, {@code value} (the number of issues) and
+ * {@code url};</li>
+ * <li>{@link JIRAGadgetType#CREATED_VS_RESOLVED}: {@code filterTitle}, {@code filterUrl}, {@code totals}
+ * ({@code created} and {@code resolved} counts), {@code results}, a list of periods with {@code start} and
+ * {@code end} (timestamps in milliseconds) and {@code data} ({@code created}, {@code resolved} and
+ * {@code unresolvedTrend}, each with a {@code count}), and {@code versions}, a list of {@code id}, {@code name},
+ * {@code url}, {@code released}, {@code archived}, {@code releaseDate} and {@code project} ({@code id},
+ * {@code name}, {@code key});</li>
+ * <li>{@link JIRAGadgetType#BIDIMENSIONAL_CHARTS}: {@code filterTitle}, {@code filterUrl}, {@code xHeading},
+ * {@code yHeading}, {@code totalRows}, and {@code firstRow} and {@code rows}, rows of {@code cells}, each with an
+ * HTML {@code markup}.</li>
+ * </ul>
  *
  * @version $Id$
  * @since 11.2.0
@@ -47,12 +86,12 @@ public interface JIRAConnector
      * @param jql the JQL query to execute
      * @param maxCount the maximum number of issues to return, or {@code -1} to not limit it (in which case an
      *     implementation can apply its own limit)
-     * @return the matching issues, as the document returned by the JIRA XML search view (i.e. one
-     *     {@code rss/channel/item} element per issue)
+     * @return the matching issues, one {@code <item>} element per issue (see the format above), in the order returned
+     *     by the query, which must be kept (e.g. for the {@code ORDER BY} clause)
      * @throws JIRAConnectionException if the issues cannot be retrieved, and more specifically a
      *     {@link JIRABadRequestException} when the query is refused (e.g. invalid JQL or missing rights)
      */
-    Document searchIssues(JIRAServer server, String jql, int maxCount) throws JIRAConnectionException;
+    List<Element> searchIssues(JIRAServer server, String jql, int maxCount) throws JIRAConnectionException;
 
     /**
      * @param server the JIRA server to search on
@@ -61,18 +100,19 @@ public interface JIRAConnector
      * @throws JIRAConnectionException if the count cannot be retrieved, and more specifically a
      *     {@link JIRABadRequestException} when the query is refused (e.g. invalid JQL or missing rights)
      */
-    Integer countIssues(JIRAServer server, String jql) throws JIRAConnectionException;
+    long countIssues(JIRAServer server, String jql) throws JIRAConnectionException;
 
     /**
      * @param server the JIRA server to get the data from
-     * @param type the gadget the data are requested for
-     * @param parameters the query parameters of the JIRA gadget REST resource
-     * @param expectedType the type in which to deserialize the JSON returned by the JIRA gadget REST resource
+     * @param type the chart the data are requested for
+     * @param parameters the query parameters of the JIRA Data Center gadget REST resource of the chart, in the order
+     *     they are sent. A parameter can have several values (e.g. {@code field} for the created vs resolved chart).
+     * @param expectedType the type in which to deserialize the JSON data
      * @param <T> the expected type
-     * @return the data of a chart, in the JSON format of the JIRA gadget REST resource
+     * @return the data of the chart, deserialized from the JSON format described above
      * @throws JIRAConnectionException if the data cannot be retrieved, and more specifically a
      *     {@link JIRABadRequestException} when the query is refused (e.g. invalid JQL or missing rights)
      */
-    <T> T fetchGadgetData(JIRAServer server, JIRAGadgetType type, List<NameValuePair> parameters,
+    <T> T fetchGadgetData(JIRAServer server, JIRAGadgetType type, Map<String, List<String>> parameters,
         Class<T> expectedType) throws JIRAConnectionException;
 }

@@ -19,14 +19,18 @@
  */
 package org.xwiki.contrib.jira.macro.internal;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
@@ -51,23 +55,29 @@ public class DefaultJIRAConnector implements JIRAConnector
     private HTTPJIRAFetcher jiraFetcher;
 
     @Override
-    public Document searchIssues(JIRAServer server, String jql, int maxCount) throws JIRAConnectionException
+    public List<Element> searchIssues(JIRAServer server, String jql, int maxCount) throws JIRAConnectionException
     {
-        return this.jiraFetcher.fetch(this.urlHelper.getSearchURL(server, jql, maxCount), server);
+        Document document = this.jiraFetcher.fetch(this.urlHelper.getSearchURL(server, jql, maxCount), server);
+
+        Element channel = document.getRootElement().getChild("channel");
+        return channel != null ? new ArrayList<>(channel.getChildren("item")) : new ArrayList<>();
     }
 
     @Override
-    public Integer countIssues(JIRAServer server, String jql) throws JIRAConnectionException
+    public long countIssues(JIRAServer server, String jql) throws JIRAConnectionException
     {
         return this.jiraFetcher.fetchJSON(this.urlHelper.getRestSearchURL(server, jql), server,
             JIRASearchResult.class).getTotal();
     }
 
     @Override
-    public <T> T fetchGadgetData(JIRAServer server, JIRAGadgetType type, List<NameValuePair> parameters,
+    public <T> T fetchGadgetData(JIRAServer server, JIRAGadgetType type, Map<String, List<String>> parameters,
         Class<T> expectedType) throws JIRAConnectionException
     {
-        return this.jiraFetcher.fetchJSON(this.urlHelper.getChartURL(server, type, parameters), server,
+        List<NameValuePair> queryParameters = new ArrayList<>();
+        parameters.forEach((name, values) -> values.forEach(value ->
+            queryParameters.add(new BasicNameValuePair(name, value))));
+        return this.jiraFetcher.fetchJSON(this.urlHelper.getChartURL(server, type, queryParameters), server,
             expectedType);
     }
 }

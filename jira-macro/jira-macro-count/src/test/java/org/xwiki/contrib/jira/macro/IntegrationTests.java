@@ -66,6 +66,23 @@ public class IntegrationTests
                 .withStatus(200)
                 .withHeader("Content-Type", "text/xml")
                 .withBody("{\"startAt\":0,\"maxResults\":0,\"total\":2,\"issues\":[]}")));
+
+        // Answer when the JQL query is refused (e.g. invalid JQL or missing rights)
+        server.stubFor(get(urlMatching(
+            "\\/rest\\/api\\/2\\/search\\?maxResults=0&jql=.*BADREQUEST.*"))
+            .willReturn(aResponse()
+                .withStatus(400)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"errorMessages\":[\"The value 'BADREQUEST' does not exist for the field 'project'.\"],"
+                    + "\"errors\":{}}")));
+
+        // Answer when the JIRA server fails
+        server.stubFor(get(urlMatching(
+            "\\/rest\\/api\\/2\\/search\\?maxResults=0&jql=.*SERVERERROR.*"))
+            .willReturn(aResponse()
+                .withStatus(500)
+                .withHeader("Content-Type", "text/html")
+                .withBody("<html><body><h1>Internal server error</h1></body></html>")));
     }
 
     @RenderingTestSuite.Initialized
