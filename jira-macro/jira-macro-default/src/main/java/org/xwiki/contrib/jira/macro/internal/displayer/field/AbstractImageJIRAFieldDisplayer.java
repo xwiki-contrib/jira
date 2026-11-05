@@ -19,17 +19,21 @@
  */
 package org.xwiki.contrib.jira.macro.internal.displayer.field;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
@@ -49,7 +53,10 @@ public abstract class AbstractImageJIRAFieldDisplayer implements JIRAFieldDispla
         Element fieldElement = getElement(issue);
         if (fieldElement != null) {
             String iconURL = getURL(issue);
-            if (iconURL != null) {
+            if (!isIconURL(iconURL)) {
+                // The value has no icon: display its name.
+                result = Arrays.asList(new VerbatimBlock(fieldElement.getText(), true));
+            } else {
                 ResourceReference reference = new ResourceReference(iconURL, ResourceType.URL);
                 Map<String, String> resourceParameters = new HashMap<>();
                 resourceParameters.put("alt", fieldElement.getText());
@@ -59,6 +66,31 @@ public abstract class AbstractImageJIRAFieldDisplayer implements JIRAFieldDispla
             }
         }
         return result;
+    }
+
+    /**
+     * @param url the icon URL returned by JIRA
+     * @return {@code false} when the value has no icon: the URL is empty or missing, or it's the URL of the JIRA
+     *     server itself, which JIRA Data Center returns e.g. for the statuses added by the users and which, unlike the
+     *     URL of an icon, ends with a slash
+     */
+    private boolean isIconURL(String url)
+    {
+        if (StringUtils.isEmpty(url)) {
+            return false;
+        }
+        try {
+            URI uri = new URI(url);
+            if (uri.isOpaque()) {
+                // E.g. a data: URI, which has no path to check.
+                return true;
+            }
+            String path = uri.getPath();
+            return StringUtils.isNotEmpty(path) && !path.endsWith("/");
+        } catch (URISyntaxException e) {
+            // Not a URL we can analyse: keep trying to display it as before.
+            return true;
+        }
     }
 
     /**

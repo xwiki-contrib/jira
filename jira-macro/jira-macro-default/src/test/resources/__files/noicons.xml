@@ -1,0 +1,50 @@
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<rss version="0.92">
+  <channel>
+    <item>
+      <title>[XWIKI-2001] Empty icon URL</title>
+      <link>http://jira.xwiki.org/browse/XWIKI-2001</link>
+      <key id="2001">XWIKI-2001</key>
+      <summary>Empty icon URL</summary>
+      <type id="1" iconUrl="">Bug</type>
+      <status id="1" iconUrl="">To Do</status>
+      <resolution id="-1">Unresolved</resolution>
+    </item>
+    <item>
+      <title>[XWIKI-2002] No icon URL</title>
+      <link>http://jira.xwiki.org/browse/XWIKI-2002</link>
+      <key id="2002">XWIKI-2002</key>
+      <summary>No icon URL</summary>
+      <type id="1" iconUrl="http://example.org/jira/">Task</type>
+      <status id="1">In Review</status>
+      <resolution id="-1">Unresolved</resolution>
+    </item>
+    <item>
+      <title>[XWIKI-2003] Icon URL pointing to the server</title>
+      <link>http://jira.xwiki.org/browse/XWIKI-2003</link>
+      <key id="2003">XWIKI-2003</key>
+      <summary>Icon URL pointing to the server</summary>
+      <type id="1" iconUrl="http://jira.xwiki.org/images/icons/bug.gif">Bug</type>
+      <status id="1" iconUrl="http://jira.xwiki.org/">Waiting</status>
+      <resolution id="-1">Unresolved</resolution>
+    </item>
+  </channel>
+</rss>
