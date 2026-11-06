@@ -38,11 +38,13 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.config.JIRAAuthenticatorFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 
@@ -99,6 +101,18 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
     protected LocalDocumentReference getClassReference()
     {
         return CLASS_REFERENCE;
+    }
+
+    @Override
+    protected List<Event> getCacheCleanupEvents()
+    {
+        // The cached servers hold their authenticator, built from the basic auth configuration, which is saved in
+        // another document: the cache must also be cleaned when it changes, otherwise the old credentials are used.
+        List<Event> events = new ArrayList<>(super.getCacheCleanupEvents());
+        events.addAll(BaseObjectReference.anyEvents(
+            this.referenceSerializer.serialize(BasicAuthJIRAAuthenticatorFactory.BASIC_AUTH_DATA_CLASS_REFERENCE)));
+
+        return events;
     }
 
     @Override
