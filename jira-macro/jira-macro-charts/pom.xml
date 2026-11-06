@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.contrib.jira</groupId>
     <artifactId>jira-macro</artifactId>
-    <version>11.1.9-SNAPSHOT</version>
+    <version>11.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>jira-macro-charts</artifactId>
   <name>JIRA - Macro - Charts</name>
   <packaging>jar</packaging>
   <description>Display charts reusing JIRA statistics</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.44</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JIRA Charts Macros</xwiki.extension.name>
     <!-- The extension's category -->

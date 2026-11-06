@@ -31,7 +31,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
@@ -76,21 +75,20 @@ public class ListJIRADataSource extends AbstractJIRADataSource
             throw new MacroExecutionException("Empty list of JIRA ids!");
         }
 
-        Document document = getXMLDocument(jiraServer, constructJQLQuery(ids), parameters.getMaxCount());
-        return buildIssues(document, ids);
+        return buildIssues(getIssues(jiraServer, constructJQLQuery(ids), parameters.getMaxCount()), ids);
     }
 
     /**
-     * @param document the XML document containing all the JIRA issues and which was returned by the JIRA server
+     * @param items the JIRA issues returned by the JIRA server, one XML element per issue
      * @param issueIds the list of JIRA issue ids specified by the user
      * @return the list of JIRA issues (returned as XML elements), in the same order as the JIRA issue id list specified
      *         by the user
      */
-    public List<Element> buildIssues(Document document, List<Pair<String, String>> issueIds)
+    public List<Element> buildIssues(List<Element> items, List<Pair<String, String>> issueIds)
     {
         // Note: JIRA doesn't return items in the order specified in the JQL query, thus we need to manually order
         // them in the same order as passed in the issueIds parameter.
-        Map<String, Element> mappedIssues = buildIssues(document);
+        Map<String, Element> mappedIssues = buildIssues(items);
 
         List<Element> issues = new ArrayList<>();
         for (Pair<String, String> id : issueIds) {

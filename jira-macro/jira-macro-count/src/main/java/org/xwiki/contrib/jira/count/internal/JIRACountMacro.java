@@ -30,12 +30,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.count.JIRACountMacroParameters;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
 import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
 import org.xwiki.contrib.jira.macro.internal.JIRAErrorGenerator;
 import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ParagraphBlock;
@@ -74,10 +73,7 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
     private JIRAServerResolver jiraServerResolver;
 
     @Inject
-    private HTTPJIRAFetcher jiraFetcher;
-
-    @Inject
-    private JIRAURLHelper urlHelper;
+    private JIRAConnectorManager connectorManager;
 
     @Inject
     private JIRAMacroTransformationManager jiraMacroTransformationManager;
@@ -110,11 +106,10 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
         if (StringUtils.isBlank(content)) {
             throw new MacroExecutionException("Missing JQL query!");
         }
-        JIRASearchResult searchResult = null;
-        List<Block> result = List.of();
+        List<Block> result;
         try {
-            String urlString = this.urlHelper.getRestSearchURL(jiraServer, content);
-            searchResult = this.jiraFetcher.fetchJSON(urlString, jiraServer, JIRASearchResult.class);
+            long total = this.connectorManager.getConnector(jiraServer).countIssues(jiraServer, content);
+            result = List.of(new WordBlock(Long.toString(total)));
         } catch (JIRABadRequestException e) {
             // We avoid to raise an exception here to give the possibility to the JIRA macro transformation to be
             // executed even if we have this error.
@@ -122,9 +117,6 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
         } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(String.format(FAILED_TO_RETRIEVE_JIRA_DATA,
                 jiraServer.getURL(), content), e);
-        }
-        if (searchResult != null) {
-            result = List.of(new WordBlock(Integer.toString(searchResult.getTotal())));
         }
         if (!context.isInline()) {
             result = Collections.singletonList(new ParagraphBlock(result));

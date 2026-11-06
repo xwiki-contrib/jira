@@ -56,6 +56,14 @@
   #set($discard = $xwiki.jsx.use($configDisplayerReference))
   #set($discard = $xwiki.ssx.use($configDisplayerReference))
 #end
+## The instance type column is only displayed when some extension contributes instance types, other than the default one,
+## or when an instance uses a type whose extension is not installed anymore.
+#set ($showInstanceType = !$services.uix.getExtensions('org.xwiki.contrib.jira.instancetype').isEmpty())
+#foreach ($serverObject in $configDoc.getObjects($configClassName))
+  #if ("$!serverObject.getValue('instanceType')" != '')
+    #set ($showInstanceType = true)
+  #end
+#end
 {{html clean="false"}}
   &lt;form id="jiraConfig" method="post" action="$configDoc.getURL("save", "xredirect=$escapetool.url(${redirect})")" class="withLock xform" data-auth-displayer-urls="$escapetool.xml($jsontool.serialize($jiraAuthUixByConfigIds))"&gt;
     &lt;fieldset&gt;
@@ -69,12 +77,12 @@
           &lt;div id='jiraInstances'&gt;
 {{/html}}
 
-|=$services.localization.render('jira.config.id')|=$services.localization.render('jira.config.url')|=$services.localization.render('jira.config.authType', 'xwiki/2.1')|=$services.localization.render('jira.config.authConfig', 'xwiki/2.1')|=$services.localization.render('jira.config.delete')
+|=$services.localization.render('jira.config.id', 'xwiki/2.1')#if ($showInstanceType)|=$services.localization.render('jira.config.instanceType', 'xwiki/2.1')#end|=$services.localization.render('jira.config.url', 'xwiki/2.1')|=$services.localization.render('jira.config.authType', 'xwiki/2.1')|=$services.localization.render('jira.config.authConfig', 'xwiki/2.1')|=$services.localization.render('jira.config.delete', 'xwiki/2.1')
 ##
 ##
 #foreach($serverObject in $configDoc.getObjects($configClassName))
   #set ($deleteURL = $configDoc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($configClassName)}&amp;classid=${serverObject.number}&amp;xredirect=${escapetool.url($redirect)}"))
-  |(% class="jira-server-id" %)$serverObject.display('id', 'edit')|$serverObject.display('url', 'edit')|$serverObject.display('authenticationType', 'edit')|(% class="jira-auth-configuration" %)|=[[image:icon:cross&gt;&gt;path:$deleteURL]]
+  |(% class="jira-server-id" %)$serverObject.display('id', 'edit')#if ($showInstanceType)|$serverObject.display('instanceType', 'edit')#end|$serverObject.display('url', 'edit')|$serverObject.display('authenticationType', 'edit')|(% class="jira-auth-configuration" %)|=[[image:icon:cross&gt;&gt;path:$deleteURL]]
 #end
 
 {{html clean="false"}}
@@ -187,11 +195,12 @@
     async function updateDisplayer(element) {
         const id = $(element).parent().find(".jira-server-id &gt; input").val()
         const authType = $(element).parent().find("select.jira-config-authentication-type").val()
+        const instanceType = $(element).parent().find("select.jira-config-instance-type").val() || ''
         const url = urlMapping[authType]
         let body = ''
         if (url !== undefined) {
             try {
-                const response = await fetch(`${url}?${new URLSearchParams({ id, authType })}`);
+                const response = await fetch(`${url}?${new URLSearchParams({ id, authType, instanceType })}`);
                 if (!response.ok) {
                     console.error("can't get displayer content")
                     return
@@ -214,6 +223,17 @@
 
     // Reload the authenticator displayer if we change the authenticator
     for (const element of $('.jira-config-authentication-type')) {
+        $(element).on('change', (event) =&gt; {
+            const e = $(element).parent().parent().find('td.jira-auth-configuration')[0]
+            // event if updateDisplayer(...) is async we don't really need to wait on the result of updateDisplayer(...)
+            // because it already catch itself the errors and each authentication configuration is independent
+            updateDisplayer(e)
+        })
+    }
+
+    // Reload the authenticator displayer if we change the instance type, since the authenticator configuration can
+    // depend on it
+    for (const element of $('.jira-config-instance-type')) {
         $(element).on('change', (event) =&gt; {
             const e = $(element).parent().parent().find('td.jira-auth-configuration')[0]
             // event if updateDisplayer(...) is async we don't really need to wait on the result of updateDisplayer(...)

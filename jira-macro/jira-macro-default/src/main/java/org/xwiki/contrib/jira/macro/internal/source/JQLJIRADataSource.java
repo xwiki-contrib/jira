@@ -25,7 +25,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
@@ -54,7 +53,6 @@ public class JQLJIRADataSource extends AbstractJIRADataSource
             throw new MacroExecutionException("Missing JQL query!");
         }
 
-        Document document = getXMLDocument(jiraServer, macroContent, parameters.getMaxCount());
-        return buildIssues(document).values();
+        return buildIssues(getIssues(jiraServer, macroContent, parameters.getMaxCount())).values();
     }
 }

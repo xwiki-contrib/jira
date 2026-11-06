@@ -61,9 +61,9 @@
       <disabled>0</disabled>
       <hint/>
       <name>authenticationType</name>
-      <number>5</number>
+      <number>4</number>
       <picker>0</picker>
-      <prettyName>authenticationType</prettyName>
+      <prettyName>Authentication Type</prettyName>
       <size>10</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -84,12 +84,62 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </id>
+    <instanceType>
+      <customDisplay>{{velocity}}
+#set ($fieldName = "${prefix}${name}")
+#set ($currentValue = "$!value")
+## Labels of the instance types, the default one (empty value) first, then the ones contributed by extensions.
+#set ($instanceTypeLabels = {})
+#set ($discard = $instanceTypeLabels.put('', $services.localization.render('jira.config.instanceType.default')))
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.contrib.jira.instancetype', {'sortByParameter': 'order'}))
+  #set ($uixParameters = $uix.parameters)
+  #set ($instanceType = "$!uixParameters.instance_type")
+  #if ($instanceType != '' &amp;&amp; !$instanceTypeLabels.containsKey($instanceType))
+    ## Fallback on the instance type itself when its label is not translated.
+    #set ($instanceTypeLabel = $instanceType)
+    #if ("$!uixParameters.translation_key" != '' &amp;&amp; "$!services.localization.get($uixParameters.translation_key)" != '')
+      #set ($instanceTypeLabel = $services.localization.render($uixParameters.translation_key))
+    #end
+    #set ($discard = $instanceTypeLabels.put($instanceType, $instanceTypeLabel))
+  #end
+#end
+## Keep the stored value displayed and selectable even when the extension providing it is not installed anymore.
+#if (!$instanceTypeLabels.containsKey($currentValue))
+  #set ($discard = $instanceTypeLabels.put($currentValue,
+    $services.localization.render('jira.config.instanceType.unavailable', [$currentValue])))
+#end
+{{html clean="false"}}
+#if ($type == 'edit')
+&lt;select id="$escapetool.xml($fieldName)" name="$escapetool.xml($fieldName)" class="jira-config-instance-type"&gt;
+#foreach ($entry in $instanceTypeLabels.entrySet())
+  &lt;option value="$escapetool.xml($entry.key)"#if ($entry.key == $currentValue) selected="selected"#end&gt;$escapetool.xml($entry.value)&lt;/option&gt;
+#end
+&lt;/select&gt;
+#elseif ($type == 'hidden')
+&lt;input type="hidden" id="$escapetool.xml($fieldName)" name="$escapetool.xml($fieldName)" value="$escapetool.xml($currentValue)"/&gt;
+#else
+$escapetool.xml($instanceTypeLabels.get($currentValue))
+#end
+{{/html}}
+{{/velocity}}</customDisplay>
+      <disabled>0</disabled>
+      <hint/>
+      <name>instanceType</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Instance Type</prettyName>
+      <size>10</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </instanceType>
     <url>
       <customDisplay/>
       <disabled>0</disabled>
       <hint/>
       <name>url</name>
-      <number>2</number>
+      <number>3</number>
       <picker>0</picker>
       <prettyName>JIRA Server URL Prefix</prettyName>
       <size>20</size>

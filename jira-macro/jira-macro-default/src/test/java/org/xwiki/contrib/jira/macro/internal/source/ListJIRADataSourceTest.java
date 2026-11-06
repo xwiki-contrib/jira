@@ -32,7 +32,11 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
+import org.xwiki.contrib.jira.macro.JIRAConnector;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -40,7 +44,10 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.contrib.jira.macro.JIRAField.KEY;
 import static org.xwiki.contrib.jira.macro.JIRAField.NOTE;
@@ -59,11 +66,18 @@ import static org.xwiki.contrib.jira.macro.JIRAField.SUMMARY;
 @ComponentTest
 class ListJIRADataSourceTest
 {
+    private static final JIRAServer JIRA_SERVER = new JIRAServer("http://localhost", "id");
+
+    private static final String JQL = "project = TEST";
+
     @InjectMockComponents
     private ListJIRADataSource jiraDataSource;
 
     @MockComponent
     private JIRAConfiguration jiraConfiguration;
+
+    @MockComponent
+    private JIRAConnectorManager connectorManager;
 
     @Test
     void parseIdsWhenNull() throws Exception
@@ -103,11 +117,12 @@ class ListJIRADataSourceTest
     void buildIssues() throws Exception
     {
         Document document = new SAXBuilder().build(getClass().getResourceAsStream("/__files/input.xml"));
+        List<Element> items = document.getRootElement().getChild("channel").getChildren("item");
         List<Pair<String, String>> ids = Arrays.asList(
             new ImmutablePair<>("XWIKI-1000", ""),
             new ImmutablePair<>("XWIKI-1001", "Note"));
 
-        List<Element> issues = this.jiraDataSource.buildIssues(document, ids);
+        List<Element> issues = this.jiraDataSource.buildIssues(items, ids);
 
         assertEquals(2, issues.size());
         Element issue1 = issues.get(0);
@@ -172,5 +187,46 @@ class ListJIRADataSourceTest
         assertEquals(
             BasicAuthJIRAAuthenticator.class,
             this.jiraDataSource.getJIRAServer(parameters).getJiraAuthenticator().orElseThrow().getClass());
+    }
+
+    @Test
+    void getIssues() throws Exception
+    {
+        List<Element> issues = List.of(new Element("item"));
+        when(mockConnector().searchIssues(JIRA_SERVER, JQL, 10)).thenReturn(issues);
+
+        assertSame(issues, this.jiraDataSource.getIssues(JIRA_SERVER, JQL, 10));
+    }
+
+    @Test
+    void getIssuesWhenConnectionError() throws Exception
+    {
+        JIRAConnectionException cause = new JIRAConnectionException("error");
+        when(mockConnector().searchIssues(JIRA_SERVER, JQL, 10)).thenThrow(cause);
+
+        MacroExecutionException exception = assertThrows(MacroExecutionException.class,
+            () -> this.jiraDataSource.getIssues(JIRA_SERVER, JQL, 10));
+
+        assertEquals("Failed to retrieve JIRA data from [http://localhost] for JQL [project = TEST]",
+            exception.getMessage());
+        assertSame(cause, exception.getCause());
+    }
+
+    @Test
+    void getIssuesWhenBadRequest() throws Exception
+    {
+        JIRABadRequestException badRequest = new JIRABadRequestException("error", List.of("message"));
+        when(mockConnector().searchIssues(JIRA_SERVER, JQL, 10)).thenThrow(badRequest);
+
+        // Bad requests are not wrapped, since the JIRA macro displays them in a specific way.
+        assertSame(badRequest, assertThrows(JIRABadRequestException.class,
+            () -> this.jiraDataSource.getIssues(JIRA_SERVER, JQL, 10)));
+    }
+
+    private JIRAConnector mockConnector() throws Exception
+    {
+        JIRAConnector connector = mock(JIRAConnector.class);
+        when(this.connectorManager.getConnector(JIRA_SERVER)).thenReturn(connector);
+        return connector;
     }
 }

@@ -30,7 +30,7 @@ import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
 import org.xwiki.contrib.jira.charts.piechart.StatisticType;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.JIRAGadgetType;
 
 /**
  * Dedicated component to fetch piechart information from JIRA.
@@ -52,8 +52,8 @@ public class JIRAPieChartDataFetcher
     }
 
     @Override
-    public JIRAURLHelper.GadgetType getGadgetType()
+    public JIRAGadgetType getGadgetType()
     {
-        return JIRAURLHelper.GadgetType.PIE_CHART;
+        return JIRAGadgetType.PIE_CHART;
     }
 }

@@ -20,9 +20,11 @@
 package org.xwiki.contrib.jira.test.ui;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.By;
@@ -42,6 +44,8 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -53,6 +57,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class JIRAMacroIT
 {
+    private static final String TEST_SPACE = "JIRATest";
+
+    private static final String BASIC_AUTH = "basicAuth";
+
     private WireMockServer wireMockServer;
 
     @BeforeEach
@@ -70,6 +78,7 @@ class JIRAMacroIT
     }
 
     @Test
+    @Order(1)
     void verifyMacro(TestUtils setup, TestInfo info)
     {
         setup.loginAsSuperAdmin();
@@ -144,5 +153,65 @@ class JIRAMacroIT
         vp.waitUntilContent("\\QType Key Summary Status Created Date\n"
             + "XWIKI-1001 19-Mar-2007\n"
             + "com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClient\\E");
+    }
+
+    /**
+     * An extension can contribute an instance type, with its own labels for the basic authentication configuration.
+     */
+    @Test
+    @Order(2)
+    void instanceTypes(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+
+        // Contribute the "testcloud" instance type, as an extension would.
+        setup.createPage(TEST_SPACE, "Translations", "jira.test.instanceType.testcloud=Test Cloud\n"
+            + "jira.config.auth.basicAuth.username.testcloud=Email\n"
+            + "jira.config.auth.basicAuth.password.testcloud=API token", "");
+        setup.addObject(TEST_SPACE, "Translations", "XWiki.TranslationDocumentClass", "scope", "WIKI");
+        setup.createPage(TEST_SPACE, "TestCloudInstanceType", "", "");
+        setup.addObject(TEST_SPACE, "TestCloudInstanceType", "XWiki.UIExtensionClass",
+            "extensionPointId", "org.xwiki.contrib.jira.instancetype",
+            "name", "org.xwiki.contrib.jira.instancetype.testcloud",
+            "parameters", "instance_type=testcloud\ntranslation_key=jira.test.instanceType.testcloud\norder=10",
+            "scope", "wiki");
+
+        JIRAAdministrationSectionPage jiraPage = gotoJIRASection();
+        assertTrue(jiraPage.hasInstanceTypeColumn());
+        int number = jiraPage.addInstance();
+        assertEquals(List.of("Data Center / Server", "Test Cloud"), jiraPage.getInstanceTypeLabels(number));
+        jiraPage.setId(number, "cloudjira");
+        jiraPage.setURL(number, "http://localhost:8889/cloudjira");
+        jiraPage.setAuthenticationType(number, BASIC_AUTH);
+        jiraPage.waitForBasicAuthConfiguration(number, "Username");
+        assertEquals("Password", jiraPage.getBasicAuthPasswordLabel(number));
+
+        // Changing the instance type reloads the authentication configuration, with the labels of that type.
+        jiraPage.setInstanceType(number, "testcloud");
+        jiraPage.waitForBasicAuthConfiguration(number, "Email");
+        assertEquals("API token", jiraPage.getBasicAuthPasswordLabel(number));
+        jiraPage.setBasicAuthCredentials(number, "user@example.com", "token");
+        jiraPage.saveAndWaitForReload();
+
+        jiraPage = gotoJIRASection();
+        assertEquals("Test Cloud", jiraPage.getSelectedInstanceTypeLabel(number));
+        jiraPage.waitForBasicAuthConfiguration(number, "Email");
+        assertEquals("user@example.com", jiraPage.getBasicAuthUsername(number));
+
+        // When the extension providing the instance type is uninstalled, the stored type is still displayed, so that
+        // saving the configuration doesn't silently change it.
+        setup.deletePage(TEST_SPACE, "TestCloudInstanceType");
+        jiraPage = gotoJIRASection();
+        assertTrue(jiraPage.hasInstanceTypeColumn());
+        assertEquals("testcloud (not available, the extension providing it may be missing)",
+            jiraPage.getSelectedInstanceTypeLabel(number));
+        assertFalse(jiraPage.getInstanceTypeLabels(number).contains("Test Cloud"));
+    }
+
+    private JIRAAdministrationSectionPage gotoJIRASection()
+    {
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        administrationPage.clickSection("Other", "JIRA");
+        return new JIRAAdministrationSectionPage();
     }
 }
