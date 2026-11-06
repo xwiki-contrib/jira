@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.By;
@@ -77,6 +78,7 @@ class JIRAMacroIT
     }
 
     @Test
+    @Order(1)
     void verifyMacro(TestUtils setup, TestInfo info)
     {
         setup.loginAsSuperAdmin();
@@ -157,6 +159,7 @@ class JIRAMacroIT
      * An extension can contribute an instance type, with its own labels for the basic authentication configuration.
      */
     @Test
+    @Order(2)
     void instanceTypes(TestUtils setup)
     {
         setup.loginAsSuperAdmin();

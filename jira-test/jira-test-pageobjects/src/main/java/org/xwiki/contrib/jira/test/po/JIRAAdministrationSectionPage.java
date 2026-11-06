@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -154,11 +153,7 @@ public class JIRAAdministrationSectionPage extends AdministrationSectionPage
         WebElement html = getDriver().findElement(By.tagName("html"));
         clickSave();
         WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(getDriver().getTimeout()));
-        try {
-            wait.until(ExpectedConditions.stalenessOf(html));
-        } catch (TimeoutException ignored) {
-            // The page may already be reloaded.
-        }
+        wait.until(ExpectedConditions.stalenessOf(html));
         wait.until(driver -> "complete".equals(((JavascriptExecutor) driver).executeScript(
             "return document.readyState")));
     }
