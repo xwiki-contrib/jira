@@ -32,14 +32,14 @@ import org.xwiki.contrib.jira.macro.JIRAConnector;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
- * Find the {@link JIRAConnector} to use to get data from a JIRA server, based on its instance type.
+ * Find the {@link JIRAConnector} to use to get data from a JIRA server, based on its deployment type.
  *
  * @version $Id$
  * @since 11.2.0
  */
-@Component(roles = JIRAConnectorManager.class)
+@Component(roles = JIRAConnectorResolver.class)
 @Singleton
-public class JIRAConnectorManager
+public class JIRAConnectorResolver
 {
     /**
      * Use the context component manager since the connectors can be provided by extensions installed on a wiki.
@@ -50,26 +50,26 @@ public class JIRAConnectorManager
 
     /**
      * @param server the JIRA server to get data from
-     * @return the connector handling the instance type of the passed server
-     * @throws MacroExecutionException if there is no connector for the instance type of the passed server. We don't
-     *     fall back on the default connector since the requests it sends are not understood by other kinds of JIRA
+     * @return the connector handling the deployment type of the passed server
+     * @throws MacroExecutionException if there is no connector for the deployment type of the passed server. We don't
+     *     fall back on the Data Center connector since the requests it sends are not understood by other kinds of JIRA
      *     instances.
      */
-    public JIRAConnector getConnector(JIRAServer server) throws MacroExecutionException
+    public JIRAConnector resolve(JIRAServer server) throws MacroExecutionException
     {
-        String instanceType = server.getInstanceType();
+        String deploymentType = server.getDeploymentType();
         ComponentManager componentManager = this.componentManagerProvider.get();
-        if (!componentManager.hasComponent(JIRAConnector.class, instanceType)) {
-            throw new MacroExecutionException(String.format("The JIRA instance type [%s] of the JIRA server [%s] is "
+        if (!componentManager.hasComponent(JIRAConnector.class, deploymentType)) {
+            throw new MacroExecutionException(String.format("The JIRA deployment type [%s] of the JIRA server [%s] is "
                 + "not supported. The extension providing it may be missing or not installed on this wiki.",
-                instanceType, server.getURL()));
+                deploymentType, server.getURL()));
         }
         try {
-            return componentManager.getInstance(JIRAConnector.class, instanceType);
+            return componentManager.getInstance(JIRAConnector.class, deploymentType);
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException(String.format(
-                "Failed to initialize the support of the JIRA instance type [%s] of the JIRA server [%s].",
-                instanceType, server.getURL()), e);
+                "Failed to initialize the support of the JIRA deployment type [%s] of the JIRA server [%s].",
+                deploymentType, server.getURL()), e);
         }
     }
 }

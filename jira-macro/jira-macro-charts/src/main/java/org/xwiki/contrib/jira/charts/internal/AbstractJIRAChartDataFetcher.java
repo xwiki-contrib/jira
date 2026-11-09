@@ -33,11 +33,16 @@ import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAChartType;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
-import org.xwiki.contrib.jira.macro.JIRAGadgetType;
-import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorResolver;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * Abstract implementation of components allowing to request information from JIRA REST gadget endpoint.
@@ -54,7 +59,7 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     private static final String FILTER_ID_PREFIX = "filter-";
 
     @Inject
-    private JIRAConnectorManager connectorManager;
+    private JIRAConnectorResolver connectorResolver;
 
     @Inject
     private JIRAServerResolver jiraServerResolver;
@@ -72,16 +77,32 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
         parametersList.addAll(getCustomQueryParameters(parameters));
 
         JIRAServer server = this.jiraServerResolver.resolve(parameters);
+        String json;
         try {
-            return this.connectorManager.getConnector(server)
-                .fetchGadgetData(server, getGadgetType(), toMap(parametersList), expectedType);
+            json = this.connectorResolver.resolve(server)
+                .getChartData(server, getChartType(), toMap(parametersList));
         } catch (JIRABadRequestException e) {
             throw e;
         } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(
                 String.format("Error when trying to get data for chart [%s] from JIRA server [%s].",
-                    getGadgetType(), server.getURL()), e);
+                    getChartType(), server.getURL()), e);
         }
+
+        try {
+            return createObjectMapper().readValue(json, expectedType);
+        } catch (JsonProcessingException e) {
+            throw new MacroExecutionException(
+                String.format("Failed to parse the data of chart [%s] from JIRA server [%s]: [%s]",
+                    getChartType(), server.getURL(), json), e);
+        }
+    }
+
+    private ObjectMapper createObjectMapper()
+    {
+        // Only the properties described in JIRAChartType are read: ignore the other ones, so that the parsing doesn't
+        // fail when JIRA adds properties.
+        return new ObjectMapper().disable(FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     private Map<String, List<String>> toMap(List<NameValuePair> parameters)
@@ -135,9 +156,9 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     }
 
     /**
-     * @return the type of requested gadget.
+     * @return the chart the data are requested for
      */
-    public abstract JIRAGadgetType getGadgetType();
+    public abstract JIRAChartType getChartType();
 
     /**
      * @param parameters the macro parameters to use for building the request.

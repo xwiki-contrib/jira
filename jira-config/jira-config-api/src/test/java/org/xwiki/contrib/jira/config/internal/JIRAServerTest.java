@@ -68,18 +68,18 @@ class JIRAServerTest
     }
 
     @Test
-    void verifyInstanceType()
+    void verifyDeploymentType()
     {
-        assertEquals(JIRAServer.DEFAULT_INSTANCE_TYPE,
-            new JIRAServer("https://jira.xwiki.org", "id").getInstanceType());
-        assertEquals(JIRAServer.DEFAULT_INSTANCE_TYPE,
-            new JIRAServer("https://jira.xwiki.org", "id", null, "").getInstanceType());
-        assertEquals(JIRAServer.DEFAULT_INSTANCE_TYPE,
-            new JIRAServer("https://jira.xwiki.org", "id", null, null).getInstanceType());
+        assertEquals(JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE,
+            new JIRAServer("https://jira.xwiki.org", "id").getDeploymentType());
+        assertEquals(JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE,
+            new JIRAServer("https://jira.xwiki.org", "id", null, "").getDeploymentType());
+        assertEquals(JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE,
+            new JIRAServer("https://jira.xwiki.org", "id", null, null).getDeploymentType());
 
         JIRAServer server = new JIRAServer("https://example.atlassian.net", "id", null, "cloud");
-        assertEquals("cloud", server.getInstanceType());
+        assertEquals("cloud", server.getDeploymentType());
         assertTrue(server.getJiraAuthenticator().isEmpty());
-        assertEquals("URL = [https://example.atlassian.net], id = [id], instanceType = [cloud]", server.toString());
+        assertEquals("URL = [https://example.atlassian.net], id = [id], deploymentType = [cloud]", server.toString());
     }
 }

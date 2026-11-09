@@ -20,6 +20,7 @@
 package org.xwiki.contrib.jira.macro.internal;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +34,9 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.JIRAChartType;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.JIRAConnector;
-import org.xwiki.contrib.jira.macro.JIRAGadgetType;
 
 /**
  * Get the data from a JIRA Data Center or Server instance, using its XML search view and its REST API.
@@ -44,10 +45,21 @@ import org.xwiki.contrib.jira.macro.JIRAGadgetType;
  * @since 11.2.0
  */
 @Component
-@Named(JIRAServer.DEFAULT_INSTANCE_TYPE)
+@Named(JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE)
 @Singleton
-public class DefaultJIRAConnector implements JIRAConnector
+public class DataCenterJIRAConnector implements JIRAConnector
 {
+    /**
+     * The gadget REST resources providing the data of the charts.
+     */
+    private static final Map<JIRAChartType, String> GADGET_RESOURCES = new EnumMap<>(JIRAChartType.class);
+
+    static {
+        GADGET_RESOURCES.put(JIRAChartType.PIE, "statistics");
+        GADGET_RESOURCES.put(JIRAChartType.CREATED_VS_RESOLVED, "dateCountInPeriod");
+        GADGET_RESOURCES.put(JIRAChartType.TWO_DIMENSIONAL_GRID, "twodimensionalfilterstats/generate");
+    }
+
     @Inject
     private JIRAURLHelper urlHelper;
 
@@ -71,13 +83,13 @@ public class DefaultJIRAConnector implements JIRAConnector
     }
 
     @Override
-    public <T> T fetchGadgetData(JIRAServer server, JIRAGadgetType type, Map<String, List<String>> parameters,
-        Class<T> expectedType) throws JIRAConnectionException
+    public String getChartData(JIRAServer server, JIRAChartType type, Map<String, List<String>> parameters)
+        throws JIRAConnectionException
     {
         List<NameValuePair> queryParameters = new ArrayList<>();
         parameters.forEach((name, values) -> values.forEach(value ->
             queryParameters.add(new BasicNameValuePair(name, value))));
-        return this.jiraFetcher.fetchJSON(this.urlHelper.getChartURL(server, type, queryParameters), server,
-            expectedType);
+        return this.jiraFetcher.fetchText(
+            this.urlHelper.getChartURL(server, GADGET_RESOURCES.get(type), queryParameters), server);
     }
 }

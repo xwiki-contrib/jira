@@ -32,7 +32,7 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.count.JIRACountMacroParameters;
 import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
-import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorResolver;
 import org.xwiki.contrib.jira.macro.internal.JIRAErrorGenerator;
 import org.xwiki.contrib.jira.macro.internal.JIRAMacroTransformationManager;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
@@ -73,7 +73,7 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
     private JIRAServerResolver jiraServerResolver;
 
     @Inject
-    private JIRAConnectorManager connectorManager;
+    private JIRAConnectorResolver connectorResolver;
 
     @Inject
     private JIRAMacroTransformationManager jiraMacroTransformationManager;
@@ -108,7 +108,7 @@ public class JIRACountMacro extends AbstractMacro<JIRACountMacroParameters>
         }
         List<Block> result;
         try {
-            long total = this.connectorManager.getConnector(jiraServer).countIssues(jiraServer, content);
+            long total = this.connectorResolver.resolve(jiraServer).countIssues(jiraServer, content);
             result = List.of(new WordBlock(Long.toString(total)));
         } catch (JIRABadRequestException e) {
             // We avoid to raise an exception here to give the possibility to the JIRA macro transformation to be

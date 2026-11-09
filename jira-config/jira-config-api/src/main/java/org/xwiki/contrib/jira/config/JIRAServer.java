@@ -24,6 +24,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -35,11 +36,15 @@ import org.xwiki.text.XWikiToStringBuilder;
 public class JIRAServer
 {
     /**
-     * The instance type used when none is configured, i.e. the type handled by this extension itself.
+     * The type of the JIRA Data Center and Server instances, which are supported by this extension itself. It's the
+     * deployment type used when none is configured. Note that the configuration stores this type as an empty value
+     * (which is also the value of the servers configured before the deployment types existed): this constant is the
+     * value returned by {@link #getDeploymentType()} and the hint of the corresponding connector.
      *
      * @since 11.2.0
      */
-    public static final String DEFAULT_INSTANCE_TYPE = "default";
+    @Unstable
+    public static final String DATA_CENTER_DEPLOYMENT_TYPE = "datacenter";
 
     private String id;
 
@@ -47,7 +52,7 @@ public class JIRAServer
 
     private JIRAAuthenticator jiraAuthenticator;
 
-    private String instanceType = DEFAULT_INSTANCE_TYPE;
+    private String deploymentType = DATA_CENTER_DEPLOYMENT_TYPE;
 
     /**
      * Public-access JIRA server.
@@ -102,21 +107,22 @@ public class JIRAServer
     }
 
     /**
-     * Constructor for a JIRA server of a given instance type (e.g. a type contributed by another extension through the
-     * {@code org.xwiki.contrib.jira.instancetype} UI extension point).
+     * Constructor for a JIRA server of a given deployment type (e.g. a type contributed by another extension through
+     * the {@code org.xwiki.contrib.jira.deploymenttype} UI extension point).
      *
      * @param url see {@link #getURL()}
      * @param id see {@link #getId()}
      * @param jiraAuthenticator see {@link #getJiraAuthenticator()}, can be {@code null} for a public-access server
-     * @param instanceType see {@link #getInstanceType()}, {@link #DEFAULT_INSTANCE_TYPE} is used when empty
+     * @param deploymentType see {@link #getDeploymentType()}, {@link #DATA_CENTER_DEPLOYMENT_TYPE} is used when empty
      * @since 11.2.0
      */
-    public JIRAServer(String url, String id, JIRAAuthenticator jiraAuthenticator, String instanceType)
+    @Unstable
+    public JIRAServer(String url, String id, JIRAAuthenticator jiraAuthenticator, String deploymentType)
     {
         this(url, id, jiraAuthenticator);
 
-        if (StringUtils.isNotEmpty(instanceType)) {
-            this.instanceType = instanceType;
+        if (StringUtils.isNotEmpty(deploymentType)) {
+            this.deploymentType = deploymentType;
         }
     }
 
@@ -146,13 +152,14 @@ public class JIRAServer
     }
 
     /**
-     * @return the type of the JIRA instance (e.g. {@link #DEFAULT_INSTANCE_TYPE}), used to find the components and the
-     *     UI handling this kind of instance
+     * @return the deployment type of the JIRA instance (e.g. {@link #DATA_CENTER_DEPLOYMENT_TYPE}), used to find the
+     *     components and the UI handling this kind of instance
      * @since 11.2.0
      */
-    public String getInstanceType()
+    @Unstable
+    public String getDeploymentType()
     {
-        return this.instanceType;
+        return this.deploymentType;
     }
 
     @Override
@@ -166,8 +173,8 @@ public class JIRAServer
         if (this.jiraAuthenticator != null) {
             builder = builder.append("authenticator", this.jiraAuthenticator.getClass());
         }
-        if (!DEFAULT_INSTANCE_TYPE.equals(this.instanceType)) {
-            builder = builder.append("instanceType", this.instanceType);
+        if (!DATA_CENTER_DEPLOYMENT_TYPE.equals(this.deploymentType)) {
+            builder = builder.append("deploymentType", this.deploymentType);
         }
         return builder.toString();
     }

@@ -32,7 +32,6 @@ import org.apache.hc.core5.net.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.JIRAGadgetType;
 
 /**
  * Utility component to build URLs for requesting JIRA.
@@ -104,16 +103,15 @@ public class JIRAURLHelper
 
     /**
      * @param server the actual JIRA server to request
-     * @param gadgetType the gadget for which to request statistics
+     * @param gadgetResource the path of the gadget REST resource of the chart, relative to the gadget REST endpoint
      * @param queryParameters the parameters of the request
      * @return the URL to perform the query.
      */
-    public String getChartURL(JIRAServer server, JIRAGadgetType gadgetType,
-        List<NameValuePair> queryParameters)
+    public String getChartURL(JIRAServer server, String gadgetResource, List<NameValuePair> queryParameters)
     {
         String queryString = URLEncodedUtils.format(queryParameters, StandardCharsets.UTF_8);
         return String.format("%s%s%s?%s", server.getURL(), GADGET_REST_ENDPOINT,
-            gadgetType.getEndpoint(), queryString);
+            gadgetResource, queryString);
     }
 
     private String encode(String content)

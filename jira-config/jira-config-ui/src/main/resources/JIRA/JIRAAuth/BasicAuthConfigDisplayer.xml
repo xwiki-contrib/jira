@@ -46,12 +46,12 @@
 #set ($discard = $authors.setEffectiveMetadataAuthor($services.user.superAdminUserReference))
 #set ($discard = $authors.setOriginalMetadataAuthor($services.user.superAdminUserReference))
 #set ($confObjects = $confDoc.getObjects($basicAuthClass))
-## Render the translation specific to the instance type (i.e. "key.instanceType"), provided by the extension contributing
-## the instance type, falling back on the generic translation. Nothing is rendered if none of them exist.
+## Render the translation specific to the deployment type (i.e. "key.deploymentType"), provided by the extension
+## contributing the deployment type, falling back on the generic translation. Nothing is rendered if none of them exist.
 #macro (jiraBasicAuthTranslation $key)
-  #set ($instanceTypeKey = "${key}.$!{request.instanceType}")
-  #if ("$!request.instanceType" != '' &amp;&amp; "$!services.localization.get($instanceTypeKey)" != '')
-$services.localization.render($instanceTypeKey, 'html/5.0')##
+  #set ($deploymentTypeKey = "${key}.$!{request.deploymentType}")
+  #if ("$!request.deploymentType" != '' &amp;&amp; "$!services.localization.get($deploymentTypeKey)" != '')
+$services.localization.render($deploymentTypeKey, 'html/5.0')##
   #elseif ("$!services.localization.get($key)" != '')
 $services.localization.render($key, 'html/5.0')##
   #end

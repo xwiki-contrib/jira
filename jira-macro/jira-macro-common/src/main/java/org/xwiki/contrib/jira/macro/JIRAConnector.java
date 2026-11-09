@@ -28,9 +28,9 @@ import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.stability.Unstable;
 
 /**
- * Defines how the JIRA macros get their data from a given kind of JIRA instance. The component hint is the instance
- * type it handles (see {@link JIRAServer#getInstanceType()}), which allows extensions to add the support of other kinds
- * of JIRA instances.
+ * Defines how the JIRA macros get their data from a given kind of JIRA instance. The component hint is the deployment
+ * type it handles (see {@link JIRAServer#getDeploymentType()}), which allows extensions to add the support of other
+ * kinds of JIRA instances.
  * <p>
  * Whatever the kind of instance, the data must be returned in the formats described below, which are the ones read by
  * the macros (and the same as the ones of JIRA Data Center). Changing these formats is an API change.
@@ -57,22 +57,8 @@ import org.xwiki.stability.Unstable;
  * Any other field asked by the user is read as the text of the child element named after the field.
  *
  * <h2>Chart data</h2>
- * The JSON returned by the JIRA Data Center gadget REST resource of the chart (see {@link JIRAGadgetType}). The macros
- * read the following properties, and ignore the other ones:
- * <ul>
- * <li>{@link JIRAGadgetType#PIE_CHART}: {@code filterTitle}, {@code filterUrl}, {@code statType},
- * {@code issueCount}, and {@code results}, a list of {@code key}, {@code value} (the number of issues) and
- * {@code url};</li>
- * <li>{@link JIRAGadgetType#CREATED_VS_RESOLVED}: {@code filterTitle}, {@code filterUrl}, {@code totals}
- * ({@code created} and {@code resolved} counts), {@code results}, a list of periods with {@code start} and
- * {@code end} (timestamps in milliseconds) and {@code data} ({@code created}, {@code resolved} and
- * {@code unresolvedTrend}, each with a {@code count}), and {@code versions}, a list of {@code id}, {@code name},
- * {@code url}, {@code released}, {@code archived}, {@code releaseDate} and {@code project} ({@code id},
- * {@code name}, {@code key});</li>
- * <li>{@link JIRAGadgetType#BIDIMENSIONAL_CHARTS}: {@code filterTitle}, {@code filterUrl}, {@code xHeading},
- * {@code yHeading}, {@code totalRows}, and {@code firstRow} and {@code rows}, rows of {@code cells}, each with an
- * HTML {@code markup}.</li>
- * </ul>
+ * The JSON data of the chart. The parameters passed for each chart and the JSON properties read by the macros are
+ * described in {@link JIRAChartType}.
  *
  * @version $Id$
  * @since 11.2.0
@@ -105,14 +91,13 @@ public interface JIRAConnector
     /**
      * @param server the JIRA server to get the data from
      * @param type the chart the data are requested for
-     * @param parameters the query parameters of the JIRA Data Center gadget REST resource of the chart, in the order
-     *     they are sent. A parameter can have several values (e.g. {@code field} for the created vs resolved chart).
-     * @param expectedType the type in which to deserialize the JSON data
-     * @param <T> the expected type
-     * @return the data of the chart, deserialized from the JSON format described above
+     * @param parameters the parameters of the chart (see {@link JIRAChartType}), in the order built by the macros.
+     *     A parameter can have several values (e.g. {@code field} for {@link JIRAChartType#CREATED_VS_RESOLVED}), and
+     *     a value can be {@code null} when the macro has no value for it.
+     * @return the data of the chart, in the JSON format described in {@link JIRAChartType}, never {@code null}
      * @throws JIRAConnectionException if the data cannot be retrieved, and more specifically a
      *     {@link JIRABadRequestException} when the query is refused (e.g. invalid JQL or missing rights)
      */
-    <T> T fetchGadgetData(JIRAServer server, JIRAGadgetType type, Map<String, List<String>> parameters,
-        Class<T> expectedType) throws JIRAConnectionException;
+    String getChartData(JIRAServer server, JIRAChartType type, Map<String, List<String>> parameters)
+        throws JIRAConnectionException;
 }

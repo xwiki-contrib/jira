@@ -42,13 +42,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link JIRAConnectorManager}.
+ * Unit tests for {@link JIRAConnectorResolver}.
  */
 @ComponentTest
-class JIRAConnectorManagerTest
+class JIRAConnectorResolverTest
 {
     @InjectMockComponents
-    private JIRAConnectorManager connectorManager;
+    private JIRAConnectorResolver connectorResolver;
 
     @MockComponent
     @Named("context")
@@ -64,55 +64,58 @@ class JIRAConnectorManagerTest
     }
 
     @Test
-    void getConnectorForDefaultInstanceType() throws Exception
+    void resolveForDataCenterDeploymentType() throws Exception
     {
-        JIRAConnector defaultConnector = this.componentManager.registerMockComponent(JIRAConnector.class, "default");
+        JIRAConnector dataCenterConnector =
+            this.componentManager.registerMockComponent(JIRAConnector.class, JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE);
         this.componentManager.registerMockComponent(JIRAConnector.class, "cloud");
 
-        assertSame(defaultConnector,
-            this.connectorManager.getConnector(new JIRAServer("http://localhost/jira", "id")));
-        // An empty instance type is the default one.
-        assertSame(defaultConnector,
-            this.connectorManager.getConnector(new JIRAServer("http://localhost/jira", "id", null, "")));
+        assertSame(dataCenterConnector,
+            this.connectorResolver.resolve(new JIRAServer("http://localhost/jira", "id")));
+        // An empty deployment type means Data Center.
+        assertSame(dataCenterConnector,
+            this.connectorResolver.resolve(new JIRAServer("http://localhost/jira", "id", null, "")));
     }
 
     @Test
-    void getConnectorForContributedInstanceType() throws Exception
+    void resolveForContributedDeploymentType() throws Exception
     {
-        this.componentManager.registerMockComponent(JIRAConnector.class, "default");
+        this.componentManager.registerMockComponent(JIRAConnector.class, JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE);
         JIRAConnector cloudConnector = this.componentManager.registerMockComponent(JIRAConnector.class, "cloud");
 
         assertSame(cloudConnector,
-            this.connectorManager.getConnector(new JIRAServer("https://site.example.org", "id", null, "cloud")));
+            this.connectorResolver.resolve(new JIRAServer("https://site.example.org", "id", null, "cloud")));
     }
 
     @Test
-    void getConnectorForUnknownInstanceType() throws Exception
+    void resolveForUnknownDeploymentType() throws Exception
     {
-        // The default connector must not be used for an instance type it doesn't handle.
-        this.componentManager.registerMockComponent(JIRAConnector.class, "default");
+        // The Data Center connector must not be used for a deployment type it doesn't handle.
+        this.componentManager.registerMockComponent(JIRAConnector.class, JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE);
 
         MacroExecutionException exception = assertThrows(MacroExecutionException.class,
-            () -> this.connectorManager.getConnector(new JIRAServer("https://site.example.org", "id", null,
+            () -> this.connectorResolver.resolve(new JIRAServer("https://site.example.org", "id", null,
                 "cloud")));
 
-        assertEquals("The JIRA instance type [cloud] of the JIRA server [https://site.example.org] is not supported. "
+        assertEquals("The JIRA deployment type [cloud] of the JIRA server [https://site.example.org] is not supported. "
             + "The extension providing it may be missing or not installed on this wiki.", exception.getMessage());
     }
 
     @Test
-    void getConnectorWhenLookupFails() throws Exception
+    void resolveWhenLookupFails() throws Exception
     {
         ComponentManager failingComponentManager = mock(ComponentManager.class);
         when(this.componentManagerProvider.get()).thenReturn(failingComponentManager);
-        when(failingComponentManager.hasComponent(JIRAConnector.class, "default")).thenReturn(true);
+        when(failingComponentManager.hasComponent(JIRAConnector.class, JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE))
+            .thenReturn(true);
         ComponentLookupException cause = new ComponentLookupException("error");
-        when(failingComponentManager.getInstance(JIRAConnector.class, "default")).thenThrow(cause);
+        when(failingComponentManager.getInstance(JIRAConnector.class, JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE))
+            .thenThrow(cause);
 
         MacroExecutionException exception = assertThrows(MacroExecutionException.class,
-            () -> this.connectorManager.getConnector(new JIRAServer("http://localhost/jira", "id")));
+            () -> this.connectorResolver.resolve(new JIRAServer("http://localhost/jira", "id")));
 
-        assertEquals("Failed to initialize the support of the JIRA instance type [default] of the JIRA server "
+        assertEquals("Failed to initialize the support of the JIRA deployment type [datacenter] of the JIRA server "
             + "[http://localhost/jira].", exception.getMessage());
         assertSame(cause, exception.getCause());
     }

@@ -156,56 +156,56 @@ class JIRAMacroIT
     }
 
     /**
-     * An extension can contribute an instance type, with its own labels for the basic authentication configuration.
+     * An extension can contribute a deployment type, with its own labels for the basic authentication configuration.
      */
     @Test
     @Order(2)
-    void instanceTypes(TestUtils setup)
+    void deploymentTypes(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
 
-        // Contribute the "testcloud" instance type, as an extension would.
-        setup.createPage(TEST_SPACE, "Translations", "jira.test.instanceType.testcloud=Test Cloud\n"
+        // Contribute the "testcloud" deployment type, as an extension would.
+        setup.createPage(TEST_SPACE, "Translations", "jira.test.deploymentType.testcloud=Test Cloud\n"
             + "jira.config.auth.basicAuth.username.testcloud=Email\n"
             + "jira.config.auth.basicAuth.password.testcloud=API token", "");
         setup.addObject(TEST_SPACE, "Translations", "XWiki.TranslationDocumentClass", "scope", "WIKI");
-        setup.createPage(TEST_SPACE, "TestCloudInstanceType", "", "");
-        setup.addObject(TEST_SPACE, "TestCloudInstanceType", "XWiki.UIExtensionClass",
-            "extensionPointId", "org.xwiki.contrib.jira.instancetype",
-            "name", "org.xwiki.contrib.jira.instancetype.testcloud",
-            "parameters", "instance_type=testcloud\ntranslation_key=jira.test.instanceType.testcloud\norder=10",
+        setup.createPage(TEST_SPACE, "TestCloudDeploymentType", "", "");
+        setup.addObject(TEST_SPACE, "TestCloudDeploymentType", "XWiki.UIExtensionClass",
+            "extensionPointId", "org.xwiki.contrib.jira.deploymenttype",
+            "name", "org.xwiki.contrib.jira.deploymenttype.testcloud",
+            "parameters", "deployment_type=testcloud\ntranslation_key=jira.test.deploymentType.testcloud\norder=10",
             "scope", "wiki");
 
         JIRAAdministrationSectionPage jiraPage = gotoJIRASection();
-        assertTrue(jiraPage.hasInstanceTypeColumn());
+        assertTrue(jiraPage.hasDeploymentTypeColumn());
         int number = jiraPage.addInstance();
-        assertEquals(List.of("Data Center / Server", "Test Cloud"), jiraPage.getInstanceTypeLabels(number));
+        assertEquals(List.of("Data Center / Server", "Test Cloud"), jiraPage.getDeploymentTypeLabels(number));
         jiraPage.setId(number, "cloudjira");
         jiraPage.setURL(number, "http://localhost:8889/cloudjira");
         jiraPage.setAuthenticationType(number, BASIC_AUTH);
         jiraPage.waitForBasicAuthConfiguration(number, "Username");
         assertEquals("Password", jiraPage.getBasicAuthPasswordLabel(number));
 
-        // Changing the instance type reloads the authentication configuration, with the labels of that type.
-        jiraPage.setInstanceType(number, "testcloud");
+        // Changing the deployment type reloads the authentication configuration, with the labels of that type.
+        jiraPage.setDeploymentType(number, "testcloud");
         jiraPage.waitForBasicAuthConfiguration(number, "Email");
         assertEquals("API token", jiraPage.getBasicAuthPasswordLabel(number));
         jiraPage.setBasicAuthCredentials(number, "user@example.com", "token");
         jiraPage.saveAndWaitForReload();
 
         jiraPage = gotoJIRASection();
-        assertEquals("Test Cloud", jiraPage.getSelectedInstanceTypeLabel(number));
+        assertEquals("Test Cloud", jiraPage.getSelectedDeploymentTypeLabel(number));
         jiraPage.waitForBasicAuthConfiguration(number, "Email");
         assertEquals("user@example.com", jiraPage.getBasicAuthUsername(number));
 
-        // When the extension providing the instance type is uninstalled, the stored type is still displayed, so that
+        // When the extension providing the deployment type is uninstalled, the stored type is still displayed, so that
         // saving the configuration doesn't silently change it.
-        setup.deletePage(TEST_SPACE, "TestCloudInstanceType");
+        setup.deletePage(TEST_SPACE, "TestCloudDeploymentType");
         jiraPage = gotoJIRASection();
-        assertTrue(jiraPage.hasInstanceTypeColumn());
+        assertTrue(jiraPage.hasDeploymentTypeColumn());
         assertEquals("testcloud (not available, the extension providing it may be missing)",
-            jiraPage.getSelectedInstanceTypeLabel(number));
-        assertFalse(jiraPage.getInstanceTypeLabels(number).contains("Test Cloud"));
+            jiraPage.getSelectedDeploymentTypeLabel(number));
+        assertFalse(jiraPage.getDeploymentTypeLabels(number).contains("Test Cloud"));
     }
 
     private JIRAAdministrationSectionPage gotoJIRASection()

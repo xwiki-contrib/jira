@@ -159,51 +159,52 @@ public class JIRAAdministrationSectionPage extends AdministrationSectionPage
     }
 
     /**
-     * @return {@code true} if the "Instance type" column is displayed
+     * @return {@code true} if the "Deployment type" column is displayed
      * @since 11.2.0
      */
-    public boolean hasInstanceTypeColumn()
+    public boolean hasDeploymentTypeColumn()
     {
-        return !getDriver().findElements(By.cssSelector("form#jiraConfig select.jira-config-instance-type")).isEmpty();
+        return !getDriver().findElements(By.cssSelector("form#jiraConfig select.jira-config-deployment-type"))
+            .isEmpty();
     }
 
     /**
      * @param number the number of the {@code JIRA.JIRAConfigClass} xobject
-     * @return the labels of the instance types that can be selected
+     * @return the labels of the deployment types that can be selected
      * @since 11.2.0
      */
-    public List<String> getInstanceTypeLabels(int number)
+    public List<String> getDeploymentTypeLabels(int number)
     {
-        return getInstanceTypeSelect(number).getOptions().stream().map(WebElement::getText)
+        return getDeploymentTypeSelect(number).getOptions().stream().map(WebElement::getText)
             .collect(Collectors.toList());
     }
 
     /**
      * @param number the number of the {@code JIRA.JIRAConfigClass} xobject
-     * @return the label of the selected instance type
+     * @return the label of the selected deployment type
      * @since 11.2.0
      */
-    public String getSelectedInstanceTypeLabel(int number)
+    public String getSelectedDeploymentTypeLabel(int number)
     {
-        return getInstanceTypeSelect(number).getFirstSelectedOption().getText();
+        return getDeploymentTypeSelect(number).getFirstSelectedOption().getText();
     }
 
     /**
-     * Select an instance type, which reloads the authentication configuration of the instance.
+     * Select a deployment type, which reloads the authentication configuration of the instance.
      *
      * @param number the number of the {@code JIRA.JIRAConfigClass} xobject
-     * @param instanceType the instance type to select (empty for the default one)
+     * @param deploymentType the deployment type to select (empty for Data Center)
      * @since 11.2.0
      */
-    public void setInstanceType(int number, String instanceType)
+    public void setDeploymentType(int number, String deploymentType)
     {
-        getInstanceTypeSelect(number).selectByValue(instanceType);
+        getDeploymentTypeSelect(number).selectByValue(deploymentType);
     }
 
-    private Select getInstanceTypeSelect(int number)
+    private Select getDeploymentTypeSelect(int number)
     {
         return new Select(
-            getDriver().findElement(By.id(String.format("JIRA.JIRAConfigClass_%d_instanceType", number))));
+            getDriver().findElement(By.id(String.format("JIRA.JIRAConfigClass_%d_deploymentType", number))));
     }
 
     /**
@@ -223,7 +224,7 @@ public class JIRAAdministrationSectionPage extends AdministrationSectionPage
      * Wait for the basic authentication configuration of an instance to be displayed.
      *
      * @param number the number of the {@code JIRA.JIRAConfigClass} xobject
-     * @param usernameLabel the expected label of the username field, which depends on the instance type
+     * @param usernameLabel the expected label of the username field, which depends on the deployment type
      * @since 11.2.0
      */
     public void waitForBasicAuthConfiguration(int number, String usernameLabel)

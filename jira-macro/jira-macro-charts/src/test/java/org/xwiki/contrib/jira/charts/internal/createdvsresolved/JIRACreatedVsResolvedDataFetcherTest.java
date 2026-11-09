@@ -33,10 +33,10 @@ import org.xwiki.contrib.jira.charts.createdvsresolved.JIRACreatedVsResolvedMacr
 import org.xwiki.contrib.jira.charts.internal.createdvsresolved.source.JIRACreatedVsResolvedDataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAChartType;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.JIRAConnector;
-import org.xwiki.contrib.jira.macro.JIRAGadgetType;
-import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorResolver;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -49,7 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -66,7 +65,7 @@ class JIRACreatedVsResolvedDataFetcherTest
     private JIRACreatedVsResolvedDataFetcher dataFetcher;
 
     @MockComponent
-    private JIRAConnectorManager connectorManager;
+    private JIRAConnectorResolver connectorResolver;
 
     @MockComponent
     private JIRAServerResolver jiraServerResolver;
@@ -78,7 +77,7 @@ class JIRACreatedVsResolvedDataFetcherTest
     void setUp() throws Exception
     {
         when(this.jiraServerResolver.resolve(any())).thenReturn(this.jiraServer);
-        when(this.connectorManager.getConnector(this.jiraServer)).thenReturn(this.connector);
+        when(this.connectorResolver.resolve(this.jiraServer)).thenReturn(this.connector);
     }
 
     @Test
@@ -93,13 +92,15 @@ class JIRACreatedVsResolvedDataFetcherTest
         parameters.setDisplayTrend(true);
         parameters.setDisplayVersion(DisplayVersion.ONLY_MAJOR);
 
-        JIRACreatedVsResolvedDataSource expectedResult = mock(JIRACreatedVsResolvedDataSource.class);
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<String, List<String>>> parametersCaptor = ArgumentCaptor.forClass(Map.class);
-        when(this.connector.fetchGadgetData(eq(this.jiraServer), eq(JIRAGadgetType.CREATED_VS_RESOLVED),
-            parametersCaptor.capture(), eq(JIRACreatedVsResolvedDataSource.class))).thenReturn(expectedResult);
+        when(this.connector.getChartData(eq(this.jiraServer), eq(JIRAChartType.CREATED_VS_RESOLVED),
+            parametersCaptor.capture())).thenReturn("{\"totals\":{\"created\":5,\"resolved\":2}}");
 
-        assertSame(expectedResult, this.dataFetcher.fetch(parameters, JIRACreatedVsResolvedDataSource.class));
+        JIRACreatedVsResolvedDataSource result =
+            this.dataFetcher.fetch(parameters, JIRACreatedVsResolvedDataSource.class);
+        assertEquals(5, result.getTotals().getCreated());
+        assertEquals(2, result.getTotals().getResolved());
 
         // The "field" parameter has several values, and the order of the parameters is kept.
         assertEquals(List.of(
@@ -116,8 +117,8 @@ class JIRACreatedVsResolvedDataFetcherTest
     void fetchWhenConnectionError() throws Exception
     {
         JIRAConnectionException cause = new JIRAConnectionException("error");
-        when(this.connector.fetchGadgetData(eq(this.jiraServer), eq(JIRAGadgetType.CREATED_VS_RESOLVED), anyMap(),
-            eq(JIRACreatedVsResolvedDataSource.class))).thenThrow(cause);
+        when(this.connector.getChartData(eq(this.jiraServer), eq(JIRAChartType.CREATED_VS_RESOLVED), anyMap()))
+            .thenThrow(cause);
 
         MacroExecutionException exception = assertThrows(MacroExecutionException.class,
             () -> this.dataFetcher.fetch(newParameters(), JIRACreatedVsResolvedDataSource.class));
@@ -131,12 +132,25 @@ class JIRACreatedVsResolvedDataFetcherTest
     void fetchWhenBadRequest() throws Exception
     {
         JIRABadRequestException badRequest = new JIRABadRequestException("error", List.of("message"));
-        when(this.connector.fetchGadgetData(eq(this.jiraServer), eq(JIRAGadgetType.CREATED_VS_RESOLVED), anyMap(),
-            eq(JIRACreatedVsResolvedDataSource.class))).thenThrow(badRequest);
+        when(this.connector.getChartData(eq(this.jiraServer), eq(JIRAChartType.CREATED_VS_RESOLVED), anyMap()))
+            .thenThrow(badRequest);
 
         // Bad requests are not wrapped, since the chart macros display them in a specific way.
         assertSame(badRequest, assertThrows(JIRABadRequestException.class,
             () -> this.dataFetcher.fetch(newParameters(), JIRACreatedVsResolvedDataSource.class)));
+    }
+
+    @Test
+    void fetchWhenInvalidJSON() throws Exception
+    {
+        when(this.connector.getChartData(eq(this.jiraServer), eq(JIRAChartType.CREATED_VS_RESOLVED), anyMap()))
+            .thenReturn("not JSON");
+
+        MacroExecutionException exception = assertThrows(MacroExecutionException.class,
+            () -> this.dataFetcher.fetch(newParameters(), JIRACreatedVsResolvedDataSource.class));
+
+        assertEquals("Failed to parse the data of chart [CREATED_VS_RESOLVED] from JIRA server "
+            + "[http://localhost/jira]: [not JSON]", exception.getMessage());
     }
 
     private JIRACreatedVsResolvedMacroParameters newParameters()

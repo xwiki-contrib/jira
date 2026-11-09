@@ -26,8 +26,8 @@ import org.jdom2.Element;
 import org.xwiki.contrib.jira.config.JIRAServer;
 
 /**
- * A connector for a fictitious "cloud" instance type, used to check that the macros get their data from the connector
- * of the instance type of the server.
+ * A connector for a fictitious "cloud" deployment type, used to check that the macros get their data from the connector
+ * of the deployment type of the server.
  *
  * @version $Id$
  */
@@ -51,8 +51,7 @@ public class TestCloudJIRAConnector implements JIRAConnector
     }
 
     @Override
-    public <T> T fetchGadgetData(JIRAServer server, JIRAGadgetType type, Map<String, List<String>> parameters,
-        Class<T> expectedType)
+    public String getChartData(JIRAServer server, JIRAChartType type, Map<String, List<String>> parameters)
     {
         throw new UnsupportedOperationException();
     }

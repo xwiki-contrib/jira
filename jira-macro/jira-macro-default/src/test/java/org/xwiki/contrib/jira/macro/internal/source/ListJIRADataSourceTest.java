@@ -36,7 +36,7 @@ import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.JIRAConnector;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -77,7 +77,7 @@ class ListJIRADataSourceTest
     private JIRAConfiguration jiraConfiguration;
 
     @MockComponent
-    private JIRAConnectorManager connectorManager;
+    private JIRAConnectorResolver connectorResolver;
 
     @Test
     void parseIdsWhenNull() throws Exception
@@ -226,7 +226,7 @@ class ListJIRADataSourceTest
     private JIRAConnector mockConnector() throws Exception
     {
         JIRAConnector connector = mock(JIRAConnector.class);
-        when(this.connectorManager.getConnector(JIRA_SERVER)).thenReturn(connector);
+        when(this.connectorResolver.resolve(JIRA_SERVER)).thenReturn(connector);
         return connector;
     }
 }

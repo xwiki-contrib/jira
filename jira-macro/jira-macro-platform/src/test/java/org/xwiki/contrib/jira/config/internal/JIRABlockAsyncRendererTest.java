@@ -79,13 +79,13 @@ class JIRABlockAsyncRendererTest
     }
 
     @Test
-    void idWithDefaultInstanceType() throws Exception
+    void idWithDefaultDeploymentType() throws Exception
     {
         when(this.jiraServerResolver.resolve(this.parameters)).thenReturn(new JIRAServer(JIRA_URL, "id"));
 
         this.renderer.initialize(mock(AsyncJIRAMacro.class), this.parameters, "ISSUE-1", true, this.context);
 
-        // Same id as the one computed before the introduction of the instance types.
+        // Same id as the one computed before the introduction of the deployment types.
         List<String> previousId = new JIRABlockAsyncRenderer()
         {
             List<String> getPreviousId()
@@ -97,7 +97,7 @@ class JIRABlockAsyncRendererTest
     }
 
     @Test
-    void idWithOtherInstanceType() throws Exception
+    void idWithOtherDeploymentType() throws Exception
     {
         when(this.jiraServerResolver.resolve(this.parameters))
             .thenReturn(new JIRAServer(JIRA_URL, "id", new BasicAuthJIRAAuthenticator("user", "pass"), "cloud"));

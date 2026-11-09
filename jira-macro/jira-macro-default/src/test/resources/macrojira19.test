@@ -1,7 +1,7 @@
 .runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test that the data of a server of another instance type come from the connector registered for that type, and
+.# Test that the data of a server of another deployment type come from the connector registered for that type, and
 .# not from the default one (nothing answers on the URL of that server).
 .#-----------------------------------------------------
 {{jira id="jira-cloud" source="list" fields="key,summary"}}

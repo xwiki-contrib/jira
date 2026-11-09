@@ -28,7 +28,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.JIRAGadgetType;
+import org.xwiki.contrib.jira.macro.JIRAChartType;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -39,20 +39,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefaultJIRAConnector}. The connector is used end to end by the rendering tests of the macros;
- * these tests only check how it adapts the Data Center answers to the connector API.
+ * Unit tests for {@link DataCenterJIRAConnector}. The connector is used end to end by the rendering tests of the
+ * macros; these tests only check how it adapts the Data Center answers to the connector API.
  */
 @ComponentTest
 @ComponentList({
     JIRAURLHelper.class
 })
-class DefaultJIRAConnectorTest
+class DataCenterJIRAConnectorTest
 {
     private static final String SEARCH_URL =
         "http://localhost/jira/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=";
 
     @InjectMockComponents
-    private DefaultJIRAConnector connector;
+    private DataCenterJIRAConnector connector;
 
     @MockComponent
     private HTTPJIRAFetcher jiraFetcher;
@@ -96,15 +96,30 @@ class DefaultJIRAConnectorTest
     }
 
     @Test
-    void fetchGadgetDataSendsAllTheValuesOfAParameter() throws Exception
+    void getChartDataSendsAllTheValuesOfAParameter() throws Exception
     {
         Map<String, List<String>> parameters = new LinkedHashMap<>();
         parameters.put("jql", List.of("project = TEST"));
         parameters.put("field", List.of("created", "resolved"));
-        when(this.jiraFetcher.fetchJSON("http://localhost/jira/rest/gadget/1.0/dateCountInPeriod"
-            + "?jql=project+%3D+TEST&field=created&field=resolved", this.jiraServer, String.class)).thenReturn("data");
+        when(this.jiraFetcher.fetchText("http://localhost/jira/rest/gadget/1.0/dateCountInPeriod"
+            + "?jql=project+%3D+TEST&field=created&field=resolved", this.jiraServer)).thenReturn("{}");
 
-        assertEquals("data", this.connector.fetchGadgetData(this.jiraServer, JIRAGadgetType.CREATED_VS_RESOLVED,
-            parameters, String.class));
+        assertEquals("{}", this.connector.getChartData(this.jiraServer, JIRAChartType.CREATED_VS_RESOLVED,
+            parameters));
+    }
+
+    @Test
+    void getChartDataUsesTheGadgetResourceOfTheChart() throws Exception
+    {
+        Map<String, List<String>> parameters = Map.of("filterId", List.of("1"));
+        when(this.jiraFetcher.fetchText("http://localhost/jira/rest/gadget/1.0/statistics?filterId=1",
+            this.jiraServer)).thenReturn("pie");
+        when(this.jiraFetcher.fetchText(
+            "http://localhost/jira/rest/gadget/1.0/twodimensionalfilterstats/generate?filterId=1", this.jiraServer))
+            .thenReturn("grid");
+
+        assertEquals("pie", this.connector.getChartData(this.jiraServer, JIRAChartType.PIE, parameters));
+        assertEquals("grid",
+            this.connector.getChartData(this.jiraServer, JIRAChartType.TWO_DIMENSIONAL_GRID, parameters));
     }
 }

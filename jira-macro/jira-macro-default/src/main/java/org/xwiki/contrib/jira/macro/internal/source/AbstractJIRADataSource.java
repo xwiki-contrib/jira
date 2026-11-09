@@ -27,12 +27,12 @@ import javax.inject.Inject;
 
 import org.jdom2.Element;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-import org.xwiki.contrib.jira.macro.JIRABadRequestException;
-import org.xwiki.contrib.jira.macro.JIRAConnectionException;
-import org.xwiki.contrib.jira.macro.internal.JIRAConnectorManager;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
@@ -48,7 +48,7 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
     private JIRAServerResolver jiraServerResolver;
 
     @Inject
-    private JIRAConnectorManager connectorManager;
+    private JIRAConnectorResolver connectorResolver;
 
     /**
      * @param items the issues, one XML element per issue
@@ -75,7 +75,7 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
         throws MacroExecutionException, JIRABadRequestException
     {
         try {
-            return this.connectorManager.getConnector(jiraServer).searchIssues(jiraServer, jqlQuery, maxCount);
+            return this.connectorResolver.resolve(jiraServer).searchIssues(jiraServer, jqlQuery, maxCount);
         } catch (JIRABadRequestException e) {
             throw e;
         } catch (JIRAConnectionException e) {

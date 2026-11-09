@@ -44,8 +44,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -92,7 +91,7 @@ class JIRAConfigClassDocumentConfigurationSourceTest
     }
 
     @Test
-    void getServersWithInstanceType() throws Exception
+    void getServersWithDeploymentType() throws Exception
     {
         addServer("cloudjira", "https://example.atlassian.net", BasicAuthJIRAAuthenticatorFactory.HINT, "cloud");
         addServer("dcjira", "https://jira.example.org", "", "");
@@ -101,16 +100,16 @@ class JIRAConfigClassDocumentConfigurationSourceTest
 
         JIRAServer cloudServer = servers.get("cloudjira");
         assertEquals("https://example.atlassian.net", cloudServer.getURL());
-        assertEquals("cloud", cloudServer.getInstanceType());
-        assertNotNull(cloudServer.getJiraAuthenticator().orElse(null));
+        assertEquals("cloud", cloudServer.getDeploymentType());
+        assertTrue(cloudServer.getJiraAuthenticator().isPresent());
 
-        // An empty value means the default instance type, so that the existing configurations keep working.
-        JIRAServer defaultServer = servers.get("dcjira");
-        assertEquals(JIRAServer.DEFAULT_INSTANCE_TYPE, defaultServer.getInstanceType());
-        assertNull(defaultServer.getJiraAuthenticator().orElse(null));
+        // An empty value means Data Center, so that the existing configurations keep working.
+        JIRAServer dataCenterServer = servers.get("dcjira");
+        assertEquals(JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE, dataCenterServer.getDeploymentType());
+        assertTrue(dataCenterServer.getJiraAuthenticator().isEmpty());
     }
 
-    private void addServer(String id, String url, String authenticationType, String instanceType) throws Exception
+    private void addServer(String id, String url, String authenticationType, String deploymentType) throws Exception
     {
         XWikiContext xcontext = this.oldcore.getXWikiContext();
         XWikiDocument document =
@@ -119,7 +118,7 @@ class JIRAConfigClassDocumentConfigurationSourceTest
         server.setStringValue("id", id);
         server.setStringValue("url", url);
         server.setStringValue("authenticationType", authenticationType);
-        server.setStringValue("instanceType", instanceType);
+        server.setStringValue("deploymentType", deploymentType);
         xcontext.getWiki().saveDocument(document, xcontext);
 
         if (BasicAuthJIRAAuthenticatorFactory.HINT.equals(authenticationType)) {

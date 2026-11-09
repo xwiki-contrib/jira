@@ -27,10 +27,10 @@ import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.charts.internal.AbstractJIRAChartDataFetcher;
-import org.xwiki.contrib.jira.charts.piechart.StatisticType;
 import org.xwiki.contrib.jira.charts.internal.piechart.source.JIRAPieChartDataSource;
 import org.xwiki.contrib.jira.charts.piechart.JIRAPieChartMacroParameters;
-import org.xwiki.contrib.jira.macro.JIRAGadgetType;
+import org.xwiki.contrib.jira.charts.piechart.StatisticType;
+import org.xwiki.contrib.jira.macro.JIRAChartType;
 
 /**
  * Dedicated component to fetch piechart information from JIRA.
@@ -52,8 +52,8 @@ public class JIRAPieChartDataFetcher
     }
 
     @Override
-    public JIRAGadgetType getGadgetType()
+    public JIRAChartType getChartType()
     {
-        return JIRAGadgetType.PIE_CHART;
+        return JIRAChartType.PIE;
     }
 }
