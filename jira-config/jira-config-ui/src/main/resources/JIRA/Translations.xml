@@ -43,14 +43,14 @@ jira.config.id=Id
 jira.config.url=JIRA URL
 jira.config.deploymentType=Deployment type
 jira.config.deploymentType.datacenter=Data Center / Server
-jira.config.deploymentType.unavailable={0} (not available, the extension providing it may be missing)
+jira.config.deploymentType.unavailable=Unavailable deployment type
 jira.config.delete=Delete
 jira.config.save=Save
 jira.config.add=Add JIRA instance
 jira.config.authType=Authentication type
 jira.config.authConfig=Authentication system configuration
 jira.config.auth.noAuth=No authentication
-jira.config.auth.basicAuth=Basic auth
+jira.config.auth.basicAuth=Basic authentication
 jira.config.auth.basicAuth.username=Username
 jira.config.auth.basicAuth.password=Password</content>
   <object>

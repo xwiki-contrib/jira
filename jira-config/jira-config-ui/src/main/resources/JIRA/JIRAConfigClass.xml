@@ -105,8 +105,7 @@
 #end
 ## Keep the stored value displayed and selectable even when the extension providing it is not installed anymore.
 #if (!$deploymentTypeLabels.containsKey($currentValue))
-  #set ($discard = $deploymentTypeLabels.put($currentValue,
-    $services.localization.render('jira.config.deploymentType.unavailable', [$currentValue])))
+  #set ($discard = $deploymentTypeLabels.put($currentValue, $services.localization.render('jira.config.deploymentType.unavailable')))
 #end
 {{html clean="false"}}
 #if ($type == 'edit')

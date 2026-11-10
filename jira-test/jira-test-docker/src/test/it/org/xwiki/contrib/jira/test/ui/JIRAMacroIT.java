@@ -203,8 +203,7 @@ class JIRAMacroIT
         setup.deletePage(TEST_SPACE, "TestCloudDeploymentType");
         jiraPage = gotoJIRASection();
         assertTrue(jiraPage.hasDeploymentTypeColumn());
-        assertEquals("testcloud (not available, the extension providing it may be missing)",
-            jiraPage.getSelectedDeploymentTypeLabel(number));
+        assertEquals("Unavailable deployment type", jiraPage.getSelectedDeploymentTypeLabel(number));
         assertFalse(jiraPage.getDeploymentTypeLabels(number).contains("Test Cloud"));
     }
 
