@@ -20,20 +20,19 @@
 package org.xwiki.contrib.jira.macro.internal.source;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.xwiki.contrib.jira.config.JIRAServer;
+import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
-import org.xwiki.contrib.jira.macro.JIRABadRequestException;
-import org.xwiki.contrib.jira.macro.JIRAConnectionException;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
@@ -46,26 +45,20 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 public abstract class AbstractJIRADataSource implements JIRADataSource
 {
     @Inject
-    private HTTPJIRAFetcher jiraFetcher;
-
-    @Inject
     private JIRAServerResolver jiraServerResolver;
 
     @Inject
-    private JIRAURLHelper urlHelper;
+    private JIRAConnectorResolver connectorResolver;
 
     /**
-     * @param document the XML document from which to extract JIRA issues
-     * @return the list of XML Elements for each JIRA issue, indexed in a Map with the issue id as the key
+     * @param items the issues, one XML element per issue
+     * @return the issues, indexed by their key, in the same order
      */
-    protected Map<String, Element> buildIssues(Document document)
+    protected Map<String, Element> buildIssues(List<Element> items)
     {
         Map<String, Element> issues = new LinkedHashMap<>();
-        Element channel = document.getRootElement().getChild("channel");
-        if (channel != null) {
-            for (Element item : channel.getChildren("item")) {
-                issues.put(item.getChildText(JIRAField.KEY.getId()), item);
-            }
+        for (Element item : items) {
+            issues.put(item.getChildText(JIRAField.KEY.getId()), item);
         }
         return issues;
     }
@@ -74,24 +67,21 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
      * @param jiraServer the JIRA Server definition to use
      * @param jqlQuery the JQL query to execute
      * @param maxCount the max number of issues to get
-     * @return the XML document containing the matching JIRA issues
+     * @return the matching JIRA issues, one XML element per issue
      * @throws MacroExecutionException if the JIRA issues cannot be retrieved
+     * @throws JIRABadRequestException if the JIRA server refused the query
      */
-    public Document getXMLDocument(JIRAServer jiraServer, String jqlQuery, int maxCount)
+    public List<Element> getIssues(JIRAServer jiraServer, String jqlQuery, int maxCount)
         throws MacroExecutionException, JIRABadRequestException
     {
-        Document document;
-
         try {
-            String urlString = this.urlHelper.getSearchURL(jiraServer, jqlQuery, maxCount);
-            document = this.jiraFetcher.fetch(urlString, jiraServer);
+            return this.connectorResolver.resolve(jiraServer).searchIssues(jiraServer, jqlQuery, maxCount);
         } catch (JIRABadRequestException e) {
             throw e;
         } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(String.format("Failed to retrieve JIRA data from [%s] for JQL [%s]",
                 jiraServer.getURL(), jqlQuery), e);
         }
-        return document;
     }
 
     /**

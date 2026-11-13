@@ -164,4 +164,45 @@ class HTTPJIRAFetcherTest
         assertEquals(exception.getExtractedMessages(),
             List.of("The value 'TEST' does not exist for the field 'project'."));
     }
+
+    @Test
+    void fetchText() throws Exception
+    {
+        this.wireMockServer.stubFor(get(urlMatching("\\/rest\\/gadget\\/1\\.0\\/statistics\\?.*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"issueCount\":2}")));
+        JIRAServer jiraServer = new JIRAServer("http://localhost:8889", "id");
+
+        assertEquals("{\"issueCount\":2}", this.jiraFetcher.fetchText(
+            "http://localhost:8889/rest/gadget/1.0/statistics?filterId=1", jiraServer));
+    }
+
+    @Test
+    void fetchTextWhenBadRequest()
+    {
+        this.wireMockServer.stubFor(get(urlMatching("\\/rest\\/gadget\\/1\\.0\\/statistics\\?.*"))
+            .willReturn(aResponse()
+                .withStatus(400)
+                .withHeader("Content-Type", "application/json")
+                .withBodyFile("badRequest.json")));
+        JIRAServer jiraServer = new JIRAServer("http://localhost:8889", "id");
+
+        JIRABadRequestException exception = assertThrows(JIRABadRequestException.class,
+            () -> this.jiraFetcher.fetchText("http://localhost:8889/rest/gadget/1.0/statistics?jql=project=TEST",
+                jiraServer));
+        assertEquals(List.of("The value 'TEST' does not exist for the field 'project'."),
+            exception.getExtractedMessages());
+    }
+
+    @Test
+    void fetchTextWhenInvalidServerURL()
+    {
+        JIRAServer jiraServer = new JIRAServer("invalid", "id");
+
+        JIRAConnectionException exception = assertThrows(JIRAConnectionException.class,
+            () -> this.jiraFetcher.fetchText("invalid/rest/gadget/1.0/statistics", jiraServer));
+        assertEquals("Failed to get JIRA content for [invalid/rest/gadget/1.0/statistics]", exception.getMessage());
+    }
 }

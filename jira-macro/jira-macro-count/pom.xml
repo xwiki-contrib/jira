@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.contrib.jira</groupId>
     <artifactId>jira-macro</artifactId>
-    <version>11.1.9-SNAPSHOT</version>
+    <version>11.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>jira-macro-count</artifactId>
   <name>JIRA - Macro - Count</name>
   <packaging>jar</packaging>
   <description>Display the number of results of a JQL query</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JIRA Count Macro</xwiki.extension.name>
     <!-- The extension's category -->

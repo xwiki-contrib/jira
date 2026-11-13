@@ -46,6 +46,16 @@
 #set ($discard = $authors.setEffectiveMetadataAuthor($services.user.superAdminUserReference))
 #set ($discard = $authors.setOriginalMetadataAuthor($services.user.superAdminUserReference))
 #set ($confObjects = $confDoc.getObjects($basicAuthClass))
+## Render the translation specific to the deployment type (i.e. "key.deploymentType"), provided by the extension
+## contributing the deployment type, falling back on the generic translation. Nothing is rendered if none of them exist.
+#macro (jiraBasicAuthTranslation $key)
+  #set ($deploymentTypeKey = "${key}.$!{request.deploymentType}")
+  #if ("$!request.deploymentType" != '' &amp;&amp; "$!services.localization.get($deploymentTypeKey)" != '')
+$services.localization.render($deploymentTypeKey, 'html/5.0')##
+  #elseif ("$!services.localization.get($key)" != '')
+$services.localization.render($key, 'html/5.0')##
+  #end
+#end
 #if ($xcontext.action == 'get')
   #if ($request.getParameter('save') == 'true')
     ## Save the changes
@@ -90,7 +100,7 @@
     {{html clean="false"}}
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label for="${basicAuthClass}_${confObj.number}_username"&gt;$services.localization.render('jira.config.auth.basicAuth.username', 'html/5.0')&lt;/label&gt;
+        &lt;label for="${basicAuthClass}_${confObj.number}_username"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.username')&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         {{/html}}
@@ -100,7 +110,7 @@
         {{html clean="false"}}
       &lt;/dd&gt;
       &lt;dt&gt;
-        &lt;label for="${basicAuthClass}_${confObj.number}_password"&gt;$services.localization.render('jira.config.auth.basicAuth.password', 'html/5.0')&lt;/label&gt;
+        &lt;label for="${basicAuthClass}_${confObj.number}_password"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.password')&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         {{/html}}

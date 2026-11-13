@@ -1,0 +1,36 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test that the data of a server of another deployment type come from the connector registered for that type, and
+.# not from the default one (nothing answers on the URL of that server).
+.#-----------------------------------------------------
+{{jira id="jira-cloud" source="list" fields="key,summary"}}
+CLOUD-1
+{{/jira}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [jira] [id=jira-cloud|source=list|fields=key,summary] [CLOUD-1]
+beginTable
+beginTableRow
+beginTableHeadCell
+onVerbatim [Key] [true]
+endTableHeadCell
+beginTableHeadCell
+onVerbatim [Summary] [true]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+beginLink [Typed = [true] Type = [url] Reference = [http://jira.cloud.invalid/browse/CLOUD-1]] [true]
+onVerbatim [CLOUD-1] [true]
+endLink [Typed = [true] Type = [url] Reference = [http://jira.cloud.invalid/browse/CLOUD-1]] [true]
+endTableCell
+beginTableCell
+onVerbatim [Issue returned by the cloud connector for [issueKey in (CLOUD-1)]] [true]
+endTableCell
+endTableRow
+endTable
+endMacroMarkerStandalone [jira] [id=jira-cloud|source=list|fields=key,summary] [CLOUD-1]
+endDocument

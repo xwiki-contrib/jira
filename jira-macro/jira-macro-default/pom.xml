@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.contrib.jira</groupId>
     <artifactId>jira-macro</artifactId>
-    <version>11.1.9-SNAPSHOT</version>
+    <version>11.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>jira-macro-default</artifactId>
   <name>JIRA - Macro - Default Implementation</name>
   <packaging>jar</packaging>
   <description>Fetches information from a JIRA server and displays them as a table, list or enumeration</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.94</xwiki.jacoco.instructionRatio>
     <!-- WireMock outputs some logs when it's stopping, thus we need to turn off console log validation till we find
          out how to tell WireMock to not do that. -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

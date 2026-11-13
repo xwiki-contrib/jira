@@ -1,0 +1,23 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test macro when JIRA refuses the query (HTTP 400): the error is displayed in the macro output.
+.#-----------------------------------------------------
+{{jiraCount url="http://localhost:8889"}}
+project = BADREQUEST
+{{/jiraCount}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [jiraCount] [url=http://localhost:8889] [project = BADREQUEST]
+beginParagraph
+beginGroup [[class]=[xwikirenderingerror]]
+onWord [JIRA returned an error of the request. This could be related to the JQL query or a rights limitation in JIRA for the XWiki user. Click on this message for details.]
+endGroup [[class]=[xwikirenderingerror]]
+beginGroup [[class]=[xwikirenderingerrordescription hidden]]
+onVerbatim [${{{regex:Here are the error message from JIRA:.*}}}] [false]
+endGroup [[class]=[xwikirenderingerrordescription hidden]]
+endParagraph
+endMacroMarkerStandalone [jiraCount] [url=http://localhost:8889] [project = BADREQUEST]
+endDocument

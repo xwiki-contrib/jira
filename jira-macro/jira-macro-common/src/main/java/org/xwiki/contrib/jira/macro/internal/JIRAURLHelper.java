@@ -61,42 +61,6 @@ public class JIRAURLHelper
     private Logger logger;
 
     /**
-     * The type of gadgets we want to request and their corresponding endpoints.
-     */
-    public enum GadgetType
-    {
-        /**
-         * For the pie chart macro.
-         */
-        PIE_CHART("statistics"),
-
-        /**
-         * For the created vs resolved macro.
-         */
-        CREATED_VS_RESOLVED("dateCountInPeriod"),
-
-        /**
-         * For the two dimensional grid charts.
-         */
-        BIDIMENSIONAL_CHARTS("twodimensionalfilterstats/generate");
-
-        private final String endpoint;
-
-        GadgetType(String endpoint)
-        {
-            this.endpoint = endpoint;
-        }
-
-        /**
-         * @return the endpoint to be used in URLs.
-         */
-        public String getEndpoint()
-        {
-            return endpoint;
-        }
-    }
-
-    /**
      * @param server the actual JIRA server to request
      * @param jqlQuery the query to perform in the search
      * @param maxCount the maximum number of issues to get or {@code -1} to not limit it
@@ -139,15 +103,15 @@ public class JIRAURLHelper
 
     /**
      * @param server the actual JIRA server to request
-     * @param gadgetType the gadget for which to request statistics
+     * @param gadgetResource the path of the gadget REST resource of the chart, relative to the gadget REST endpoint
      * @param queryParameters the parameters of the request
      * @return the URL to perform the query.
      */
-    public String getChartURL(JIRAServer server, GadgetType gadgetType, List<NameValuePair> queryParameters)
+    public String getChartURL(JIRAServer server, String gadgetResource, List<NameValuePair> queryParameters)
     {
         String queryString = URLEncodedUtils.format(queryParameters, StandardCharsets.UTF_8);
         return String.format("%s%s%s?%s", server.getURL(), GADGET_REST_ENDPOINT,
-            gadgetType.getEndpoint(), queryString);
+            gadgetResource, queryString);
     }
 
     private String encode(String content)

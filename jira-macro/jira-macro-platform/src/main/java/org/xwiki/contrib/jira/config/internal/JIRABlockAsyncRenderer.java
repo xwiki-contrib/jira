@@ -167,10 +167,16 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
         // for the same jira url since different users can have different permissions on jira.
         String jiraURL;
         String authenticatorPart = null;
+        String deploymentTypePart = null;
         try {
             JIRAServer jiraServer = this.jiraServerResolver.resolve(this.parameters);
             jiraURL = jiraServer.getURL();
             authenticatorPart = jiraServer.getJiraAuthenticator().map(JIRAAuthenticator::getId).orElse(null);
+            // Don't mix up the results got with different deployment types. The Data Center type is left out of the id,
+            // so that the existing cached results of the macros using it stay valid.
+            if (!JIRAServer.DATA_CENTER_DEPLOYMENT_TYPE.equals(jiraServer.getDeploymentType())) {
+                deploymentTypePart = jiraServer.getDeploymentType();
+            }
         } catch (MacroExecutionException e) {
             // The jira url is not set, nor an id set (or the id points to a not-defined JIRA URL), so we cannot get the
             // value. The macro will fail to display. We cache the result based on the id if it's defined. Otherwise,
@@ -178,7 +184,12 @@ public class JIRABlockAsyncRenderer extends AbstractBlockAsyncRenderer
             jiraURL = this.parameters.getId();
         }
 
-        return createId("rendering", "macro", "jira", source, index, jiraURL, authenticatorPart);
+        List<Object> idValues =
+            new ArrayList<>(Arrays.asList("rendering", "macro", "jira", source, index, jiraURL, authenticatorPart));
+        if (deploymentTypePart != null) {
+            idValues.add(deploymentTypePart);
+        }
+        return createId(idValues.toArray());
     }
 
     /**

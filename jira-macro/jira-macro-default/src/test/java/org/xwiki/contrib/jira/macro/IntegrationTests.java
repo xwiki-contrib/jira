@@ -98,6 +98,10 @@ public class IntegrationTests
         JIRAServer server2 =
             new JIRAServer("http://localhost:8889/auth", "id", new BasicAuthJIRAAuthenticator("username", "password"));
         servers.put("jira-auth", server2);
+        // A server of another deployment type, whose data come from the connector registered for that type
+        JIRAServer server3 = new JIRAServer("http://jira.cloud.invalid", "jira-cloud", null, "cloud");
+        servers.put("jira-cloud", server3);
+        componentManager.registerComponent(JIRAConnector.class, "cloud", new TestCloudJIRAConnector());
         when(configuration.getJIRAServers()).thenReturn(servers);
     }
 
