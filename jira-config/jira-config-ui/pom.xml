@@ -43,6 +43,19 @@
       <artifactId>jira-config-platform</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- The JIRA instances are displayed with the Live Data macro, from a page using the live table results format. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <extensions>

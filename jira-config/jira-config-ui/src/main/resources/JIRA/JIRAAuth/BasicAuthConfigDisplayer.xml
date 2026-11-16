@@ -37,15 +37,17 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+## Displays and saves the basic authentication settings of the JIRA instances, for the JIRA administration section (see
+## the org.xwiki.contrib.jira.authconfig UIX extension point). The settings are stored in
+## JIRA.JIRAAuth.BasicAuthConfiguration, as one JIRA.JIRAAuth.BasicAuthClass object per instance ID.
+## * GET, without "action": the settings of the instance with the given "id" (empty for a new instance), with labels
+##   depending on the "deploymentType". Nothing is saved.
+## * POST action=saveInstance: saves the "username" and the "password" of the instance "id", renamed from "previousId"
+##   when it's not empty. An empty "previousId" means a new instance, which doesn't reuse settings left for the same ID.
+##   A missing parameter or an empty password keeps the current value.
+## * POST action=deleteInstance: removes the settings of the instance "id".
 #set ($basicAuthClass = 'JIRA.JIRAAuth.BasicAuthClass')
 #set ($confDoc = $xwiki.getDocument('JIRA.JIRAAuth.BasicAuthConfiguration'))
-#set ($discard = $confDoc.setHidden(true))
-#set ($authors = $confDoc.getAuthors())
-#set ($discard = $authors.setCreator($services.user.superAdminUserReference))
-#set ($discard = $authors.setContentAuthor($services.user.superAdminUserReference))
-#set ($discard = $authors.setEffectiveMetadataAuthor($services.user.superAdminUserReference))
-#set ($discard = $authors.setOriginalMetadataAuthor($services.user.superAdminUserReference))
-#set ($confObjects = $confDoc.getObjects($basicAuthClass))
 ## Render the translation specific to the deployment type (i.e. "key.deploymentType"), provided by the extension
 ## contributing the deployment type, falling back on the generic translation. Nothing is rendered if none of them exist.
 #macro (jiraBasicAuthTranslation $key)
@@ -56,68 +58,123 @@ $services.localization.render($deploymentTypeKey, 'html/5.0')##
 $services.localization.render($key, 'html/5.0')##
   #end
 #end
-#if ($xcontext.action == 'get')
-  #if ($request.getParameter('save') == 'true')
-    ## Save the changes
-    #if ($services.csrf.isTokenValid($!request.form_token))
-      #foreach ($obj in $confObjects)
-        #set ($formIdFieldName = "${basicAuthClass}_${obj.number}_id")
-        #set ($formUsernameFieldName = "${basicAuthClass}_${obj.number}_username")
-        #set ($formPwdFieldName = "${basicAuthClass}_${obj.number}_password")
-        #set ($formIdValue = $request.getParameter($formIdFieldName))
-        #set ($formUsernameValue = $request.getParameter($formUsernameFieldName))
-        #set ($formPwdValue = $request.getParameter($formPwdFieldName))
-        #if ($formIdValue != $NULL &amp;&amp; $formUsernameValue != $NULL &amp;&amp; $formPwdValue != $NULL)
-          #set ($discard = $obj.set('id', $formIdValue))
-          #set ($discard = $obj.set('username', $formUsernameValue))
-          #set ($discard = $obj.set('password', $formPwdValue))
-        #else
-          ## Seem that the object is not any more in the form, so drop it
-          #set ($discard = $confDoc.removeObject($obj))
-        #end
-      #end
-      #set ($discard = $confDoc.save())
+## Sets $basicAuthObjects: the settings objects of the given instance ID.
+#macro (jiraBasicAuthGetObjects $jiraBasicAuthId)
+  #set ($basicAuthObjects = [])
+  #foreach ($candidate in $confDoc.getObjects($basicAuthClass))
+    #if ("$!candidate" != '' &amp;&amp; "$!candidate.getValue('id')" == $jiraBasicAuthId)
+      #set ($discard = $basicAuthObjects.add($candidate))
+    #end
+  #end
+#end
+#macro (jiraBasicAuthError $status $message)
+  #set ($discard = $response.setStatus($status))
+  #jsonResponse({'error': $message})
+#end
+#macro (jiraBasicAuthSaveDocument $comment)
+  #set ($discard = $confDoc.setHidden(true))
+  #set ($authors = $confDoc.getAuthors())
+  #set ($discard = $authors.setCreator($services.user.superAdminUserReference))
+  #set ($discard = $authors.setContentAuthor($services.user.superAdminUserReference))
+  #set ($discard = $authors.setEffectiveMetadataAuthor($services.user.superAdminUserReference))
+  #set ($discard = $authors.setOriginalMetadataAuthor($services.user.superAdminUserReference))
+  #set ($discard = $confDoc.save($comment, true))
+#end
+#macro (jiraBasicAuthSaveInstance)
+  #set ($instanceId = $stringtool.trimToEmpty($request.id))
+  #set ($previousId = "$!request.previousId")
+  #if ($instanceId == '')
+    #jiraBasicAuthError(400, $services.localization.render('jira.config.error.idRequired'))
+  #else
+    #if ($previousId == '')
+      ## A new instance: the settings left for the same ID (e.g. by an instance whose settings couldn't be deleted)
+      ## aren't reused, they're replaced.
+      #set ($basicAuthObjects = [])
     #else
-      #set($discard = $response.setStatus(403))
-      #jsonResponse({"error": "Invalid CSRF token"})
+      ## Keep the settings of the instance when its ID is changed.
+      #jiraBasicAuthGetObjects($previousId)
+      #if ($basicAuthObjects.isEmpty())
+        #jiraBasicAuthGetObjects($instanceId)
+      #end
+    #end
+    #if ($basicAuthObjects.isEmpty())
+      #set ($basicAuthObject = $confDoc.newObject($basicAuthClass))
+    #else
+      #set ($basicAuthObject = $basicAuthObjects.get(0))
+    #end
+    ## Only one settings object per instance ID.
+    #set ($basicAuthObjectNumber = $basicAuthObject.number)
+    #jiraBasicAuthGetObjects($instanceId)
+    #foreach ($duplicate in $basicAuthObjects)
+      #if ($duplicate.number != $basicAuthObjectNumber)
+        #set ($discard = $confDoc.removeObject($duplicate))
+      #end
+    #end
+    #set ($discard = $basicAuthObject.set('id', $instanceId))
+    #if ($request.getParameter('username') != $NULL)
+      #set ($discard = $basicAuthObject.set('username', $request.getParameter('username')))
+    #end
+    #if ("$!request.password" != '')
+      #set ($discard = $basicAuthObject.set('password', $request.password))
+    #end
+    #jiraBasicAuthSaveDocument("Saved the basic authentication of the JIRA instance [$instanceId]")
+    #jsonResponse({'id': $instanceId})
+  #end
+#end
+#macro (jiraBasicAuthDeleteInstance)
+  #set ($instanceId = $stringtool.trimToEmpty($request.id))
+  #jiraBasicAuthGetObjects($instanceId)
+  #if ($instanceId != '' &amp;&amp; !$basicAuthObjects.isEmpty())
+    #foreach ($basicAuthObject in $basicAuthObjects)
+      #set ($discard = $confDoc.removeObject($basicAuthObject))
+    #end
+    #jiraBasicAuthSaveDocument("Removed the basic authentication of the JIRA instance [$instanceId]")
+  #end
+  #jsonResponse({'id': $instanceId})
+#end
+#if ($xcontext.action == 'get')
+  #if (!$xwiki.hasAdminRights())
+    #jiraBasicAuthError(403, $services.localization.render('jira.config.error.notAllowed'))
+  #elseif ("$!request.action" != '')
+    #if ($request.method != 'POST' || !$services.csrf.isTokenValid($request.form_token))
+      #jiraBasicAuthError(403, $services.localization.render('jira.config.error.invalidRequest'))
+    #elseif ($request.action == 'saveInstance')
+      #jiraBasicAuthSaveInstance
+    #elseif ($request.action == 'deleteInstance')
+      #jiraBasicAuthDeleteInstance
+    #else
+      #jiraBasicAuthError(400, $services.localization.render('jira.config.error.invalidRequest'))
     #end
   #else
-    ## Show the content
-    #set ($configId = $request.id)
-    #set ($confObj = $NULL)
-    #foreach ($o in $confObjects)
-      #if ($o.getValue('id') == $configId)
-        #set ($confObj = $o)
+    ## Show the settings of the instance.
+    #set ($username = '')
+    #set ($hasPassword = false)
+    #set ($instanceId = "$!request.id")
+    #if ($instanceId != '')
+      #jiraBasicAuthGetObjects($instanceId)
+      #if (!$basicAuthObjects.isEmpty())
+        #set ($username = "$!basicAuthObjects.get(0).getValue('username')")
+        #set ($hasPassword = "$!basicAuthObjects.get(0).getValue('password')" != '')
       #end
     #end
-    #if ($confObj == $NULL)
-      #set ($confObj = $confDoc.newObject($basicAuthClass))
-      #set ($discard = $confObj.set('id', $configId))
-      #set ($discard = $confDoc.save("Update basic auth configuration", true))
-    #end
-    $confObj.display('id', 'hidden')
-
     {{html clean="false"}}
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label for="${basicAuthClass}_${confObj.number}_username"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.username')&lt;/label&gt;
+        &lt;label for="jiraBasicAuthUsername"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.username')&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        {{/html}}
-
-        $confObj.display('username', 'edit')
-
-        {{html clean="false"}}
+        &lt;input type="text" id="jiraBasicAuthUsername" name="username" value="$escapetool.xml($username)"
+          autocomplete="off" /&gt;
       &lt;/dd&gt;
       &lt;dt&gt;
-        &lt;label for="${basicAuthClass}_${confObj.number}_password"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.password')&lt;/label&gt;
+        &lt;label for="jiraBasicAuthPassword"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.password')&lt;/label&gt;
+        #if ($hasPassword)
+          &lt;span class="xHint" id="jiraBasicAuthPasswordHint"&gt;#jiraBasicAuthTranslation('jira.config.auth.keepSecret')&lt;/span&gt;
+        #end
       &lt;/dt&gt;
       &lt;dd&gt;
-        {{/html}}
-
-        $confObj.display('password', 'edit')
-
-        {{html clean="false"}}
+        &lt;input type="password" id="jiraBasicAuthPassword" name="password" value="" autocomplete="new-password"
+          #if ($hasPassword)aria-describedby="jiraBasicAuthPasswordHint"#end /&gt;
       &lt;/dd&gt;
     &lt;/dl&gt;
     {{/html}}
@@ -230,8 +287,8 @@ $services.localization.render($key, 'html/5.0')##
       <cache>long</cache>
     </property>
     <property>
-      <code>td.jira-auth-configuration dl {
-        margin-left: 0px
+      <code>.jira-auth-configuration dl {
+  margin-left: 0;
 }</code>
     </property>
     <property>

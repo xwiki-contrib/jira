@@ -1,0 +1,101 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="JIRA.JIRAConfigMacros" locale="">
+  <web>JIRA</web>
+  <name>JIRAConfigMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>JIRA.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>JIRA Config Macros</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+## Velocity macros shared by the JIRA administration section (JIRA.JIRAConfigSheet) and the service handling the JIRA
+## instances (JIRA.JIRAConfigService).
+
+## Sets $jiraDeploymentTypeLabels: the labels of the deployment types, by deployment type. Data Center (stored as an
+## empty value) comes first, then the deployment types contributed by extensions through the
+## org.xwiki.contrib.jira.deploymenttype UIX extension point.
+#macro (jiraConfigDeploymentTypeLabels)
+  #set ($jiraDeploymentTypeLabels = {})
+  #set ($discard = $jiraDeploymentTypeLabels.put('',
+    $services.localization.render('jira.config.deploymentType.datacenter')))
+  #foreach ($uix in $services.uix.getExtensions('org.xwiki.contrib.jira.deploymenttype', {'sortByParameter': 'order'}))
+    #set ($uixParameters = $uix.parameters)
+    #set ($deploymentType = "$!uixParameters.deployment_type")
+    #if ($deploymentType != '' &amp;&amp; !$jiraDeploymentTypeLabels.containsKey($deploymentType))
+      ## Fallback on the deployment type itself when its label is not translated.
+      #set ($deploymentTypeLabel = $deploymentType)
+      #if ("$!uixParameters.translation_key" != '' &amp;&amp; "$!services.localization.get($uixParameters.translation_key)" != '')
+        #set ($deploymentTypeLabel = $services.localization.render($uixParameters.translation_key))
+      #end
+      #set ($discard = $jiraDeploymentTypeLabels.put($deploymentType, $deploymentTypeLabel))
+    #end
+  #end
+#end
+
+## Sets $jiraAuthenticationTypeLabels: the labels of the authentication types, by authentication type ("No
+## authentication" first, then the authentication types contributed through the org.xwiki.contrib.jira.authconfig UIX
+## extension point), and $jiraAuthenticationDisplayers: the reference of the page displaying and saving the settings of
+## each authentication type that has settings.
+#macro (jiraConfigAuthenticationTypes)
+  #set ($jiraAuthenticationTypeLabels = {})
+  #set ($discard = $jiraAuthenticationTypeLabels.put('noAuth', $services.localization.render('jira.config.auth.noAuth')))
+  #set ($jiraAuthenticationDisplayers = {})
+  #foreach ($uix in $services.uix.getExtensions('org.xwiki.contrib.jira.authconfig'))
+    #set ($uixParameters = $uix.parameters)
+    #set ($authenticationType = "$!uixParameters.config_id")
+    #if ($authenticationType != '' &amp;&amp; !$jiraAuthenticationTypeLabels.containsKey($authenticationType))
+      #set ($authenticationTypeLabel = $authenticationType)
+      #if ("$!uixParameters.translation_key" != '' &amp;&amp; "$!services.localization.get($uixParameters.translation_key)" != '')
+        #set ($authenticationTypeLabel = $services.localization.render($uixParameters.translation_key))
+      #end
+      #set ($discard = $jiraAuthenticationTypeLabels.put($authenticationType, $authenticationTypeLabel))
+      #if ("$!uixParameters.config_displayer_reference" != '')
+        #set ($discard = $jiraAuthenticationDisplayers.put($authenticationType,
+          $uixParameters.config_displayer_reference))
+      #end
+    #end
+  #end
+#end
+
+## Sets $jiraShowDeploymentType: whether the deployment type is displayed, i.e. when some extension contributes
+## deployment types other than Data Center, or when an instance uses a deployment type whose extension is not installed
+## anymore.
+#macro (jiraConfigShowDeploymentType $jiraConfigDoc)
+  #set ($jiraShowDeploymentType = !$services.uix.getExtensions('org.xwiki.contrib.jira.deploymenttype').isEmpty())
+  #foreach ($jiraInstance in $jiraConfigDoc.getObjects('JIRA.JIRAConfigClass'))
+    #if ("$!jiraInstance.getValue('deploymentType')" != '')
+      #set ($jiraShowDeploymentType = true)
+    #end
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

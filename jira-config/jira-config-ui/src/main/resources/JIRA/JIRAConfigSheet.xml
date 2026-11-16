@@ -36,67 +36,190 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{include reference="JIRA.JIRAConfigMacros"/}}
+
+{{velocity}}
 #set ($discard = $xwiki.jsx.use('JIRA.JIRAConfigSheet'))
-#set ($redirect = $xwiki.relativeRequestURL)
+#set ($discard = $xwiki.ssx.use('JIRA.JIRAConfigSheet'))
 #set ($configDoc = $xwiki.getDocument('JIRA.JIRAConfig'))
-## If there's no xobject create one!
-#set ($configClassName = 'JIRA.JIRAConfigClass')
-#set ($configObject = $configDoc.getObject($configClassName))
-#if ($xcontext.action == 'admin' &amp;&amp; "$!configObject" == '')
-  #set ($configObject = $configDoc.newObject($configClassName))
-  #set ($discard = $configDoc.save('Created empty JIRA configuration', true))
+#jiraConfigDeploymentTypeLabels
+#jiraConfigAuthenticationTypes
+#jiraConfigShowDeploymentType($configDoc)
+## The settings of each authentication type are displayed and saved by its own page (see the
+## org.xwiki.contrib.jira.authconfig UIX extension point).
+#set ($authDisplayerURLs = {})
+#foreach ($entry in $jiraAuthenticationDisplayers.entrySet())
+  #set ($discard = $authDisplayerURLs.put($entry.key, $xwiki.getURL($entry.value, 'get')))
+  ## Also load the JSX and SSX, so the authentication type can inject JSX or/and SSX here if needed.
+  #set ($discard = $xwiki.jsx.use($entry.value))
+  #set ($discard = $xwiki.ssx.use($entry.value))
 #end
-#set($jiraAuthUixByConfigIds = {})
-#set($jiraAuthUixs = $services.uix.getExtensions('org.xwiki.contrib.jira.authconfig'))
-#foreach ($uix in $jiraAuthUixs)
-  #set($configDisplayerReference = $uix.parameters.get('config_displayer_reference'))
-  #set($jiraAuthUixByConfigIds[$uix.parameters.get('config_id')] = $xwiki.getURL($configDisplayerReference, 'get'))
-  ## Also load the JSX and SSX, so the authenticator can inject JSX or/and SSX here if needed.
-  #set($discard = $xwiki.jsx.use($configDisplayerReference))
-  #set($discard = $xwiki.ssx.use($configDisplayerReference))
+{{html clean="false"}}
+&lt;div id="jiraConfig" class="xform"
+  data-auth-displayer-urls="$escapetool.xml($jsontool.serialize($authDisplayerURLs))"
+  data-service-url="$escapetool.xml($xwiki.getURL('JIRA.JIRAConfigService', 'get'))"
+  data-form-token="$escapetool.xml($services.csrf.token)"&gt;
+  &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label&gt;$escapetool.xml($services.localization.render('jira.config.label'))&lt;/label&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('jira.config.label.hint'))&lt;/span&gt;
+    &lt;/dt&gt;
+  &lt;/dl&gt;
+  &lt;p&gt;
+    &lt;button type="button" class="btn btn-primary jira-instance-add"&gt;
+      $services.icon.renderHTML('add') $escapetool.xml($services.localization.render('jira.config.add'))
+    &lt;/button&gt;
+  &lt;/p&gt;
+  ## The form to add or edit an instance.
+  &lt;div class="modal fade" id="jiraInstanceModal" tabindex="-1" role="dialog" aria-labelledby="jiraInstanceModalTitle"
+      data-backdrop="static"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;form class="xform jira-instance-form" novalidate="novalidate"&gt;
+          &lt;div class="modal-header"&gt;
+            &lt;button type="button" class="close" data-dismiss="modal"
+                aria-label="$escapetool.xml($services.localization.render('jira.config.close'))"&gt;
+              &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;div class="modal-title" id="jiraInstanceModalTitle"&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-body"&gt;
+            &lt;div class="box errormessage jira-instance-error" role="alert" hidden&gt;&lt;/div&gt;
+            &lt;input type="hidden" name="number" value="" /&gt;
+            ## Disabled while the instance is being saved.
+            &lt;fieldset class="jira-instance-fields"&gt;
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for="jiraInstanceId"&gt;$escapetool.xml($services.localization.render('jira.config.id'))&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('jira.config.id.hint'))&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  &lt;input type="text" id="jiraInstanceId" name="id" aria-required="true" /&gt;
+                &lt;/dd&gt;
+                #if ($jiraShowDeploymentType)
+                  &lt;dt&gt;
+                    &lt;label for="jiraInstanceDeploymentType"&gt;
+                      $escapetool.xml($services.localization.render('jira.config.deploymentType'))
+                    &lt;/label&gt;
+                  &lt;/dt&gt;
+                  &lt;dd&gt;
+                    &lt;select id="jiraInstanceDeploymentType" name="deploymentType"&gt;
+                      #foreach ($entry in $jiraDeploymentTypeLabels.entrySet())
+                        &lt;option value="$escapetool.xml($entry.key)"&gt;$escapetool.xml($entry.value)&lt;/option&gt;
+                      #end
+                    &lt;/select&gt;
+                  &lt;/dd&gt;
+                #end
+                &lt;dt&gt;
+                  &lt;label for="jiraInstanceURL"&gt;$escapetool.xml($services.localization.render('jira.config.url'))&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('jira.config.url.hint'))&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  &lt;input type="text" id="jiraInstanceURL" name="url" aria-required="true" inputmode="url"
+                    placeholder="https://jira.example.com" /&gt;
+                &lt;/dd&gt;
+                &lt;dt&gt;
+                  &lt;label for="jiraInstanceAuthenticationType"&gt;
+                    $escapetool.xml($services.localization.render('jira.config.authType'))
+                  &lt;/label&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  &lt;select id="jiraInstanceAuthenticationType" name="authenticationType"&gt;
+                    #foreach ($entry in $jiraAuthenticationTypeLabels.entrySet())
+                      &lt;option value="$escapetool.xml($entry.key)"&gt;$escapetool.xml($entry.value)&lt;/option&gt;
+                    #end
+                  &lt;/select&gt;
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+              ## The settings of the selected authentication type, loaded from its page.
+              &lt;div class="jira-auth-configuration" aria-live="polite"&gt;&lt;/div&gt;
+            &lt;/fieldset&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-footer"&gt;
+            &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+              $escapetool.xml($services.localization.render('jira.config.cancel'))
+            &lt;/button&gt;
+            &lt;button type="submit" class="btn btn-primary"&gt;
+              $escapetool.xml($services.localization.render('jira.config.save'))
+            &lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  ## The confirmation of the deletion of an instance.
+  &lt;div class="modal fade" id="jiraInstanceDeleteModal" tabindex="-1" role="dialog"
+      aria-labelledby="jiraInstanceDeleteModalTitle"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('jira.config.close'))"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title" id="jiraInstanceDeleteModalTitle"&gt;
+            $escapetool.xml($services.localization.render('jira.config.delete.title'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          &lt;p class="jira-instance-delete-message"&gt;&lt;/p&gt;
+          &lt;p class="text-muted"&gt;$escapetool.xml($services.localization.render('jira.config.delete.hint'))&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('jira.config.cancel'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-danger jira-instance-delete-confirm"&gt;
+            $escapetool.xml($services.localization.render('jira.config.delete'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+
+#set ($properties = ['id'])
+#if ($jiraShowDeploymentType)
+  #set ($discard = $properties.add('deploymentType'))
 #end
-## The deployment type column is only displayed when some extension contributes deployment types, other than Data
-## Center, or when an instance uses a type whose extension is not installed anymore.
-#set ($showDeploymentType = !$services.uix.getExtensions('org.xwiki.contrib.jira.deploymenttype').isEmpty())
-#foreach ($serverObject in $configDoc.getObjects($configClassName))
-  #if ("$!serverObject.getValue('deploymentType')" != '')
-    #set ($showDeploymentType = true)
+#set ($discard = $properties.addAll(['url', 'authenticationType', 'actions']))
+## The deployment and authentication types are filtered by their stored value (datacenter for Data Center, which is
+## stored as an empty value).
+#set ($deploymentTypeOptions = [])
+#foreach ($entry in $jiraDeploymentTypeLabels.entrySet())
+  #set ($deploymentTypeValue = $entry.key)
+  #if ($deploymentTypeValue == '')
+    #set ($deploymentTypeValue = 'datacenter')
   #end
+  #set ($discard = $deploymentTypeOptions.add({'value': $deploymentTypeValue, 'label': $entry.value}))
 #end
-{{html clean="false"}}
-  &lt;form id="jiraConfig" method="post" action="$configDoc.getURL("save", "xredirect=$escapetool.url(${redirect})")" class="withLock xform" data-auth-displayer-urls="$escapetool.xml($jsontool.serialize($jiraAuthUixByConfigIds))"&gt;
-    &lt;fieldset&gt;
-      &lt;dl&gt;
-        &lt;dt&gt;
-          &lt;label for='jiraInstances'&gt;$services.localization.render('jira.config.label')&lt;/label&gt;
-          &lt;span class='xHint'&gt;$services.localization.render('jira.config.label.hint')&lt;/span&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;br /&gt;
-          &lt;div id='jiraInstances'&gt;
-{{/html}}
-
-|=$services.localization.render('jira.config.id', 'xwiki/2.1')#if ($showDeploymentType)|=$services.localization.render('jira.config.deploymentType', 'xwiki/2.1')#end|=$services.localization.render('jira.config.url', 'xwiki/2.1')|=$services.localization.render('jira.config.authType', 'xwiki/2.1')|=$services.localization.render('jira.config.authConfig', 'xwiki/2.1')|=$services.localization.render('jira.config.delete', 'xwiki/2.1')
-##
-##
-#foreach($serverObject in $configDoc.getObjects($configClassName))
-  #set ($deleteURL = $configDoc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($configClassName)}&amp;classid=${serverObject.number}&amp;xredirect=${escapetool.url($redirect)}"))
-  |(% class="jira-server-id" %)$serverObject.display('id', 'edit')#if ($showDeploymentType)|$serverObject.display('deploymentType', 'edit')#end|$serverObject.display('url', 'edit')|$serverObject.display('authenticationType', 'edit')|(% class="jira-auth-configuration" %)|=[[image:icon:cross&gt;&gt;path:$deleteURL]]
+#set ($authenticationTypeOptions = [])
+#foreach ($entry in $jiraAuthenticationTypeLabels.entrySet())
+  #set ($discard = $authenticationTypeOptions.add({'value': $entry.key, 'label': $entry.value}))
 #end
-
-{{html clean="false"}}
-          &lt;/div&gt;        
-        &lt;/dd&gt;
-      &lt;/dl&gt;
-    &lt;/fieldset&gt;
-    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-    &lt;input type="submit" value="$services.localization.render('jira.config.save')" name="formactionsac" class="button" /&gt;
-    &lt;span class="buttonwrapper"&gt;
-      &lt;a href="$configDoc.getURL('objectadd', "classname=$escapetool.url($configClassName)&amp;amp;form_token=$!{services.csrf.getToken()}&amp;amp;xredirect=$escapetool.url(${redirect})")" class="xobject-add-control"&gt;$services.localization.render('jira.config.add')&lt;/a&gt;
-    &lt;/span&gt;
-  &lt;/form&gt;
-{{/html}}
+#set ($liveDataConfig = {
+  'meta': {
+    'entryDescriptor': {'idProperty': 'id'},
+    'propertyDescriptors': [
+      {'id': 'id', 'displayer': 'html', 'sortable': false, 'filterable': true, 'filter': {'id': 'text'}},
+      {'id': 'deploymentType', 'displayer': 'html', 'sortable': false, 'filterable': true,
+        'filter': {'id': 'list', 'options': $deploymentTypeOptions}},
+      {'id': 'url', 'displayer': 'html', 'sortable': false, 'filterable': true, 'filter': {'id': 'text'}},
+      {'id': 'authenticationType', 'displayer': 'html', 'sortable': false, 'filterable': true,
+        'filter': {'id': 'list', 'options': $authenticationTypeOptions}},
+      {'id': 'actions', 'displayer': 'html', 'sortable': false, 'filterable': false}
+    ]
+  }
+})
+{{liveData
+  id="jiraInstances"
+  properties="$stringtool.join($properties, ',')"
+  source="liveTable"
+  sourceParameters="resultPage=JIRA.JIRAConfigService&amp;translationPrefix=jira.config.instances."
+}}
+$jsontool.serialize($liveDataConfig)
+{{/liveData}}
 {{/velocity}}</content>
   <object>
     <name>JIRA.JIRAConfigSheet</name>
@@ -186,114 +309,563 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function ($) {
-    const urlMapping = JSON.parse($('#jiraConfig')[0].dataset.authDisplayerUrls)
-    /**
-     * Load or reload the displayer for the authenticator configuration
-     * @param {*} element the parent container for the displayer content
-     */
-    async function updateDisplayer(element) {
-        const id = $(element).parent().find(".jira-server-id &gt; input").val()
-        const authType = $(element).parent().find("select.jira-config-authentication-type").val()
-        const deploymentType = $(element).parent().find("select.jira-config-deployment-type").val() || ''
-        const url = urlMapping[authType]
-        let body = ''
-        if (url !== undefined) {
-            try {
-                const response = await fetch(`${url}?${new URLSearchParams({ id, authType, deploymentType })}`);
-                if (!response.ok) {
-                    console.error("can't get displayer content")
-                    return
-                }
-                body = await response.text()
-            } catch (e) {
-                console.error(e);
-                return
-            }
+      <code>// The translations used by the JIRA administration.
+define('jira-config-sheet-translation-keys', {
+  prefix: 'jira.config.',
+  keys: [
+    'add.title',
+    'edit.title',
+    'error',
+    'error.authSettings',
+    'error.authLoad',
+    'error.idRequired',
+    'error.urlInvalid',
+    'deploymentType.unavailable',
+    'authType.unavailable',
+    'saved',
+    'deleted',
+    'delete.confirm'
+  ]
+});
+
+require(['jquery', 'xwiki-l10n!jira-config-sheet-translation-keys', 'bootstrap'], function ($, l10n) {
+  const config = $('#jiraConfig');
+  if (!config.length) {
+    return;
+  }
+  // The pages displaying and saving the settings of each authentication type, by authentication type.
+  const authDisplayerURLs = JSON.parse(config.attr('data-auth-displayer-urls') || '{}');
+  const serviceURL = config.attr('data-service-url');
+  const formToken = config.attr('data-form-token');
+
+  const modal = $('#jiraInstanceModal');
+  const form = modal.find('form.jira-instance-form');
+  const fields = form.find('fieldset.jira-instance-fields');
+  const authConfiguration = form.find('.jira-auth-configuration');
+  const deleteModal = $('#jiraInstanceDeleteModal');
+
+  // The instance being edited: its object number and the ID it has in the configuration (empty for a new instance).
+  let currentInstance = {number: '', id: ''};
+  // The ID the authentication settings are stored under, when the instance was renamed but its authentication settings
+  // couldn't be saved: they have to be renamed when saving again. Null otherwise.
+  let pendingPreviousId = null;
+  // Ignore the responses of the previous requests when the authentication settings are reloaded several times.
+  let authConfigurationRequest = 0;
+  // Whether the settings of the selected authentication type are displayed: the instance can't be saved before, since
+  // the settings sent would be missing or belong to another authentication type.
+  let authConfigurationLoaded = false;
+  // Whether the instance is being saved: the form can't be changed or closed meanwhile.
+  let saving = false;
+  // The fields are only marked as invalid once the form has been submitted, then while they are changed.
+  let submitted = false;
+
+  function getField(name) {
+    return form.find(`[name="${name}"]`).first();
+  }
+
+  function getDeploymentType() {
+    // The deployment type isn't displayed when no extension contributes deployment types.
+    const deploymentType = getField('deploymentType');
+    return deploymentType.length ? deploymentType.val() || '' : undefined;
+  }
+
+  function getAuthenticationType() {
+    return getField('authenticationType').val() || 'noAuth';
+  }
+
+  // Get the translation with the given instance ID as parameter. The parameter is inserted as a String.replace
+  // replacement: its "$" are doubled so that the ID is displayed as is, without interpreting $&amp;, $1, etc.
+  function formatMessage(key, id) {
+    return l10n.get(key, String(id).split('$').join('$$'));
+  }
+
+  // The notification text is plain text since XWiki 17.10.9 / 18.4.0RC1, which added Notification.textFormat, and HTML
+  // before.
+  function notify(message, type) {
+    const text = typeof XWiki.widgets.Notification.textFormat === 'function' ? message : message.escapeHTML();
+    new XWiki.widgets.Notification(text, type);
+  }
+
+  function updateState() {
+    fields.prop('disabled', saving);
+    modal.find('button').prop('disabled', saving);
+    modal.find('button[type="submit"]').prop('disabled', saving || !authConfigurationLoaded);
+  }
+
+  // Select the given value, adding an option for it when it isn't available anymore (e.g. the extension providing it
+  // was uninstalled), so that it isn't changed silently.
+  function selectValue(select, value, unavailableLabel) {
+    if (!select.length) {
+      return;
+    }
+    select.find('option.jira-unavailable').remove();
+    const exists = select.find('option').filter(function () {
+      return this.value === value;
+    }).length &gt; 0;
+    if (!exists) {
+      $('&lt;option class="jira-unavailable"&gt;&lt;/option&gt;').val(value).text(unavailableLabel).appendTo(select);
+    }
+    select.val(value);
+  }
+
+  function showError(message) {
+    form.find('.jira-instance-error').text(message).prop('hidden', !message);
+  }
+
+  /**
+   * Load the settings of the selected authentication type, from the page of this authentication type. The values
+   * already typed are kept when the same authentication type is reloaded (e.g. when the deployment type changes).
+   */
+  async function loadAuthConfiguration() {
+    const requestNumber = ++authConfigurationRequest;
+    const authType = getAuthenticationType();
+    const url = authDisplayerURLs[authType];
+    const previousValues = authConfiguration.attr('data-auth-type') === authType
+      ? authConfiguration.find(':input[name]').serializeArray() : [];
+    authConfigurationLoaded = false;
+    updateState();
+    let html = '';
+    if (url) {
+      const parameters = {id: currentInstance.id, authType, deploymentType: getDeploymentType() || ''};
+      try {
+        const response = await fetch(`${url}?${new URLSearchParams(parameters)}`);
+        if (!response.ok) {
+          throw new Error(`Failed to load the authentication settings: ${response.status}`);
         }
-        element.innerHTML = body
+        html = await response.text();
+      } catch (e) {
+        console.error(e);
+        if (requestNumber === authConfigurationRequest) {
+          // Don't keep the settings of another authentication type: the instance can't be saved until they're loaded.
+          authConfiguration.empty().removeAttr('data-auth-type');
+          showError(l10n.get('error.authLoad'));
+        }
+        return;
+      }
     }
-
-    // First load of the authenticator displayer
-    for (const element of $('.jira-auth-configuration')) {
-        // event if updateDisplayer(...) is async we don't really need to wait on the result of updateDisplayer(...)
-        // because it already catch itself the errors and each authentication configuration is independent
-        updateDisplayer(element)
+    if (requestNumber !== authConfigurationRequest) {
+      return;
     }
-
-    // Reload the authenticator displayer if we change the authenticator
-    for (const element of $('.jira-config-authentication-type')) {
-        $(element).on('change', (event) =&gt; {
-            const e = $(element).parent().parent().find('td.jira-auth-configuration')[0]
-            // event if updateDisplayer(...) is async we don't really need to wait on the result of updateDisplayer(...)
-            // because it already catch itself the errors and each authentication configuration is independent
-            updateDisplayer(e)
-        })
-    }
-
-    // Reload the authenticator displayer if we change the deployment type, since the authenticator configuration can
-    // depend on it
-    for (const element of $('.jira-config-deployment-type')) {
-        $(element).on('change', (event) =&gt; {
-            const e = $(element).parent().parent().find('td.jira-auth-configuration')[0]
-            // event if updateDisplayer(...) is async we don't really need to wait on the result of updateDisplayer(...)
-            // because it already catch itself the errors and each authentication configuration is independent
-            updateDisplayer(e)
-        })
-    }
-
-
-    $('#jiraConfig input.button').on('click', async (e) =&gt; {
-        // Avoid that on the reload of the page we cancel the next async part of code which save for the authentication configuration
-        // The save of the main configuration will be done after we saved all authenticator configuration
-        e.preventDefault()
-
-        // Save the authenticator configuration
-        // We need to ensure that all fetch request are done before running "form.submit()"
-        // overise the reload of the page (triggered by form.submit()) will cancel the fetch requests.
-        const form = $('#jiraConfig')[0]
-        const urlEncodedData = new URLSearchParams(new FormData(form).entries());
-
-        await Promise.all(Object.values(urlMapping).map(async url =&gt; {
-            const fetchUrl = `${url}?save=true`
-            try {
-                const response = await fetch(fetchUrl, {
-                    method: "POST",
-                    headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                    body: urlEncodedData,
-                });
-                if (!response.ok) {
-                    console.error("Can't update JIRA authenticator configuration")
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }))
-        // run the default action as soon as the other query was sent
-        form.submit();
+    authConfiguration.html(html).attr('data-auth-type', authType);
+    previousValues.forEach(field =&gt; {
+      authConfiguration.find(':input[name]').filter(function () {
+        return this.name === field.name &amp;&amp; this.type !== 'checkbox' &amp;&amp; this.type !== 'radio';
+      }).val(field.value);
     });
+    authConfigurationLoaded = true;
+    updateState();
+  }
 
-    // Update the ID fields of the authenticator configuration, so we have a consistent server ID matching between the JIRAServer configuration and the authenticator configuration
-    for (const element of $('form#jiraConfig .jira-server-id input')) {
-        element.on('change', (e) =&gt; {
-            const idHiddenFiled = $(element).parent().parent().find('td.jira-auth-configuration input[type="hidden"]')[0]
-            if (idHiddenFiled != null) {
-                idHiddenFiled.value = element.value
-            }
-        })
+  function openModal(instance) {
+    if (saving) {
+      return;
     }
-})</code>
+    currentInstance = {number: instance.number || '', id: instance.id || ''};
+    pendingPreviousId = null;
+    form[0].reset();
+    submitted = false;
+    showError('');
+    form.find('.has-error').removeClass('has-error');
+    form.find('[aria-invalid]').removeAttr('aria-invalid');
+    modal.find('.modal-title').text(l10n.get(currentInstance.number !== '' ? 'edit.title' : 'add.title'));
+    getField('number').val(currentInstance.number);
+    getField('id').val(currentInstance.id);
+    getField('url').val(instance.url || '');
+    selectValue(getField('deploymentType'), instance.deploymentType || '',
+      l10n.get('deploymentType.unavailable'));
+    selectValue(getField('authenticationType'), instance.authenticationType || 'noAuth',
+      l10n.get('authType.unavailable'));
+    authConfiguration.empty().removeAttr('data-auth-type');
+    loadAuthConfiguration();
+    modal.modal('show');
+  }
+
+  function getInstance(link) {
+    // Read the attributes as strings, without any type conversion.
+    return {
+      number: link.attr('data-number'),
+      id: link.attr('data-id'),
+      url: link.attr('data-url'),
+      deploymentType: link.attr('data-deployment-type'),
+      authenticationType: link.attr('data-authentication-type')
+    };
+  }
+
+  function refreshInstances() {
+    const liveData = $('#jiraInstances').data('liveData');
+    if (liveData) {
+      liveData.updateEntries();
+    } else {
+      window.location.reload();
+    }
+  }
+
+  function post(url, data) {
+    return $.ajax({url, method: 'POST', data: $.param(Object.assign({form_token: formToken}, data), true)});
+  }
+
+  function getErrorMessage(xhr) {
+    return xhr &amp;&amp; xhr.responseJSON &amp;&amp; xhr.responseJSON.error || l10n.get('error');
+  }
+
+  // Save the settings of the selected authentication type, and remove the settings of the instance from the other
+  // authentication types. The values are the ones of the form when it was submitted.
+  function saveAuthConfiguration(values) {
+    const requests = [];
+    Object.entries(authDisplayerURLs).forEach(([type, url]) =&gt; {
+      if (type === values.authenticationType) {
+        const data = {action: 'saveInstance', id: values.id, previousId: values.previousAuthId, url: values.url};
+        if (values.deploymentType !== undefined) {
+          data.deploymentType = values.deploymentType;
+        }
+        values.authFields.forEach(field =&gt; {
+          if (!(field.name in data)) {
+            data[field.name] = field.value;
+          }
+        });
+        requests.push(post(url, data));
+      } else {
+        new Set([values.id, values.previousAuthId]).forEach(id =&gt; {
+          if (id) {
+            requests.push(post(url, {action: 'deleteInstance', id}));
+          }
+        });
+      }
+    });
+    return Promise.all(requests);
+  }
+
+  function markInvalid(field, invalid) {
+    field.attr('aria-invalid', invalid ? 'true' : null).closest('dd').prev('dt').addBack()
+      .toggleClass('has-error', invalid);
+  }
+
+  function validate() {
+    const id = getField('id');
+    const url = getField('url');
+    const idValid = id.val().trim() !== '';
+    const urlValid = /^https?:\/\/\S/i.test(url.val().trim());
+    markInvalid(id, !idValid);
+    markInvalid(url, !urlValid);
+    showError(!idValid ? l10n.get('error.idRequired') : (!urlValid ? l10n.get('error.urlInvalid') : ''));
+    return idValid &amp;&amp; urlValid;
+  }
+
+  async function save() {
+    if (saving || !authConfigurationLoaded) {
+      return;
+    }
+    submitted = true;
+    if (!validate()) {
+      return;
+    }
+    // Read the form once: it can't be changed while saving, but the requests must not depend on it anyway.
+    const values = {
+      number: currentInstance.number,
+      // The ID the instance has in the configuration, checked by the service so that another instance isn't
+      // overwritten if this one was deleted or changed in the meantime.
+      currentId: currentInstance.id,
+      // The ID the authentication settings are stored under.
+      previousAuthId: pendingPreviousId !== null ? pendingPreviousId : currentInstance.id,
+      id: getField('id').val().trim(),
+      url: getField('url').val().trim(),
+      deploymentType: getDeploymentType(),
+      authenticationType: getAuthenticationType(),
+      authFields: authConfiguration.find(':input[name]').serializeArray()
+    };
+    saving = true;
+    updateState();
+    try {
+      const data = {
+        action: 'save',
+        number: values.number,
+        previousId: values.currentId,
+        id: values.id,
+        url: values.url,
+        authenticationType: values.authenticationType
+      };
+      if (values.deploymentType !== undefined) {
+        data.deploymentType = values.deploymentType;
+      }
+      let result;
+      try {
+        result = await post(serviceURL, data);
+      } catch (xhr) {
+        showError(getErrorMessage(xhr));
+        if (xhr &amp;&amp; (xhr.status === 404 || xhr.status === 409)) {
+          refreshInstances();
+        }
+        return;
+      }
+      if (!result || result.number === undefined) {
+        showError(l10n.get('error'));
+        return;
+      }
+      // The instance is saved: it's edited from now on, and its authentication settings are still stored under the
+      // previous ID until they're saved.
+      currentInstance = {number: String(result.number), id: result.id};
+      pendingPreviousId = values.previousAuthId;
+      getField('number').val(currentInstance.number);
+      modal.find('.modal-title').text(l10n.get('edit.title'));
+      try {
+        await saveAuthConfiguration(values);
+      } catch (xhr) {
+        console.error(xhr);
+        showError(l10n.get('error.authSettings'));
+        refreshInstances();
+        return;
+      }
+      pendingPreviousId = null;
+      saving = false;
+      modal.modal('hide');
+      refreshInstances();
+      notify(formatMessage('saved', values.id), 'done');
+    } finally {
+      saving = false;
+      updateState();
+    }
+  }
+
+  async function deleteInstance(instance) {
+    const buttons = deleteModal.find('button').prop('disabled', true);
+    try {
+      await post(serviceURL, {action: 'delete', number: instance.number, id: instance.id});
+      if (instance.id) {
+        await Promise.all(Object.values(authDisplayerURLs).map(url =&gt;
+          post(url, {action: 'deleteInstance', id: instance.id})));
+      }
+      deleteModal.modal('hide');
+      notify(formatMessage('deleted', instance.id), 'done');
+    } catch (xhr) {
+      notify(getErrorMessage(xhr), 'error');
+    } finally {
+      buttons.prop('disabled', false);
+      refreshInstances();
+    }
+  }
+
+  config.find('.jira-instance-add').on('click', () =&gt; openModal({}));
+
+  // The edit and delete links are in the Live Data, which is (re)loaded asynchronously.
+  $(document).on('click', '#jiraInstances a.jira-instance-edit', function (event) {
+    event.preventDefault();
+    openModal(getInstance($(this)));
+  });
+
+  $(document).on('click', '#jiraInstances a.jira-instance-delete', function (event) {
+    event.preventDefault();
+    const instance = getInstance($(this));
+    deleteModal.data('instance', instance);
+    deleteModal.find('.jira-instance-delete-message').text(formatMessage('delete.confirm', instance.id));
+    deleteModal.modal('show');
+  });
+
+  deleteModal.find('.jira-instance-delete-confirm').on('click', () =&gt; deleteInstance(deleteModal.data('instance')));
+
+  // The settings depend on the authentication type and their labels can depend on the deployment type.
+  form.on('change', 'select[name="authenticationType"], select[name="deploymentType"]', loadAuthConfiguration);
+
+  form.on('input', 'input[name="id"], input[name="url"]', () =&gt; {
+    if (submitted) {
+      validate();
+    }
+  });
+
+  form.on('submit', event =&gt; {
+    event.preventDefault();
+    save();
+  });
+
+  // The form can't be closed while the instance is being saved (e.g. with the Escape key).
+  modal.on('hide.bs.modal', event =&gt; {
+    if (saving) {
+      event.preventDefault();
+    }
+  });
+
+  // Focus the first field once the modal is displayed.
+  modal.on('shown.bs.modal', () =&gt; getField('id').trigger('focus'));
+});</code>
     </property>
     <property>
-      <name>authTypeSelector</name>
+      <name/>
     </property>
     <property>
       <parse>0</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>JIRA.JIRAConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>dee15847-ac71-45fe-aa9a-f190a16c69c3</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#jiraConfig .modal-title {
+  font-weight: bold;
+}
+
+/* The fields take the whole width of the modal, whatever its size. */
+#jiraInstanceModal .modal-body input[type="text"],
+#jiraInstanceModal .modal-body input[type="password"],
+#jiraInstanceModal .modal-body input[type="email"],
+#jiraInstanceModal .modal-body select {
+  width: 100%;
+}
+
+/* Only used to disable the fields while saving. */
+#jiraInstanceModal fieldset.jira-instance-fields {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+#jiraInstanceModal .jira-auth-configuration dl {
+  margin: 0;
+}
+
+/* The Live Data breaks the values anywhere, even in the middle of the IDs and labels: keep the words whole, and only
+   break the URLs anywhere, which are long and would widen the Live Data. */
+#jiraInstances .livedata-displayer {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+#jiraInstances .jira-instance-url {
+  overflow-wrap: anywhere;
+}
+
+#jiraInstances .jira-instance-actions {
+  white-space: nowrap;
+}
+
+#jiraInstances .jira-instance-actions .action + .action {
+  margin-left: .5em;
+}
+
+/* The invalid fields, once the form has been submitted. */
+#jiraInstanceModal .has-error label {
+  color: #a94442;
+}
+
+#jiraInstanceModal dd.has-error input {
+  border-color: #a94442;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>
