@@ -161,20 +161,25 @@ $services.localization.render($key, 'html/5.0')##
     &lt;dl&gt;
       &lt;dt&gt;
         &lt;label for="jiraBasicAuthUsername"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.username')&lt;/label&gt;
+        &lt;span class="xHint" id="jiraBasicAuthUsernameHint"&gt;##
+          #jiraBasicAuthTranslation('jira.config.auth.basicAuth.username.hint')&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         &lt;input type="text" id="jiraBasicAuthUsername" name="username" value="$escapetool.xml($username)"
-          autocomplete="off" /&gt;
+          autocomplete="off" aria-describedby="jiraBasicAuthUsernameHint" /&gt;
       &lt;/dd&gt;
       &lt;dt&gt;
         &lt;label for="jiraBasicAuthPassword"&gt;#jiraBasicAuthTranslation('jira.config.auth.basicAuth.password')&lt;/label&gt;
-        #if ($hasPassword)
-          &lt;span class="xHint" id="jiraBasicAuthPasswordHint"&gt;#jiraBasicAuthTranslation('jira.config.auth.keepSecret')&lt;/span&gt;
-        #end
+        &lt;span class="xHint" id="jiraBasicAuthPasswordHint"&gt;##
+          #jiraBasicAuthTranslation('jira.config.auth.basicAuth.password.hint')
+          #if ($hasPassword)
+            &lt;span id="jiraBasicAuthPasswordKeep"&gt; #jiraBasicAuthTranslation('jira.config.auth.keepSecret')&lt;/span&gt;##
+          #end
+        &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         &lt;input type="password" id="jiraBasicAuthPassword" name="password" value="" autocomplete="new-password"
-          #if ($hasPassword)aria-describedby="jiraBasicAuthPasswordHint"#end /&gt;
+          aria-describedby="jiraBasicAuthPasswordHint" /&gt;
       &lt;/dd&gt;
     &lt;/dl&gt;
     {{/html}}

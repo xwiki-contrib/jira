@@ -382,7 +382,7 @@ public class JIRAAdministrationSectionPage extends AdministrationSectionPage
      */
     public boolean hasStoredBasicAuthPassword()
     {
-        return !getAuthConfiguration().findElements(By.id("jiraBasicAuthPasswordHint")).isEmpty();
+        return !getAuthConfiguration().findElements(By.id("jiraBasicAuthPasswordKeep")).isEmpty();
     }
 
     /**

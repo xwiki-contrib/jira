@@ -91,19 +91,23 @@
               &lt;dl&gt;
                 &lt;dt&gt;
                   &lt;label for="jiraInstanceId"&gt;$escapetool.xml($services.localization.render('jira.config.id'))&lt;/label&gt;
-                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('jira.config.id.hint'))&lt;/span&gt;
+                  &lt;span class="xHint" id="jiraInstanceIdHint"&gt;$escapetool.xml($services.localization.render('jira.config.id.hint'))&lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;
-                  &lt;input type="text" id="jiraInstanceId" name="id" aria-required="true" /&gt;
+                  &lt;input type="text" id="jiraInstanceId" name="id" aria-required="true" aria-describedby="jiraInstanceIdHint" /&gt;
                 &lt;/dd&gt;
                 #if ($jiraShowDeploymentType)
                   &lt;dt&gt;
                     &lt;label for="jiraInstanceDeploymentType"&gt;
                       $escapetool.xml($services.localization.render('jira.config.deploymentType'))
                     &lt;/label&gt;
+                    &lt;span class="xHint" id="jiraInstanceDeploymentTypeHint"&gt;
+                      $escapetool.xml($services.localization.render('jira.config.deploymentType.hint'))
+                    &lt;/span&gt;
                   &lt;/dt&gt;
                   &lt;dd&gt;
-                    &lt;select id="jiraInstanceDeploymentType" name="deploymentType"&gt;
+                    &lt;select id="jiraInstanceDeploymentType" name="deploymentType"
+                      aria-describedby="jiraInstanceDeploymentTypeHint"&gt;
                       #foreach ($entry in $jiraDeploymentTypeLabels.entrySet())
                         &lt;option value="$escapetool.xml($entry.key)"&gt;$escapetool.xml($entry.value)&lt;/option&gt;
                       #end
@@ -112,19 +116,24 @@
                 #end
                 &lt;dt&gt;
                   &lt;label for="jiraInstanceURL"&gt;$escapetool.xml($services.localization.render('jira.config.url'))&lt;/label&gt;
-                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('jira.config.url.hint'))&lt;/span&gt;
+                  &lt;span class="xHint" id="jiraInstanceURLHint"&gt;$escapetool.xml($services.localization.render('jira.config.url.hint'))&lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;
                   &lt;input type="text" id="jiraInstanceURL" name="url" aria-required="true" inputmode="url"
+                    aria-describedby="jiraInstanceURLHint"
                     placeholder="https://jira.example.com" /&gt;
                 &lt;/dd&gt;
                 &lt;dt&gt;
                   &lt;label for="jiraInstanceAuthenticationType"&gt;
                     $escapetool.xml($services.localization.render('jira.config.authType'))
                   &lt;/label&gt;
+                  &lt;span class="xHint" id="jiraInstanceAuthenticationTypeHint"&gt;
+                    $escapetool.xml($services.localization.render('jira.config.authType.hint'))
+                  &lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;
-                  &lt;select id="jiraInstanceAuthenticationType" name="authenticationType"&gt;
+                  &lt;select id="jiraInstanceAuthenticationType" name="authenticationType"
+                    aria-describedby="jiraInstanceAuthenticationTypeHint"&gt;
                     #foreach ($entry in $jiraAuthenticationTypeLabels.entrySet())
                       &lt;option value="$escapetool.xml($entry.key)"&gt;$escapetool.xml($entry.value)&lt;/option&gt;
                     #end
