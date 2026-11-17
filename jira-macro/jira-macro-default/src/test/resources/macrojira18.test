@@ -1,0 +1,66 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test the display of the type and status of issues without an icon: empty icon URL, no icon URL and icon URL
+.# pointing to the server, with or without a context path (JIRA-52). Their name is displayed instead.
+.#-----------------------------------------------------
+{{jira url="http://localhost:8889" source="jql" fields="key,type,status"}}key in (XWIKI-2001, XWIKI-2002, XWIKI-2003){{/jira}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [jira] [url=http://localhost:8889|source=jql|fields=key,type,status] [key in (XWIKI-2001, XWIKI-2002, XWIKI-2003)]
+beginTable
+beginTableRow
+beginTableHeadCell
+onVerbatim [Key] [true]
+endTableHeadCell
+beginTableHeadCell
+onVerbatim [Type] [true]
+endTableHeadCell
+beginTableHeadCell
+onVerbatim [Status] [true]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+beginLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-2001]] [true]
+onVerbatim [XWIKI-2001] [true]
+endLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-2001]] [true]
+endTableCell
+beginTableCell
+onVerbatim [Bug] [true]
+endTableCell
+beginTableCell
+onVerbatim [To Do] [true]
+endTableCell
+endTableRow
+beginTableRow
+beginTableCell
+beginLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-2002]] [true]
+onVerbatim [XWIKI-2002] [true]
+endLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-2002]] [true]
+endTableCell
+beginTableCell
+onVerbatim [Task] [true]
+endTableCell
+beginTableCell
+onVerbatim [In Review] [true]
+endTableCell
+endTableRow
+beginTableRow
+beginTableCell
+beginLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-2003]] [true]
+onVerbatim [XWIKI-2003] [true]
+endLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-2003]] [true]
+endTableCell
+beginTableCell
+onImage [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/images/icons/bug.gif]] [false] [[alt]=[Bug][data-xwiki-lightbox]=[false][title]=[Bug]]
+endTableCell
+beginTableCell
+onVerbatim [Waiting] [true]
+endTableCell
+endTableRow
+endTable
+endMacroMarkerStandalone [jira] [url=http://localhost:8889|source=jql|fields=key,type,status] [key in (XWIKI-2001, XWIKI-2002, XWIKI-2003)]
+endDocument

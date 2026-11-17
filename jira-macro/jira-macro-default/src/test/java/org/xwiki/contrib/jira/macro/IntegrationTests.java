@@ -75,6 +75,14 @@ public class IntegrationTests
                 .withHeader("Content-Type", "text/xml")
                 .withBodyFile("input.xml")));
 
+        // Answer for issues whose type or status has no icon
+        server.stubFor(get(urlMatching(
+            "\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*XWIKI-200[1-3].*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "text/xml")
+                .withBodyFile("noicons.xml")));
+
         // Default answer when authentication is required
         server.stubFor(get(urlMatching(
             "\\/auth\\/sr\\/jira.issueviews:searchrequest-xml\\/temp\\/SearchRequest\\.xml\\?jqlQuery=.*"))
