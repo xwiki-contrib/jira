@@ -19,27 +19,28 @@
  */
 package org.xwiki.contrib.jira.charts.internal.bidimensionalgrid;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRABiDimensionalGridChartMacroParameter;
 import org.xwiki.contrib.jira.charts.bidimensionalgrid.JIRAField;
 import org.xwiki.contrib.jira.charts.internal.bidimensionalgrid.source.JIRABiDimensionalGridChartJIRADataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.JIRAChartType;
+import org.xwiki.contrib.jira.macro.JIRAConnector;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorResolver;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -50,20 +51,19 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class JIRABiDimensionalGridChartDataFetcherTest
 {
+    private final JIRAServer jiraServer = new JIRAServer("http://localhost/jira", "myjira");
+
     @InjectMockComponents
     private JIRABiDimensionalGridChartDataFetcher dataFetcher;
 
     @MockComponent
-    private JIRAURLHelper urlHelper;
-
-    @MockComponent
-    private HTTPJIRAFetcher httpjiraFetcher;
+    private JIRAConnectorResolver connectorResolver;
 
     @MockComponent
     private JIRAServerResolver jiraServerResolver;
 
     @Mock
-    JIRAServer jiraServer;
+    private JIRAConnector connector;
 
     @Test
     void fetch() throws Exception
@@ -78,24 +78,27 @@ class JIRABiDimensionalGridChartDataFetcherTest
         parameters.setSortAscending(false);
 
         when(this.jiraServerResolver.resolve(any())).thenReturn(this.jiraServer);
-        List<NameValuePair> expectedParameters = List.of(
-            new BasicNameValuePair("filterId", "filter-43434"),
-            new BasicNameValuePair("xstattype", "statuses"),
-            new BasicNameValuePair("ystattype", "assignees"),
-            new BasicNameValuePair("sortDirection", "desc"),
-            new BasicNameValuePair("sortBy", "natural"),
-            new BasicNameValuePair("numberToShow", "21")
-        );
+        when(this.connectorResolver.resolve(this.jiraServer)).thenReturn(this.connector);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, List<String>>> parametersCaptor = ArgumentCaptor.forClass(Map.class);
+        // The properties not read by the macro are ignored.
+        when(this.connector.getChartData(eq(this.jiraServer), eq(JIRAChartType.TWO_DIMENSIONAL_GRID),
+            parametersCaptor.capture()))
+            .thenReturn("{\"filterTitle\":\"My filter\",\"xHeading\":\"Status\",\"totalRows\":3,\"other\":1}");
 
-        when(this.urlHelper.getChartURL(any(), any(), any())).thenReturn("myurl");
+        JIRABiDimensionalGridChartJIRADataSource result =
+            this.dataFetcher.fetch(parameters, JIRABiDimensionalGridChartJIRADataSource.class);
+        assertEquals("My filter", result.getFilterTitle());
+        assertEquals("Status", result.getxHeading());
+        assertEquals(3, result.getTotalRows());
 
-        JIRABiDimensionalGridChartJIRADataSource expectedResult = mock(JIRABiDimensionalGridChartJIRADataSource.class);
-        when(this.httpjiraFetcher.fetchJSON("myurl", this.jiraServer, JIRABiDimensionalGridChartJIRADataSource.class))
-            .thenReturn(expectedResult);
-
-        assertSame(expectedResult, this.dataFetcher.fetch(parameters, JIRABiDimensionalGridChartJIRADataSource.class));
-        verify(this.urlHelper).getChartURL(jiraServer, JIRAURLHelper.GadgetType.BIDIMENSIONAL_CHARTS,
-            expectedParameters);
-
+        assertEquals(List.of(
+            Map.entry("filterId", List.of("filter-43434")),
+            Map.entry("xstattype", List.of("statuses")),
+            Map.entry("ystattype", List.of("assignees")),
+            Map.entry("sortDirection", List.of("desc")),
+            Map.entry("sortBy", List.of("natural")),
+            Map.entry("numberToShow", List.of("21"))
+        ), new ArrayList<>(parametersCaptor.getValue().entrySet()));
     }
 }

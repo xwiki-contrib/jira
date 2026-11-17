@@ -19,18 +19,13 @@
  */
 package org.xwiki.contrib.jira.test.ui;
 
-import java.time.Duration;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.contrib.jira.test.po.JIRAAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.UITest;
@@ -42,6 +37,8 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -53,6 +50,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class JIRAMacroIT
 {
+    private static final String TEST_SPACE = "JIRATest";
+
+    private static final String BASIC_AUTH = "basicAuth";
+
+    private static final String DEPLOYMENT_TYPE = "Deployment type";
+
     private WireMockServer wireMockServer;
 
     @BeforeEach
@@ -70,6 +73,7 @@ class JIRAMacroIT
     }
 
     @Test
+    @Order(1)
     void verifyMacro(TestUtils setup, TestInfo info)
     {
         setup.loginAsSuperAdmin();
@@ -91,20 +95,10 @@ class JIRAMacroIT
         // Setup a jira instance
         wikiAdministrationPage.clickSection("Other", "JIRA");
         JIRAAdministrationSectionPage jiraPage = new JIRAAdministrationSectionPage();
-        jiraPage.setId(0, "local");
-        jiraPage.setURL(0, "http://localhost:8889");
-        jiraPage.clickSave();
-        // we need to handle the wait because the save call `preventDefault()`
-        // so we need specify to selenium unit what we need to wait
-        WebDriverWait wait = new WebDriverWait(setup.getDriver(), Duration.ofSeconds(10));
-        try {
-            // workaround to be sure that on the next wait the page already started to be reloaded so
-            //  document.readyState != complete
-            wait.until(ExpectedConditions.stalenessOf(setup.getDriver().findElement(By.tagName("html"))));
-        } catch (TimeoutException ignored) {
-        }
-        wait.until(webDriver -> (((org.openqa.selenium.JavascriptExecutor) webDriver)
-            .executeScript("return document.readyState")).equals("complete"));
+        jiraPage.clickAddInstance();
+        jiraPage.setId("local");
+        jiraPage.setURL("http://localhost:8889");
+        jiraPage.saveInstance();
 
         // Now create a new page and try using the jira macro in it + verify that the scripting jira api works too
         String velocity = "{{jira id=\"local\"}}\n"
@@ -144,5 +138,169 @@ class JIRAMacroIT
         vp.waitUntilContent("\\QType Key Summary Status Created Date\n"
             + "XWIKI-1001 19-Mar-2007\n"
             + "com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClient\\E");
+    }
+
+    /**
+     * An extension can contribute a deployment type, with its own labels for the basic authentication configuration.
+     */
+    @Test
+    @Order(2)
+    void deploymentTypes(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+
+        // Contribute the "testcloud" deployment type, as an extension would.
+        setup.createPage(TEST_SPACE, "Translations", "jira.test.deploymentType.testcloud=Test Cloud\n"
+            + "jira.config.auth.basicAuth.username.testcloud=Email\n"
+            + "jira.config.auth.basicAuth.password.testcloud=API token", "");
+        setup.addObject(TEST_SPACE, "Translations", "XWiki.TranslationDocumentClass", "scope", "WIKI");
+        setup.createPage(TEST_SPACE, "TestCloudDeploymentType", "", "");
+        setup.addObject(TEST_SPACE, "TestCloudDeploymentType", "XWiki.UIExtensionClass",
+            "extensionPointId", "org.xwiki.contrib.jira.deploymenttype",
+            "name", "org.xwiki.contrib.jira.deploymenttype.testcloud",
+            "parameters", "deployment_type=testcloud\ntranslation_key=jira.test.deploymentType.testcloud\norder=10",
+            "scope", "wiki");
+
+        JIRAAdministrationSectionPage jiraPage = gotoJIRASection();
+        assertTrue(jiraPage.hasDeploymentTypeColumn());
+        jiraPage.clickAddInstance();
+        assertEquals(List.of("Data Center / Server", "Test Cloud"), jiraPage.getDeploymentTypeLabels());
+        jiraPage.setId("cloudjira");
+        jiraPage.setURL("http://localhost:8889/cloudjira");
+        jiraPage.setAuthenticationType(BASIC_AUTH);
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        assertEquals("Password", jiraPage.getBasicAuthPasswordLabel());
+
+        // Changing the deployment type reloads the authentication settings, with the labels of that type, keeping the
+        // values already typed.
+        jiraPage.setBasicAuthCredentials("user@example.com", "token");
+        jiraPage.setDeploymentType("testcloud");
+        jiraPage.waitForBasicAuthConfiguration("Email");
+        assertEquals("API token", jiraPage.getBasicAuthPasswordLabel());
+        assertEquals("user@example.com", jiraPage.getBasicAuthUsername());
+        jiraPage.saveInstance();
+        assertEquals("Test Cloud", jiraPage.getInstanceValue("cloudjira", DEPLOYMENT_TYPE));
+        assertEquals("Basic authentication", jiraPage.getInstanceValue("cloudjira", "Authentication type"));
+
+        jiraPage = gotoJIRASection();
+        jiraPage.clickInstanceId("cloudjira");
+        assertEquals("Test Cloud", jiraPage.getSelectedDeploymentTypeLabel());
+        jiraPage.waitForBasicAuthConfiguration("Email");
+        assertEquals("user@example.com", jiraPage.getBasicAuthUsername());
+        jiraPage.cancelInstance();
+
+        // When the extension providing the deployment type is uninstalled, the stored type is still displayed, so that
+        // saving the instance doesn't silently change it.
+        setup.deletePage(TEST_SPACE, "TestCloudDeploymentType");
+        jiraPage = gotoJIRASection();
+        assertTrue(jiraPage.hasDeploymentTypeColumn());
+        assertEquals("Unavailable deployment type", jiraPage.getInstanceValue("cloudjira", DEPLOYMENT_TYPE));
+        jiraPage.clickEditInstance("cloudjira");
+        assertEquals("Unavailable deployment type", jiraPage.getSelectedDeploymentTypeLabel());
+        assertFalse(jiraPage.getDeploymentTypeLabels().contains("Test Cloud"));
+        jiraPage.cancelInstance();
+    }
+
+    /**
+     * The JIRA instances are added, edited and deleted from the administration, one at a time.
+     */
+    @Test
+    @Order(3)
+    void manageInstances(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+
+        JIRAAdministrationSectionPage jiraPage = gotoJIRASection();
+        jiraPage.clickAddInstance();
+        assertEquals("Add JIRA instance", jiraPage.getInstanceFormTitle());
+
+        // The ID and the URL are checked before saving.
+        jiraPage.setURL("http://localhost:8889/manage");
+        assertEquals("The ID is required.", jiraPage.saveInstanceWithError());
+        jiraPage.setId("local");
+        assertEquals("A JIRA instance with the ID \"local\" already exists.", jiraPage.saveInstanceWithError());
+        jiraPage.setId("manage");
+        jiraPage.setURL("localhost:8889/manage");
+        assertEquals("The JIRA URL must start with http:// or https://.", jiraPage.saveInstanceWithError());
+        jiraPage.setURL("http://localhost:8889/manage");
+        jiraPage.setAuthenticationType(BASIC_AUTH);
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        jiraPage.setBasicAuthCredentials("manager", "secret");
+        jiraPage.saveInstance();
+        assertEquals("http://localhost:8889/manage", jiraPage.getInstanceValue("manage", "JIRA URL"));
+        assertEquals("Basic authentication", jiraPage.getInstanceValue("manage", "Authentication type"));
+
+        // Renaming the instance keeps its credentials, including the password when it's left empty.
+        jiraPage.clickEditInstance("manage");
+        assertEquals("Edit JIRA instance", jiraPage.getInstanceFormTitle());
+        assertEquals("manage", jiraPage.getId());
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        assertEquals("manager", jiraPage.getBasicAuthUsername());
+        assertTrue(jiraPage.hasStoredBasicAuthPassword());
+        jiraPage.setId("managed");
+        jiraPage.saveInstance();
+        jiraPage.waitUntilInstanceIsNotListed("manage");
+        jiraPage.clickInstanceId("managed");
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        assertEquals("manager", jiraPage.getBasicAuthUsername());
+        assertTrue(jiraPage.hasStoredBasicAuthPassword());
+        jiraPage.cancelInstance();
+
+        // Deleting an instance deletes its credentials: a new instance with the same ID doesn't get them.
+        jiraPage.clickAddInstance();
+        jiraPage.setId("temporary");
+        jiraPage.setURL("http://localhost:8889/temporary");
+        jiraPage.setAuthenticationType(BASIC_AUTH);
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        jiraPage.setBasicAuthCredentials("temporary", "secret");
+        jiraPage.saveInstance();
+        // Each instance keeps its own credentials (JIRA-124).
+        jiraPage.clickInstanceId("temporary");
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        assertEquals("temporary", jiraPage.getBasicAuthUsername());
+        jiraPage.cancelInstance();
+        jiraPage.clickInstanceId("managed");
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        assertEquals("manager", jiraPage.getBasicAuthUsername());
+        assertTrue(jiraPage.hasStoredBasicAuthPassword());
+        jiraPage.cancelInstance();
+        jiraPage.deleteInstance("temporary");
+        jiraPage.clickAddInstance();
+        jiraPage.setId("temporary");
+        jiraPage.setURL("http://localhost:8889/temporary");
+        jiraPage.setAuthenticationType(BASIC_AUTH);
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        jiraPage.saveInstance();
+        jiraPage.clickInstanceId("temporary");
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        assertEquals("", jiraPage.getBasicAuthUsername());
+        assertFalse(jiraPage.hasStoredBasicAuthPassword());
+        jiraPage.cancelInstance();
+        jiraPage.deleteInstance("temporary");
+        jiraPage.clickInstanceId("managed");
+        jiraPage.waitForBasicAuthConfiguration("Username");
+
+        // Switching to no authentication removes the credentials.
+        jiraPage.setAuthenticationType("noAuth");
+        jiraPage.waitForNoAuthConfiguration();
+        jiraPage.saveInstance();
+        assertEquals("No authentication", jiraPage.getInstanceValue("managed", "Authentication type"));
+        jiraPage.clickInstanceId("managed");
+        jiraPage.setAuthenticationType(BASIC_AUTH);
+        jiraPage.waitForBasicAuthConfiguration("Username");
+        assertEquals("", jiraPage.getBasicAuthUsername());
+        jiraPage.cancelInstance();
+
+        // The other instances are kept when one is saved or deleted.
+        jiraPage.deleteInstance("managed");
+        jiraPage = gotoJIRASection();
+        assertEquals(List.of("local", "cloudjira"), jiraPage.getInstanceIds());
+    }
+
+    private JIRAAdministrationSectionPage gotoJIRASection()
+    {
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        administrationPage.clickSection("Other", "JIRA");
+        return new JIRAAdministrationSectionPage();
     }
 }

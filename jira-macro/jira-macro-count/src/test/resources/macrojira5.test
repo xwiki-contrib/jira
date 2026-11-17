@@ -1,0 +1,21 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test macro when the JIRA server fails (HTTP 500): the macro fails.
+.#-----------------------------------------------------
+{{jiraCount url="http://localhost:8889"}}
+project = SERVERERROR
+{{/jiraCount}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [jiraCount] [url=http://localhost:8889] [project = SERVERERROR]
+beginGroup [[class]=[xwikirenderingerror]]
+onWord [Failed to execute the [jiraCount] macro. Cause: [Error code = [500], Error message = [Unknown error] URL = [http://localhost:8889/rest/api/2/search?maxResults=0&jql=project+%3D+SERVERERROR]]. Click on this message for details.]
+endGroup [[class]=[xwikirenderingerror]]
+beginGroup [[class]=[xwikirenderingerrordescription hidden]]
+onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: Failed to retrieve JIRA data from [http://localhost:8889] for JQL [project = SERVERERROR]${{{regex:.*}}}] [false]
+endGroup [[class]=[xwikirenderingerrordescription hidden]]
+endMacroMarkerStandalone [jiraCount] [url=http://localhost:8889] [project = SERVERERROR]
+endDocument

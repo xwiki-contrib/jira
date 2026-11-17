@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib.jira</groupId>
     <artifactId>jira-config</artifactId>
-    <version>11.1.9-SNAPSHOT</version>
+    <version>11.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>jira-config-ui</artifactId>
   <name>JIRA - Config - Admin UI</name>
@@ -42,6 +42,19 @@
       <groupId>org.xwiki.contrib.jira</groupId>
       <artifactId>jira-config-platform</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- The JIRA instances are displayed with the Live Data macro, from a page using the live table results format. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>

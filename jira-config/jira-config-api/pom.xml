@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.contrib.jira</groupId>
     <artifactId>jira-config</artifactId>
-    <version>11.1.9-SNAPSHOT</version>
+    <version>11.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>jira-config-api</artifactId>
   <name>JIRA - Config - Default API</name>
   <packaging>jar</packaging>
   <description>JIRA configuration API and in-memory implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>In-Memory JIRA Configuration</xwiki.extension.name>
     <!-- The extension's category -->

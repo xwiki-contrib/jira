@@ -118,8 +118,9 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
             StringProperty urlProperty = (StringProperty) baseObject.getField("url");
             if (!isPropertyEmpty(idProperty) && !isPropertyEmpty(urlProperty)) {
                 String authType = baseObject.getStringValue("authenticationType");
+                String deploymentType = baseObject.getStringValue("deploymentType");
 
-                jiraServer = getJiraServer(authType, urlProperty, idProperty);
+                jiraServer = getJiraServer(authType, deploymentType, urlProperty, idProperty);
                 if (jiraServer == null) {
                     continue;
                 }
@@ -132,13 +133,14 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
         return jiraServers;
     }
 
-    private JIRAServer getJiraServer(String authType, StringProperty urlProperty, StringProperty idProperty)
+    private JIRAServer getJiraServer(String authType, String deploymentType, StringProperty urlProperty,
+        StringProperty idProperty)
     {
         ComponentManager componentManager = componentManagerProvider.get();
 
         JIRAServer jiraServer = null;
         if (StringUtils.isEmpty(authType) || "noAuth".equals(authType)) {
-            jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue());
+            jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue(), null, deploymentType);
         } else {
             if (!componentManager.hasComponent(JIRAAuthenticatorFactory.class, authType)) {
                 logger.error("Can't find JIRAuthenticatorFactory with name [{}]", authType);
@@ -147,7 +149,7 @@ public class JIRAConfigClassDocumentConfigurationSource extends AbstractDocument
                     JIRAAuthenticatorFactory jiraAuthenticatorFactory = componentManagerProvider.get()
                         .getInstance(JIRAAuthenticatorFactory.class, authType);
                     jiraServer = new JIRAServer(urlProperty.getValue(), idProperty.getValue(),
-                        jiraAuthenticatorFactory.get(idProperty.getValue()));
+                        jiraAuthenticatorFactory.get(idProperty.getValue()), deploymentType);
                 } catch (ComponentLookupException e) {
                     logger.error("Can't create JIRAuthenticatorFactory for authentication type [{}]", authType,
                         e);

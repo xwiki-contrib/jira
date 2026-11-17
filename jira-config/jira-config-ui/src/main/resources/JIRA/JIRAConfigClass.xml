@@ -49,21 +49,39 @@
     <authenticationType>
       <customDisplay>{{velocity}}
 #set ($id = $escapetool.xml("${prefix}${name}"))
-{{html clean="false"}}
-&lt;select id="$id" name="$id" class="jira-config-authentication-type"&gt;
-&lt;option value="noAuth" #if ($value == 'noAuth') selected #end&gt;$services.localization.render('jira.config.auth.noAuth')&lt;/option&gt;
+## Labels of the authentication types: no authentication, then the ones contributed by extensions.
+#set ($authenticationTypeLabels = {})
+#set ($discard = $authenticationTypeLabels.put('noAuth', $services.localization.render('jira.config.auth.noAuth')))
 #foreach ($u in $services.uix.getExtensions('org.xwiki.contrib.jira.authconfig'))
-  &lt;option value="$u.parameters.config_id" #if ($value == $u.parameters.config_id) selected #end&gt;$services.localization.render($u.parameters.translation_key)&lt;/option&gt;
+  #set ($discard = $authenticationTypeLabels.put("$!u.parameters.config_id",
+    $services.localization.render($u.parameters.translation_key)))
+#end
+#set ($currentValue = "$!value")
+#if ($currentValue == '')
+  #set ($currentValue = 'noAuth')
+#end
+{{html clean="false"}}
+#if ($type == 'edit')
+&lt;select id="$id" name="$id" class="jira-config-authentication-type"&gt;
+#foreach ($entry in $authenticationTypeLabels.entrySet())
+  &lt;option value="$escapetool.xml($entry.key)"#if ($entry.key == $currentValue) selected="selected"#end&gt;$escapetool.xml($entry.value)&lt;/option&gt;
 #end
 &lt;/select&gt;
+#elseif ($type == 'hidden')
+&lt;input type="hidden" id="$id" name="$id" value="$escapetool.xml($currentValue)"/&gt;
+#elseif ($authenticationTypeLabels.containsKey($currentValue))
+$escapetool.xml($authenticationTypeLabels.get($currentValue))
+#else
+$escapetool.xml($services.localization.render('jira.config.authType.unavailable'))
+#end
 {{/html}}
 {{/velocity}}</customDisplay>
       <disabled>0</disabled>
       <hint/>
       <name>authenticationType</name>
-      <number>5</number>
+      <number>4</number>
       <picker>0</picker>
-      <prettyName>authenticationType</prettyName>
+      <prettyName>Authentication Type</prettyName>
       <size>10</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -84,12 +102,61 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </id>
+    <deploymentType>
+      <customDisplay>{{velocity}}
+#set ($fieldName = "${prefix}${name}")
+#set ($currentValue = "$!value")
+## Labels of the deployment types, Data Center (empty value) first, then the ones contributed by extensions.
+#set ($deploymentTypeLabels = {})
+#set ($discard = $deploymentTypeLabels.put('', $services.localization.render('jira.config.deploymentType.datacenter')))
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.contrib.jira.deploymenttype', {'sortByParameter': 'order'}))
+  #set ($uixParameters = $uix.parameters)
+  #set ($deploymentType = "$!uixParameters.deployment_type")
+  #if ($deploymentType != '' &amp;&amp; !$deploymentTypeLabels.containsKey($deploymentType))
+    ## Fallback on the deployment type itself when its label is not translated.
+    #set ($deploymentTypeLabel = $deploymentType)
+    #if ("$!uixParameters.translation_key" != '' &amp;&amp; "$!services.localization.get($uixParameters.translation_key)" != '')
+      #set ($deploymentTypeLabel = $services.localization.render($uixParameters.translation_key))
+    #end
+    #set ($discard = $deploymentTypeLabels.put($deploymentType, $deploymentTypeLabel))
+  #end
+#end
+## Keep the stored value displayed and selectable even when the extension providing it is not installed anymore.
+#if (!$deploymentTypeLabels.containsKey($currentValue))
+  #set ($discard = $deploymentTypeLabels.put($currentValue, $services.localization.render('jira.config.deploymentType.unavailable')))
+#end
+{{html clean="false"}}
+#if ($type == 'edit')
+&lt;select id="$escapetool.xml($fieldName)" name="$escapetool.xml($fieldName)" class="jira-config-deployment-type"&gt;
+#foreach ($entry in $deploymentTypeLabels.entrySet())
+  &lt;option value="$escapetool.xml($entry.key)"#if ($entry.key == $currentValue) selected="selected"#end&gt;$escapetool.xml($entry.value)&lt;/option&gt;
+#end
+&lt;/select&gt;
+#elseif ($type == 'hidden')
+&lt;input type="hidden" id="$escapetool.xml($fieldName)" name="$escapetool.xml($fieldName)" value="$escapetool.xml($currentValue)"/&gt;
+#else
+$escapetool.xml($deploymentTypeLabels.get($currentValue))
+#end
+{{/html}}
+{{/velocity}}</customDisplay>
+      <disabled>0</disabled>
+      <hint/>
+      <name>deploymentType</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Deployment Type</prettyName>
+      <size>10</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </deploymentType>
     <url>
       <customDisplay/>
       <disabled>0</disabled>
       <hint/>
       <name>url</name>
-      <number>2</number>
+      <number>3</number>
       <picker>0</picker>
       <prettyName>JIRA Server URL Prefix</prettyName>
       <size>20</size>

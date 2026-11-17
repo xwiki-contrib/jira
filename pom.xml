@@ -34,7 +34,7 @@
   <artifactId>jira</artifactId>
   <packaging>pom</packaging>
   <name>JIRA</name>
-  <version>11.1.9-SNAPSHOT</version>
+  <version>11.2.0-SNAPSHOT</version>
   <description>Provides various integration points between XWiki and JIRA.</description>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/jira.git</connection>

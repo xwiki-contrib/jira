@@ -20,7 +20,9 @@
 package org.xwiki.contrib.jira.charts.internal;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -30,12 +32,17 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.xwiki.contrib.jira.charts.AbstractChartMacroParameters;
 import org.xwiki.contrib.jira.charts.internal.source.AbstractJIRADataSource;
 import org.xwiki.contrib.jira.config.JIRAServer;
-import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
 import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAChartType;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
-import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
+import org.xwiki.contrib.jira.macro.internal.JIRAConnectorResolver;
 import org.xwiki.contrib.jira.macro.internal.source.JIRAServerResolver;
 import org.xwiki.rendering.macro.MacroExecutionException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * Abstract implementation of components allowing to request information from JIRA REST gadget endpoint.
@@ -52,10 +59,7 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     private static final String FILTER_ID_PREFIX = "filter-";
 
     @Inject
-    private JIRAURLHelper urlHelper;
-
-    @Inject
-    private HTTPJIRAFetcher httpjiraFetcher;
+    private JIRAConnectorResolver connectorResolver;
 
     @Inject
     private JIRAServerResolver jiraServerResolver;
@@ -73,15 +77,42 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
         parametersList.addAll(getCustomQueryParameters(parameters));
 
         JIRAServer server = this.jiraServerResolver.resolve(parameters);
-        String chartURL = this.urlHelper.getChartURL(server, getGadgetType(), parametersList);
+        String json;
         try {
-            return this.httpjiraFetcher.fetchJSON(chartURL, server, expectedType);
+            json = this.connectorResolver.resolve(server)
+                .getChartData(server, getChartType(), toMap(parametersList));
         } catch (JIRABadRequestException e) {
             throw e;
         } catch (JIRAConnectionException e) {
             throw new MacroExecutionException(
-                String.format("Error when trying to get data for pie chart from URL [%s].", chartURL), e);
+                String.format("Error when trying to get data for chart [%s] from JIRA server [%s].",
+                    getChartType(), server.getURL()), e);
         }
+
+        try {
+            return createObjectMapper().readValue(json, expectedType);
+        } catch (JsonProcessingException e) {
+            throw new MacroExecutionException(
+                String.format("Failed to parse the data of chart [%s] from JIRA server [%s]: [%s]",
+                    getChartType(), server.getURL(), json), e);
+        }
+    }
+
+    private ObjectMapper createObjectMapper()
+    {
+        // Only the properties described in JIRAChartType are read: ignore the other ones, so that the parsing doesn't
+        // fail when JIRA adds properties.
+        return new ObjectMapper().disable(FAIL_ON_UNKNOWN_PROPERTIES);
+    }
+
+    private Map<String, List<String>> toMap(List<NameValuePair> parameters)
+    {
+        // Keep the order of the parameters and the parameters with several values (e.g. "field").
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        for (NameValuePair parameter : parameters) {
+            map.computeIfAbsent(parameter.getName(), name -> new ArrayList<>()).add(parameter.getValue());
+        }
+        return map;
     }
 
     /**
@@ -125,9 +156,9 @@ public abstract class AbstractJIRAChartDataFetcher<T extends AbstractChartMacroP
     }
 
     /**
-     * @return the type of requested gadget.
+     * @return the chart the data are requested for
      */
-    public abstract JIRAURLHelper.GadgetType getGadgetType();
+    public abstract JIRAChartType getChartType();
 
     /**
      * @param parameters the macro parameters to use for building the request.

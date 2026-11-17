@@ -1,0 +1,291 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="JIRA.JIRAConfigService" locale="">
+  <web>JIRA</web>
+  <name>JIRAConfigService</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>JIRA.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>JIRA Config Service</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="JIRA.JIRAConfigMacros"/}}
+
+{{velocity}}
+## Lists, saves and deletes the JIRA instances defined in JIRA.JIRAConfig, for the JIRA administration section
+## (JIRA.JIRAConfigSheet).
+## * Without an "action" parameter: the instances, in the format of the live table results (used as the result page of
+##   the Live Data of the administration section).
+## * POST action=save: creates (no "number" parameter) or updates (the "number" of the instance object, which must still
+##   have the "previousId" ID) an instance from the "id", "url", "deploymentType" (kept when the parameter is missing)
+##   and "authenticationType" parameters.
+## * POST action=delete: deletes the instance object with the given "number" and "id".
+## The authentication settings of the instances are saved by the page of their authentication type (see the
+## org.xwiki.contrib.jira.authconfig UIX extension point), not here.
+#set ($configClassName = 'JIRA.JIRAConfigClass')
+#set ($configDoc = $xwiki.getDocument('JIRA.JIRAConfig'))
+##
+#macro (jiraConfigError $status $message)
+  #set ($discard = $response.setStatus($status))
+  #jsonResponse({'error': $message})
+#end
+##
+## Sets $instance: the instance object with the number given in the request, if any.
+#macro (jiraConfigGetInstance)
+  #set ($instance = $NULL)
+  #set ($instanceNumber = $numbertool.toNumber($request.number))
+  #if ("$!instanceNumber" != '')
+    #set ($instance = $configDoc.getObject($configClassName, $instanceNumber.intValue()))
+  #end
+#end
+##
+#macro (jiraConfigLink $cssClass $label $content $instance)
+&lt;a href='#' class='$cssClass' title='$escapetool.xml($label)' aria-label='$escapetool.xml($label)' ##
+data-number='$instance.number' ##
+data-id='$!escapetool.xml($instance.getValue('id'))' ##
+data-url='$!escapetool.xml($instance.getValue('url'))' ##
+data-deployment-type='$!escapetool.xml($instance.getValue('deploymentType'))' ##
+data-authentication-type='$!escapetool.xml($instance.getValue('authenticationType'))'&gt;$content&lt;/a&gt;##
+#end
+##
+## Sets $matches: whether the given value matches the Live Data filter of the given property, sent with the live table
+## results parameters: the values ("&lt;property&gt;"), how they're matched ("&lt;property&gt;_match": partial, prefix, exact or
+## empty, where the value is ignored; the deployment and authentication types are matched exactly) and whether all or
+## any of them have to match ("&lt;property&gt;/join_mode": AND or OR).
+#macro (jiraConfigMatchesFilter $property $value)
+  #set ($matches = true)
+  #set ($filterValues = $request.getParameterValues($property))
+  #if ($filterValues &amp;&amp; $filterValues.size() &gt; 0)
+    #set ($joinModeParameter = "${property}/join_mode")
+    #set ($matchAny = "$!request.getParameter($joinModeParameter)" == 'OR')
+    #set ($matchTypeParameter = "${property}_match")
+    #set ($matchTypes = $request.getParameterValues($matchTypeParameter))
+    #set ($matches = !$matchAny)
+    #set ($lowerCaseValue = "$!value.toLowerCase()")
+    #foreach ($filterValue in $filterValues)
+      #set ($lowerCaseFilterValue = "$!filterValue.toLowerCase()")
+      #set ($matchType = 'partial')
+      #if ($matchTypes &amp;&amp; $matchTypes.size() &gt;= $foreach.count)
+        #set ($matchType = $matchTypes.get($foreach.index))
+      #end
+      #if ($matchType != 'empty' &amp;&amp; ($property == 'deploymentType' || $property == 'authenticationType'))
+        #set ($matchType = 'exact')
+      #end
+      #if ($matchType == 'empty')
+        #set ($valueMatches = $lowerCaseValue == '')
+      #elseif ($matchType == 'exact')
+        #set ($valueMatches = $lowerCaseValue == $lowerCaseFilterValue)
+      #elseif ($matchType == 'prefix')
+        #set ($valueMatches = $lowerCaseValue.startsWith($lowerCaseFilterValue))
+      #else
+        #set ($valueMatches = $lowerCaseValue.contains($lowerCaseFilterValue))
+      #end
+      #if ($matchAny &amp;&amp; $valueMatches)
+        #set ($matches = true)
+      #elseif (!$matchAny &amp;&amp; !$valueMatches)
+        #set ($matches = false)
+      #end
+    #end
+  #end
+#end
+##
+#macro (jiraConfigInstances)
+  #jiraConfigDeploymentTypeLabels
+  #jiraConfigAuthenticationTypes
+  #set ($instances = [])
+  #foreach ($instance in $configDoc.getObjects($configClassName))
+    ## Deleted objects leave a null in the list.
+    #if ("$!instance" != '')
+      ## Data Center is stored as an empty deployment type.
+      #set ($filterDeploymentType = "$!instance.getValue('deploymentType')")
+      #if ($filterDeploymentType == '')
+        #set ($filterDeploymentType = 'datacenter')
+      #end
+      #set ($filterAuthenticationType = "$!instance.getValue('authenticationType')")
+      #if ($filterAuthenticationType == '')
+        #set ($filterAuthenticationType = 'noAuth')
+      #end
+      #set ($included = true)
+      #foreach ($filter in [['id', "$!instance.getValue('id')"], ['url', "$!instance.getValue('url')"],
+          ['deploymentType', $filterDeploymentType], ['authenticationType', $filterAuthenticationType]])
+        #jiraConfigMatchesFilter($filter.get(0) $filter.get(1))
+        #if (!$matches)
+          #set ($included = false)
+        #end
+      #end
+      #if ($included)
+        #set ($discard = $instances.add($instance))
+      #end
+    #end
+  #end
+  ## The live table offset starts at 1.
+  #set ($offset = $numbertool.toNumber($request.offset).intValue())
+  #if (!$offset || $offset &lt; 1)
+    #set ($offset = 1)
+  #end
+  #set ($limit = $numbertool.toNumber($request.limit).intValue())
+  #if (!$limit || $limit &lt; 1)
+    #set ($limit = 15)
+  #end
+  #set ($editLabel = $services.localization.render('jira.config.instances.edit'))
+  #set ($deleteLabel = $services.localization.render('jira.config.instances.delete'))
+  #set ($rows = [])
+  #foreach ($instance in $instances)
+    #if ($foreach.count &gt;= $offset &amp;&amp; $rows.size() &lt; $limit)
+      #set ($id = "$!instance.getValue('id')")
+      #set ($url = "$!instance.getValue('url')")
+      #set ($deploymentType = "$!instance.getValue('deploymentType')")
+      #set ($authenticationType = "$!instance.getValue('authenticationType')")
+      #if ($authenticationType == '')
+        #set ($authenticationType = 'noAuth')
+      #end
+      ## The ID opens the edit form too. An instance without ID can't be used, but is listed so that it can be fixed or
+      ## deleted.
+      #if ($id != '')
+        #set ($idContent = $escapetool.xml($id))
+      #else
+        #set ($idContent = "&lt;em&gt;$escapetool.xml($services.localization.render('jira.config.instances.noId'))&lt;/em&gt;")
+      #end
+      #set ($idHTML = "#jiraConfigLink('jira-instance-edit' $editLabel $idContent $instance)")
+      ## Only link to web addresses.
+      #set ($lowerCaseURL = $url.toLowerCase())
+      #if ($lowerCaseURL.startsWith('http://') || $lowerCaseURL.startsWith('https://'))
+        #set ($urlAttributes = "class='jira-instance-url' target='_blank' rel='noopener noreferrer'")
+        #set ($urlHTML = "&lt;a href='$escapetool.xml($url)' $urlAttributes&gt;$escapetool.xml($url)&lt;/a&gt;")
+      #else
+        ## Not an empty string, which the Live Data displays as missing.
+        #set ($urlHTML = "&lt;span class='jira-instance-url'&gt;$escapetool.xml($url)&lt;/span&gt;")
+      #end
+      #set ($deploymentTypeLabel = $jiraDeploymentTypeLabels.get($deploymentType))
+      #if ("$!deploymentTypeLabel" == '')
+        #set ($deploymentTypeLabel = $services.localization.render('jira.config.deploymentType.unavailable'))
+      #end
+      #set ($authenticationTypeLabel = $jiraAuthenticationTypeLabels.get($authenticationType))
+      #if ("$!authenticationTypeLabel" == '')
+        #set ($authenticationTypeLabel = $services.localization.render('jira.config.authType.unavailable'))
+      #end
+      #set ($editIcon = $services.icon.renderHTML('pencil'))
+      #set ($deleteIcon = $services.icon.renderHTML('cross'))
+      #set ($actionsHTML = "&lt;div class='jira-instance-actions'&gt;##
+#jiraConfigLink('action jira-instance-edit' $editLabel $editIcon $instance)##
+#jiraConfigLink('action jira-instance-delete' $deleteLabel $deleteIcon $instance)&lt;/div&gt;")
+      #set ($discard = $rows.add({
+        'id': $idHTML,
+        'deploymentType': $escapetool.xml($deploymentTypeLabel),
+        'url': $urlHTML,
+        'authenticationType': $escapetool.xml($authenticationTypeLabel),
+        'actions': $actionsHTML
+      }))
+    #end
+  #end
+  #jsonResponse({
+    'totalrows': $instances.size(),
+    'returnedrows': $rows.size(),
+    'offset': $offset,
+    'reqNo': $numbertool.toNumber($request.reqNo).intValue(),
+    'rows': $rows
+  })
+#end
+##
+#macro (jiraConfigSaveInstance)
+  #jiraConfigGetInstance
+  #set ($id = $stringtool.trimToEmpty($request.id))
+  #set ($url = $stringtool.trimToEmpty($request.url))
+  #set ($lowerCaseURL = $url.toLowerCase())
+  #if ("$!request.number" != '' &amp;&amp; "$!instance" == '')
+    #jiraConfigError(404, $services.localization.render('jira.config.error.notFound'))
+  #elseif ("$!instance" != '' &amp;&amp; $stringtool.trimToEmpty($instance.getValue('id'))
+      != $stringtool.trimToEmpty($request.previousId))
+    ## The object was given to another instance since the form was opened (e.g. the instance was deleted, then another
+    ## one was added): don't overwrite it.
+    #jiraConfigError(409, $services.localization.render('jira.config.error.modified'))
+  #elseif ($id == '')
+    #jiraConfigError(400, $services.localization.render('jira.config.error.idRequired'))
+  #elseif (!$lowerCaseURL.startsWith('http://') &amp;&amp; !$lowerCaseURL.startsWith('https://'))
+    #jiraConfigError(400, $services.localization.render('jira.config.error.urlInvalid'))
+  #else
+    ## The ID identifies the instance in the macros and its authentication settings: it must be unique.
+    #set ($duplicate = false)
+    #foreach ($other in $configDoc.getObjects($configClassName))
+      #if ("$!other" != '' &amp;&amp; ("$!instance" == '' || $other.number != $instance.number)
+          &amp;&amp; $stringtool.trimToEmpty($other.getValue('id')) == $id)
+        #set ($duplicate = true)
+      #end
+    #end
+    #if ($duplicate)
+      #jiraConfigError(400, $services.localization.render('jira.config.error.idExists', [$id]))
+    #else
+      #if ("$!instance" == '')
+        #set ($instance = $configDoc.newObject($configClassName))
+      #end
+      #set ($discard = $instance.set('id', $id))
+      #set ($discard = $instance.set('url', $url))
+      ## The deployment type isn't sent when it isn't displayed: keep the current one.
+      #if ($request.getParameter('deploymentType') != $NULL)
+        #set ($discard = $instance.set('deploymentType', $request.getParameter('deploymentType')))
+      #end
+      #set ($authenticationType = "$!request.authenticationType")
+      #if ($authenticationType == '')
+        #set ($authenticationType = 'noAuth')
+      #end
+      #set ($discard = $instance.set('authenticationType', $authenticationType))
+      #set ($discard = $configDoc.save("Saved the JIRA instance [$id]"))
+      #jsonResponse({'number': $instance.number, 'id': $id})
+    #end
+  #end
+#end
+##
+#macro (jiraConfigDeleteInstance)
+  #jiraConfigGetInstance
+  ## Check the ID too, in case the instance was replaced since the list was displayed.
+  #if ("$!instance" == '' || "$!instance.getValue('id')" != "$!request.id")
+    #jiraConfigError(404, $services.localization.render('jira.config.error.notFound'))
+  #else
+    #set ($discard = $configDoc.removeObject($instance))
+    #set ($discard = $configDoc.save("Deleted the JIRA instance [$!request.id]"))
+    #jsonResponse({'id': "$!request.id"})
+  #end
+#end
+##
+#if (!$xwiki.hasAdminRights())
+  #jiraConfigError(403, $services.localization.render('jira.config.error.notAllowed'))
+#elseif ("$!request.action" == '')
+  #jiraConfigInstances
+#elseif ($request.method != 'POST' || !$services.csrf.isTokenValid($request.form_token))
+  #jiraConfigError(403, $services.localization.render('jira.config.error.invalidRequest'))
+#elseif ($request.action == 'save')
+  #jiraConfigSaveInstance
+#elseif ($request.action == 'delete')
+  #jiraConfigDeleteInstance
+#else
+  #jiraConfigError(400, $services.localization.render('jira.config.error.invalidRequest'))
+#end
+{{/velocity}}</content>
+</xwikidoc>

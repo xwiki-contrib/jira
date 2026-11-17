@@ -57,6 +57,8 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 @Singleton
 public class HTTPJIRAFetcher
 {
+    private static final String FETCH_ERROR = "Failed to get JIRA content for [%s]";
+
     @Inject
     private ErrorMessageExtractor extractor;
 
@@ -114,13 +116,34 @@ public class HTTPJIRAFetcher
         }
     }
 
+    /**
+     * Fetch the content of the given URL as text, without parsing it.
+     *
+     * @param urlString the full JIRA URL to call
+     * @param jiraServer the jira server data containing optional credentials (used to setup preemptive basic
+     *     authentication
+     * @return the content returned by JIRA
+     * @throws JIRAConnectionException in case of problem when performing the request
+     * @since 11.2.0
+     */
+    public String fetchText(String urlString, JIRAServer jiraServer) throws JIRAConnectionException
+    {
+        try {
+            return performRequest(urlString, jiraServer, is -> IOUtils.toString(is, StandardCharsets.UTF_8));
+        } catch (JIRAConnectionException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JIRAConnectionException(String.format(FETCH_ERROR, urlString), e);
+        }
+    }
+
     private String getRawJIRAResponse(String urlString, JIRAServer jiraServer)
     {
         String message;
         try {
             message = performRequest(urlString, jiraServer, is -> IOUtils.toString(is, StandardCharsets.UTF_8));
         } catch (Exception e) {
-            message = String.format("Failed to get JIRA content for [%s]", urlString);
+            message = String.format(FETCH_ERROR, urlString);
         }
         return message;
     }
