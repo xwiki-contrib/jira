@@ -45,14 +45,20 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  */
 public abstract class AbstractJIRADataSource implements JIRADataSource
 {
+    /**
+     * Executes the HTTP requests to the JIRA server.
+     */
     @Inject
-    private HTTPJIRAFetcher jiraFetcher;
+    protected HTTPJIRAFetcher jiraFetcher;
+
+    /**
+     * Builds the URLs of the JIRA server endpoints.
+     */
+    @Inject
+    protected JIRAURLHelper urlHelper;
 
     @Inject
     private JIRAServerResolver jiraServerResolver;
-
-    @Inject
-    private JIRAURLHelper urlHelper;
 
     /**
      * @param document the XML document from which to extract JIRA issues

@@ -29,15 +29,24 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.contrib.jira.macro.internal.HTTPJIRAFetcher;
+import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -59,11 +68,24 @@ import static org.xwiki.contrib.jira.macro.JIRAField.SUMMARY;
 @ComponentTest
 class ListJIRADataSourceTest
 {
+    private static final JIRAServer JIRA_SERVER = new JIRAServer("http://localhost", "id");
+
+    private static final String OLD_1_URL = "http://localhost/rest/api/2/issue/OLD-1?fields=key";
+
     @InjectMockComponents
     private ListJIRADataSource jiraDataSource;
 
     @MockComponent
     private JIRAConfiguration jiraConfiguration;
+
+    @MockComponent
+    private HTTPJIRAFetcher jiraFetcher;
+
+    @MockComponent
+    private JIRAURLHelper urlHelper;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void parseIdsWhenNull() throws Exception
@@ -107,7 +129,7 @@ class ListJIRADataSourceTest
             new ImmutablePair<>("XWIKI-1000", ""),
             new ImmutablePair<>("XWIKI-1001", "Note"));
 
-        List<Element> issues = this.jiraDataSource.buildIssues(document, ids);
+        List<Element> issues = this.jiraDataSource.buildIssues(document, ids, JIRA_SERVER);
 
         assertEquals(2, issues.size());
         Element issue1 = issues.get(0);
@@ -117,6 +139,45 @@ class ListJIRADataSourceTest
         assertEquals("XWIKI-1001", issue2.getChildTextTrim(KEY.getId()));
         assertEquals("On jetty, non-default skins are not usable", issue2.getChildTextTrim(SUMMARY.getId()));
         assertEquals("Note", issue2.getChildTextTrim(NOTE));
+    }
+
+    @Test
+    void buildIssuesWhenIssueMoved() throws Exception
+    {
+        when(this.urlHelper.getIssueKeyURL(JIRA_SERVER, "OLD-1")).thenReturn(OLD_1_URL);
+        when(this.jiraFetcher.fetchJSON(OLD_1_URL, JIRA_SERVER, JsonNode.class))
+            .thenReturn(new ObjectMapper().readTree("{\"key\": \"XWIKI-1001\"}"));
+        Document document = new SAXBuilder().build(getClass().getResourceAsStream("/__files/input.xml"));
+        List<Pair<String, String>> ids = List.of(
+            new ImmutablePair<>("OLD-1", "Note"),
+            new ImmutablePair<>("XWIKI-1000", ""));
+
+        List<Element> issues = this.jiraDataSource.buildIssues(document, ids, JIRA_SERVER);
+
+        assertEquals(2, issues.size());
+        Element issue1 = issues.get(0);
+        assertEquals("XWIKI-1001", issue1.getChildTextTrim(KEY.getId()));
+        assertEquals("Note", issue1.getChildTextTrim(NOTE));
+        assertEquals("XWIKI-1000", issues.get(1).getChildTextTrim(KEY.getId()));
+    }
+
+    @Test
+    void buildIssuesWhenIssueKeyCannotBeResolved() throws Exception
+    {
+        when(this.urlHelper.getIssueKeyURL(JIRA_SERVER, "OLD-1")).thenReturn(OLD_1_URL);
+        when(this.jiraFetcher.fetchJSON(OLD_1_URL, JIRA_SERVER, JsonNode.class))
+            .thenThrow(new JIRAConnectionException("Not found"));
+        Document document = new SAXBuilder().build(getClass().getResourceAsStream("/__files/input.xml"));
+        List<Pair<String, String>> ids = List.of(
+            new ImmutablePair<>("OLD-1", ""),
+            new ImmutablePair<>("XWIKI-1000", ""));
+
+        List<Element> issues = this.jiraDataSource.buildIssues(document, ids, JIRA_SERVER);
+
+        assertEquals(1, issues.size());
+        assertEquals("XWIKI-1000", issues.get(0).getChildTextTrim(KEY.getId()));
+        assertEquals("Failed to get the current key of JIRA issue [OLD-1] from [http://localhost]. "
+            + "Root cause: [JIRAConnectionException: Not found]", this.logCapture.getMessage(0));
     }
 
     @Test

@@ -25,20 +25,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRABadRequestException;
+import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Takes a discrete list of JIRA issues from the Macro content and return their field values.
@@ -65,6 +71,9 @@ public class ListJIRADataSource extends AbstractJIRADataSource
      */
     private static final String PIPE = "|";
 
+    @Inject
+    private Logger logger;
+
     @Override
     public Collection<Element> getData(String macroContent, JIRAMacroParameters parameters)
         throws MacroExecutionException, JIRABadRequestException
@@ -77,16 +86,17 @@ public class ListJIRADataSource extends AbstractJIRADataSource
         }
 
         Document document = getXMLDocument(jiraServer, constructJQLQuery(ids), parameters.getMaxCount());
-        return buildIssues(document, ids);
+        return buildIssues(document, ids, jiraServer);
     }
 
     /**
      * @param document the XML document containing all the JIRA issues and which was returned by the JIRA server
      * @param issueIds the list of JIRA issue ids specified by the user
+     * @param jiraServer the JIRA server to ask for the current key of the issues that have been moved
      * @return the list of JIRA issues (returned as XML elements), in the same order as the JIRA issue id list specified
      *         by the user
      */
-    public List<Element> buildIssues(Document document, List<Pair<String, String>> issueIds)
+    public List<Element> buildIssues(Document document, List<Pair<String, String>> issueIds, JIRAServer jiraServer)
     {
         // Note: JIRA doesn't return items in the order specified in the JQL query, thus we need to manually order
         // them in the same order as passed in the issueIds parameter.
@@ -95,6 +105,10 @@ public class ListJIRADataSource extends AbstractJIRADataSource
         List<Element> issues = new ArrayList<>();
         for (Pair<String, String> id : issueIds) {
             Element issue = mappedIssues.get(id.getLeft());
+            if (issue == null) {
+                // JIRA resolves the key of a moved issue in the JQL query, but returns the issue with its new key.
+                issue = mappedIssues.get(getCurrentKey(id.getLeft(), jiraServer));
+            }
             if (issue != null) {
                 // Add the Note field if there's one specified by the user
                 String note = id.getRight();
@@ -108,6 +122,18 @@ public class ListJIRADataSource extends AbstractJIRADataSource
         }
 
         return issues;
+    }
+
+    private String getCurrentKey(String issueKey, JIRAServer jiraServer)
+    {
+        try {
+            return this.jiraFetcher.fetchJSON(this.urlHelper.getIssueKeyURL(jiraServer, issueKey), jiraServer,
+                JsonNode.class).path(JIRAField.KEY.getId()).asText(null);
+        } catch (JIRAConnectionException e) {
+            this.logger.warn("Failed to get the current key of JIRA issue [{}] from [{}]. Root cause: [{}]", issueKey,
+                jiraServer.getURL(), ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
     }
 
     /**
