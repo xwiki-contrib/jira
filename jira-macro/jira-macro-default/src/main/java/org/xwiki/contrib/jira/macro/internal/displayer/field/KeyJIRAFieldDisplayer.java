@@ -57,7 +57,9 @@ public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
         String key = issue.getChildText(JIRAField.KEY.getId());
         if (key != null) {
             String link = issue.getChildText(JIRAField.LINK.getId());
-            List<Block> labelBlocks = Arrays.asList(new VerbatimBlock(key, true));
+            String originalKey = issue.getChildText(JIRAField.ORIGINAL_KEY);
+            String label = originalKey == null ? key : String.format("%s (moved to %s)", originalKey, key);
+            List<Block> labelBlocks = Arrays.asList(new VerbatimBlock(label, true));
 
             // If the Issue is closed then display it striked-out
             String resolutionId = issue.getChild(JIRAField.RESOLUTION.getId()).getAttributeValue("id");

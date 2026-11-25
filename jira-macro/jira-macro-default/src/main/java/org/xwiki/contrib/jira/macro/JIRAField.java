@@ -122,6 +122,14 @@ public class JIRAField
     public static final String NOTE = "note";
 
     /**
+     * Special field used by the List Data Source to hold the key written by the user when the issue has been moved,
+     * and is thus returned by JIRA under a different key.
+     *
+     * @since 11.1.9
+     */
+    public static final String ORIGINAL_KEY = "originalKey";
+
+    /**
      * Map of all known JIRA fields (with their id, label and type).
      */
     public static final Map<String, JIRAField> DEFAULT_FIELDS = new HashMap<>();

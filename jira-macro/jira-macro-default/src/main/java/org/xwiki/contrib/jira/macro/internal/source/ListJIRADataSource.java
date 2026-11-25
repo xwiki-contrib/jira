@@ -22,29 +22,26 @@ package org.xwiki.contrib.jira.macro.internal.source;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRABadRequestException;
-import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Takes a discrete list of JIRA issues from the Macro content and return their field values.
@@ -70,9 +67,6 @@ public class ListJIRADataSource extends AbstractJIRADataSource
      * The symbol used to separate the issue id from a user-specified note.
      */
     private static final String PIPE = "|";
-
-    @Inject
-    private Logger logger;
 
     @Override
     public Collection<Element> getData(String macroContent, JIRAMacroParameters parameters)
@@ -102,12 +96,17 @@ public class ListJIRADataSource extends AbstractJIRADataSource
         // them in the same order as passed in the issueIds parameter.
         Map<String, Element> mappedIssues = buildIssues(document);
 
+        Set<String> listedKeys = issueIds.stream().map(Pair::getLeft).collect(Collectors.toSet());
+        // The issues returned by JIRA under a key nobody listed: they are the moved issues.
+        Map<String, Element> unmatchedIssues = new LinkedHashMap<>(mappedIssues);
+        unmatchedIssues.keySet().removeAll(listedKeys);
+        long missingCount = listedKeys.stream().filter(key -> !mappedIssues.containsKey(key)).count();
+
         List<Element> issues = new ArrayList<>();
         for (Pair<String, String> id : issueIds) {
             Element issue = mappedIssues.get(id.getLeft());
-            if (issue == null) {
-                // JIRA resolves the key of a moved issue in the JQL query, but returns the issue with its new key.
-                issue = mappedIssues.get(getCurrentKey(id.getLeft(), jiraServer));
+            if (issue == null && !unmatchedIssues.isEmpty()) {
+                issue = findMovedIssue(id.getLeft(), missingCount, unmatchedIssues, jiraServer);
             }
             if (issue != null) {
                 // Add the Note field if there's one specified by the user
@@ -124,16 +123,19 @@ public class ListJIRADataSource extends AbstractJIRADataSource
         return issues;
     }
 
-    private String getCurrentKey(String issueKey, JIRAServer jiraServer)
+    private Element findMovedIssue(String oldKey, long missingCount, Map<String, Element> unmatchedIssues,
+        JIRAServer jiraServer)
     {
-        try {
-            return this.jiraFetcher.fetchJSON(this.urlHelper.getIssueKeyURL(jiraServer, issueKey), jiraServer,
-                JsonNode.class).path(JIRAField.KEY.getId()).asText(null);
-        } catch (JIRAConnectionException e) {
-            this.logger.warn("Failed to get the current key of JIRA issue [{}] from [{}]. Root cause: [{}]", issueKey,
-                jiraServer.getURL(), ExceptionUtils.getRootCauseMessage(e));
-            return null;
+        // With a single candidate on each side they necessarily match, no need to ask JIRA.
+        String newKey = missingCount == 1 && unmatchedIssues.size() == 1
+            ? unmatchedIssues.keySet().iterator().next()
+            : getCurrentIssueKey(jiraServer, oldKey);
+        Element issue = unmatchedIssues.remove(newKey);
+        if (issue != null) {
+            this.logger.debug("Issue [{}] is now [{}]", oldKey, newKey);
+            issue.addContent(new Element(JIRAField.ORIGINAL_KEY).addContent(oldKey));
         }
+        return issue;
     }
 
     /**

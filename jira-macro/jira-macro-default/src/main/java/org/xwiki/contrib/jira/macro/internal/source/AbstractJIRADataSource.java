@@ -24,8 +24,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.slf4j.Logger;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.macro.JIRADataSource;
 import org.xwiki.contrib.jira.macro.JIRAField;
@@ -35,6 +37,8 @@ import org.xwiki.contrib.jira.macro.JIRABadRequestException;
 import org.xwiki.contrib.jira.macro.JIRAConnectionException;
 import org.xwiki.contrib.jira.macro.internal.JIRAURLHelper;
 import org.xwiki.rendering.macro.MacroExecutionException;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Common implementation for JIRA Data Source that knowns how to execute a JQL query on a JIRA instance and retrieve the
@@ -46,16 +50,16 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 public abstract class AbstractJIRADataSource implements JIRADataSource
 {
     /**
-     * Executes the HTTP requests to the JIRA server.
+     * The logger to use.
      */
     @Inject
-    protected HTTPJIRAFetcher jiraFetcher;
+    protected Logger logger;
 
-    /**
-     * Builds the URLs of the JIRA server endpoints.
-     */
     @Inject
-    protected JIRAURLHelper urlHelper;
+    private HTTPJIRAFetcher jiraFetcher;
+
+    @Inject
+    private JIRAURLHelper urlHelper;
 
     @Inject
     private JIRAServerResolver jiraServerResolver;
@@ -108,5 +112,22 @@ public abstract class AbstractJIRADataSource implements JIRADataSource
     protected JIRAServer getJIRAServer(JIRAMacroParameters parameters) throws MacroExecutionException
     {
         return this.jiraServerResolver.resolve(parameters);
+    }
+
+    /**
+     * @param jiraServer the JIRA server to ask
+     * @param issueKey a key under which the issue may have been listed, possibly an old one if the issue was moved
+     * @return the current key of the issue, or {@code null} if it cannot be retrieved
+     */
+    protected String getCurrentIssueKey(JIRAServer jiraServer, String issueKey)
+    {
+        try {
+            return this.jiraFetcher.fetchJSON(this.urlHelper.getIssueKeyURL(jiraServer, issueKey), jiraServer,
+                JsonNode.class).path(JIRAField.KEY.getId()).asText(null);
+        } catch (JIRAConnectionException e) {
+            this.logger.warn("Failed to get the current key of JIRA issue [{}] from [{}]. Root cause: [{}]", issueKey,
+                jiraServer.getURL(), ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
     }
 }

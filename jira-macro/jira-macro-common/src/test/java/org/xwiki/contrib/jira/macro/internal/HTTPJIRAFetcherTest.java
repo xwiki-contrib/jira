@@ -36,6 +36,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -163,5 +164,22 @@ class HTTPJIRAFetcherTest
             exception.getMessage());
         assertEquals(exception.getExtractedMessages(),
             List.of("The value 'TEST' does not exist for the field 'project'."));
+    }
+
+    @Test
+    void jsonNotFoundDoesNotRetry()
+    {
+        this.wireMockServer.stubFor(get(urlMatching("\\/rest\\/api\\/2\\/issue\\/OLD-1.*"))
+            .willReturn(aResponse()
+                .withStatus(404)
+                .withHeader("Content-Type", "text/html")
+                .withBody("<html><body><h1>Not found</h1></body></html>")));
+        JIRAServer jiraServer =
+            new JIRAServer("http://localhost:8889", "id", new BasicAuthJIRAAuthenticator("user", "pass"));
+
+        assertThrows(JIRAConnectionException.class, () -> this.jiraFetcher.fetchJSON(
+            "http://localhost:8889/rest/api/2/issue/OLD-1?fields=key", jiraServer, Object.class));
+
+        this.wireMockServer.verify(1, getRequestedFor(urlMatching("\\/rest\\/api\\/2\\/issue\\/OLD-1.*")));
     }
 }
