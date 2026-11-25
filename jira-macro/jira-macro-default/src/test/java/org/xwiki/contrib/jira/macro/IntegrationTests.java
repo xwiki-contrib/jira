@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.xwiki.contrib.jira.config.JIRAConfiguration;
 import org.xwiki.contrib.jira.config.JIRAServer;
 import org.xwiki.contrib.jira.config.internal.BasicAuthJIRAAuthenticator;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -99,6 +100,11 @@ public class IntegrationTests
             new JIRAServer("http://localhost:8889/auth", "id", new BasicAuthJIRAAuthenticator("username", "password"));
         servers.put("jira-auth", server2);
         when(configuration.getJIRAServers()).thenReturn(servers);
+
+        ContextualLocalizationManager localizationManager =
+            componentManager.registerMockComponent(ContextualLocalizationManager.class);
+        when(localizationManager.getTranslationPlain("jira.macro.default.displayer.key.movedTo", "OLD-1",
+            "XWIKI-1001")).thenReturn("OLD-1 (moved to XWIKI-1001)");
     }
 
     @AfterClass

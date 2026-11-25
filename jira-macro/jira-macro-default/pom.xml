@@ -82,6 +82,11 @@
       <artifactId>xwiki-rendering-transformation-macro</artifactId>
       <version>${rendering.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -120,8 +125,8 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
-            <!-- Ensure that we don't add any dependency on XWiki Platform since we want to allow pure
-                 XWiki Rendering users to be able to use the default jira macro. -->
+            <!-- Ensure that we don't add any dependency on XWiki Platform, except the localization API used to
+                 translate the displayed texts. -->
             <id>enforce-platform-isolation</id>
             <goals>
               <goal>enforce</goal>
@@ -132,6 +137,10 @@
                   <excludes>
                     <exclude>org.xwiki.platform:*</exclude>
                   </excludes>
+                  <includes>
+                    <include>org.xwiki.platform:xwiki-platform-localization-api</include>
+                    <include>org.xwiki.platform:xwiki-platform-model-api</include>
+                  </includes>
                 </bannedDependencies>
               </rules>
             </configuration>

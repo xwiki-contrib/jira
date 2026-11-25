@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -30,6 +31,7 @@ import org.jdom2.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -50,6 +52,9 @@ import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
 @Singleton
 public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
 {
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
     @Override
     public List<Block> displayField(JIRAField field, Element issue, JIRAMacroParameters parameters)
     {
@@ -58,7 +63,7 @@ public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
         if (key != null) {
             String link = issue.getChildText(JIRAField.LINK.getId());
             String originalKey = issue.getChildText(JIRAField.ORIGINAL_KEY);
-            String label = originalKey == null ? key : String.format("%s (moved to %s)", originalKey, key);
+            String label = originalKey == null ? key : getMovedLabel(originalKey, key);
             List<Block> labelBlocks = Arrays.asList(new VerbatimBlock(label, true));
 
             // If the Issue is closed then display it striked-out
@@ -76,5 +81,12 @@ public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
             }
         }
         return result;
+    }
+
+    private String getMovedLabel(String originalKey, String key)
+    {
+        String label = this.localizationManager.getTranslationPlain("jira.macro.default.displayer.key.movedTo",
+            originalKey, key);
+        return label != null ? label : key;
     }
 }
