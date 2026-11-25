@@ -23,8 +23,10 @@ import java.util.List;
 
 import org.jdom2.Element;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.VerbatimBlock;
@@ -49,21 +51,37 @@ class KeyJIRAFieldDisplayerTest
     private KeyJIRAFieldDisplayer displayer;
 
     @MockComponent
+    private ComponentManager componentManager;
+
+    @Mock
     private ContextualLocalizationManager localizationManager;
 
     @Test
-    void displayMovedIssue()
+    void displayMovedIssueWhenTranslated() throws Exception
     {
+        when(this.componentManager.hasComponent(ContextualLocalizationManager.class)).thenReturn(true);
+        when(this.componentManager.getInstance(ContextualLocalizationManager.class))
+            .thenReturn(this.localizationManager);
         when(this.localizationManager.getTranslationPlain(MOVED_TO, "OLD-1", "NEW-1"))
-            .thenReturn("OLD-1 (moved to NEW-1)");
+            .thenReturn("OLD-1 (déplacé vers NEW-1)");
+
+        assertEquals("OLD-1 (déplacé vers NEW-1)", display());
+    }
+
+    @Test
+    void displayMovedIssueWhenTranslationMissing() throws Exception
+    {
+        when(this.componentManager.hasComponent(ContextualLocalizationManager.class)).thenReturn(true);
+        when(this.componentManager.getInstance(ContextualLocalizationManager.class))
+            .thenReturn(this.localizationManager);
 
         assertEquals("OLD-1 (moved to NEW-1)", display());
     }
 
     @Test
-    void displayMovedIssueWhenTranslationMissing()
+    void displayMovedIssueWhenLocalizationUnavailable()
     {
-        assertEquals("NEW-1", display());
+        assertEquals("OLD-1 (moved to NEW-1)", display());
     }
 
     private String display()
