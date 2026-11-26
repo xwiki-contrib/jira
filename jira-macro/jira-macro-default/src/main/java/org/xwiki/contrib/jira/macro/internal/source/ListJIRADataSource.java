@@ -22,8 +22,11 @@ package org.xwiki.contrib.jira.macro.internal.source;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -77,24 +80,34 @@ public class ListJIRADataSource extends AbstractJIRADataSource
         }
 
         Document document = getXMLDocument(jiraServer, constructJQLQuery(ids), parameters.getMaxCount());
-        return buildIssues(document, ids);
+        return buildIssues(document, ids, jiraServer);
     }
 
     /**
      * @param document the XML document containing all the JIRA issues and which was returned by the JIRA server
      * @param issueIds the list of JIRA issue ids specified by the user
+     * @param jiraServer the JIRA server to ask for the current key of the issues that have been moved
      * @return the list of JIRA issues (returned as XML elements), in the same order as the JIRA issue id list specified
      *         by the user
      */
-    public List<Element> buildIssues(Document document, List<Pair<String, String>> issueIds)
+    public List<Element> buildIssues(Document document, List<Pair<String, String>> issueIds, JIRAServer jiraServer)
     {
         // Note: JIRA doesn't return items in the order specified in the JQL query, thus we need to manually order
         // them in the same order as passed in the issueIds parameter.
         Map<String, Element> mappedIssues = buildIssues(document);
 
+        Set<String> listedKeys = issueIds.stream().map(Pair::getLeft).collect(Collectors.toSet());
+        // The issues returned by JIRA under a key nobody listed: they are the moved issues.
+        Map<String, Element> unmatchedIssues = new LinkedHashMap<>(mappedIssues);
+        unmatchedIssues.keySet().removeAll(listedKeys);
+        long missingCount = listedKeys.stream().filter(key -> !mappedIssues.containsKey(key)).count();
+
         List<Element> issues = new ArrayList<>();
         for (Pair<String, String> id : issueIds) {
             Element issue = mappedIssues.get(id.getLeft());
+            if (issue == null && !unmatchedIssues.isEmpty()) {
+                issue = findMovedIssue(id.getLeft(), missingCount, unmatchedIssues, jiraServer);
+            }
             if (issue != null) {
                 // Add the Note field if there's one specified by the user
                 String note = id.getRight();
@@ -108,6 +121,21 @@ public class ListJIRADataSource extends AbstractJIRADataSource
         }
 
         return issues;
+    }
+
+    private Element findMovedIssue(String oldKey, long missingCount, Map<String, Element> unmatchedIssues,
+        JIRAServer jiraServer)
+    {
+        // With a single candidate on each side they necessarily match, no need to ask JIRA.
+        String newKey = missingCount == 1 && unmatchedIssues.size() == 1
+            ? unmatchedIssues.keySet().iterator().next()
+            : getCurrentIssueKey(jiraServer, oldKey);
+        Element issue = unmatchedIssues.remove(newKey);
+        if (issue != null) {
+            this.logger.debug("Issue [{}] is now [{}]", oldKey, newKey);
+            issue.addContent(new Element(JIRAField.ORIGINAL_KEY).addContent(oldKey));
+        }
+        return issue;
     }
 
     /**

@@ -57,6 +57,8 @@ public class JIRAURLHelper
 
     private static final String JQL_REST_SEARCH_URL_PREFIX = "/rest/api/2/search?maxResults=0&jql=";
 
+    private static final String REST_ISSUE_URL_PREFIX = "/rest/api/2/issue/";
+
     @Inject
     private Logger logger;
 
@@ -135,6 +137,18 @@ public class JIRAURLHelper
                 encode(jqlQuery));
         this.logger.debug("Computed JIRA REST SEARCH URL [{}]", fullURL);
         return fullURL;
+    }
+
+    /**
+     * @param server the actual JIRA server to request
+     * @param issueKey the key of the issue to get, which can be an old key of a moved issue
+     * @return the URL to get the current key of the issue
+     * @since 11.1.9
+     */
+    public String getIssueKeyURL(JIRAServer server, String issueKey)
+    {
+        return String.format("%s%s%s?fields=key", server.getURL(), REST_ISSUE_URL_PREFIX,
+            encode(issueKey).replace("+", "%20"));
     }
 
     /**

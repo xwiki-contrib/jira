@@ -19,15 +19,20 @@
  */
 package org.xwiki.contrib.jira.macro.internal.displayer.field;
 
-import java.util.Arrays;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jdom2.Element;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.jira.macro.JIRAField;
 import org.xwiki.contrib.jira.macro.JIRAMacroParameters;
 import org.xwiki.rendering.block.Block;
@@ -50,6 +55,20 @@ import org.xwiki.contrib.jira.macro.JIRAFieldDisplayer;
 @Singleton
 public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
 {
+    private static final String MOVED_TO_KEY = "jira.macro.default.displayer.key.movedTo";
+
+    private static final String MOVED_TO_DEFAULT = "{0} (moved to {1})";
+
+    // The localization API is a XWiki Platform API, which this module must not depend on at compile time. The
+    // translation is used when it's available at runtime.
+    private static final String LOCALIZATION_MANAGER_ROLE = "org.xwiki.localization.ContextualLocalizationManager";
+
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
+
     @Override
     public List<Block> displayField(JIRAField field, Element issue, JIRAMacroParameters parameters)
     {
@@ -57,22 +76,47 @@ public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
         String key = issue.getChildText(JIRAField.KEY.getId());
         if (key != null) {
             String link = issue.getChildText(JIRAField.LINK.getId());
-            List<Block> labelBlocks = Arrays.asList(new VerbatimBlock(key, true));
+            String originalKey = issue.getChildText(JIRAField.ORIGINAL_KEY);
+            String label = originalKey == null ? key : getMovedLabel(originalKey, key);
+            List<Block> labelBlocks = List.of(new VerbatimBlock(label, true));
 
             // If the Issue is closed then display it striked-out
             String resolutionId = issue.getChild(JIRAField.RESOLUTION.getId()).getAttributeValue("id");
             if (!"-1".equals(resolutionId)) {
                 // The issue is resolved
-                labelBlocks = Arrays.asList(new FormatBlock(labelBlocks, Format.STRIKEDOUT));
+                labelBlocks = List.of(new FormatBlock(labelBlocks, Format.STRIKEDOUT));
             }
 
             if (link != null) {
                 ResourceReference reference = new ResourceReference(link, ResourceType.URL);
-                result = Arrays.asList(new LinkBlock(labelBlocks, reference, true));
+                result = List.of(new LinkBlock(labelBlocks, reference, true));
             } else {
                 result = labelBlocks;
             }
         }
         return result;
+    }
+
+    private String getMovedLabel(String originalKey, String key)
+    {
+        String label = translate(originalKey, key);
+        return label != null ? label : MessageFormat.format(MOVED_TO_DEFAULT, originalKey, key);
+    }
+
+    private String translate(String originalKey, String key)
+    {
+        try {
+            Class<?> role = Class.forName(LOCALIZATION_MANAGER_ROLE);
+            if (this.componentManager.hasComponent(role)) {
+                Object manager = this.componentManager.getInstance(role);
+                return (String) role.getMethod("getTranslationPlain", String.class, Object[].class)
+                    .invoke(manager, MOVED_TO_KEY, new Object[] { originalKey, key });
+            }
+        } catch (ClassNotFoundException e) {
+            // Not running on top of XWiki Platform, use the default message.
+        } catch (ReflectiveOperationException | ComponentLookupException e) {
+            this.logger.debug("Failed to translate [{}]: [{}]", MOVED_TO_KEY, ExceptionUtils.getRootCauseMessage(e));
+        }
+        return null;
     }
 }

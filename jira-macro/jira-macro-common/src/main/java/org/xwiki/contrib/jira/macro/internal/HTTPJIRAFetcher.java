@@ -104,7 +104,7 @@ public class HTTPJIRAFetcher
     {
         try {
             return performRequest(urlString, jiraServer, is -> getObjectMapper().readValue(is, type));
-        } catch (JIRABadRequestException e) {
+        } catch (JIRAConnectionException e) {
             throw e;
         } catch (Exception e) {
             // The JSON has failed to be parsed, read it as plain text and return it, for debugging purpose.

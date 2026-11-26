@@ -1,0 +1,40 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test the "list" style with a moved issue.
+.#-----------------------------------------------------
+{{jira url="http://localhost:8889" style="list"}}
+OLD-1
+XWIKI-1000
+{{/jira}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [jira] [url=http://localhost:8889|style=list] [OLD-1
+XWIKI-1000]
+beginList [BULLETED]
+beginListItem
+onImage [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/images/icons/status_open.gif]] [false] [[alt]=[Open][data-xwiki-lightbox]=[false][title]=[Open]]
+onSpace
+beginLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-1001]] [true]
+onVerbatim [OLD-1 (moved to XWIKI-1001)] [true]
+endLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-1001]] [true]
+onSpace
+onVerbatim [On jetty, non-default skins are not usable] [true]
+endListItem
+beginListItem
+onImage [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/images/icons/status_closed.gif]] [false] [[alt]=[Closed][data-xwiki-lightbox]=[false][title]=[Closed]]
+onSpace
+beginLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-1000]] [true]
+beginFormat [STRIKEDOUT]
+onVerbatim [XWIKI-1000] [true]
+endFormat [STRIKEDOUT]
+endLink [Typed = [true] Type = [url] Reference = [http://jira.xwiki.org/browse/XWIKI-1000]] [true]
+onSpace
+onVerbatim [Improve PDF Output] [true]
+endListItem
+endList [BULLETED]
+endMacroMarkerStandalone [jira] [url=http://localhost:8889|style=list] [OLD-1
+XWIKI-1000]
+endDocument

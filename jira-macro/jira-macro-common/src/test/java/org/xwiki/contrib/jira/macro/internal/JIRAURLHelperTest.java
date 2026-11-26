@@ -73,4 +73,14 @@ class JIRAURLHelperTest
         assertEquals("http://localhost/jira/rest/api/2/search?maxResults=0&jql=query",
             this.jiraURLHelper.getRestSearchURL(jiraServer, "query"));
     }
+
+    @Test
+    void getIssueKeyURL()
+    {
+        JIRAServer jiraServer = new JIRAServer("http://localhost/jira", "id");
+        assertEquals("http://localhost/jira/rest/api/2/issue/XWIKI-1?fields=key",
+            this.jiraURLHelper.getIssueKeyURL(jiraServer, "XWIKI-1"));
+        assertEquals("http://localhost/jira/rest/api/2/issue/A%20B%2F..%3F%26?fields=key",
+            this.jiraURLHelper.getIssueKeyURL(jiraServer, "A B/..?&"));
+    }
 }
