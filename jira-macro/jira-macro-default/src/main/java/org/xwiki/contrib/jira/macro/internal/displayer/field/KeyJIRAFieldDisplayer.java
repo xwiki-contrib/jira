@@ -20,7 +20,6 @@
 package org.xwiki.contrib.jira.macro.internal.displayer.field;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -79,18 +78,18 @@ public class KeyJIRAFieldDisplayer implements JIRAFieldDisplayer
             String link = issue.getChildText(JIRAField.LINK.getId());
             String originalKey = issue.getChildText(JIRAField.ORIGINAL_KEY);
             String label = originalKey == null ? key : getMovedLabel(originalKey, key);
-            List<Block> labelBlocks = Arrays.asList(new VerbatimBlock(label, true));
+            List<Block> labelBlocks = List.of(new VerbatimBlock(label, true));
 
             // If the Issue is closed then display it striked-out
             String resolutionId = issue.getChild(JIRAField.RESOLUTION.getId()).getAttributeValue("id");
             if (!"-1".equals(resolutionId)) {
                 // The issue is resolved
-                labelBlocks = Arrays.asList(new FormatBlock(labelBlocks, Format.STRIKEDOUT));
+                labelBlocks = List.of(new FormatBlock(labelBlocks, Format.STRIKEDOUT));
             }
 
             if (link != null) {
                 ResourceReference reference = new ResourceReference(link, ResourceType.URL);
-                result = Arrays.asList(new LinkBlock(labelBlocks, reference, true));
+                result = List.of(new LinkBlock(labelBlocks, reference, true));
             } else {
                 result = labelBlocks;
             }
